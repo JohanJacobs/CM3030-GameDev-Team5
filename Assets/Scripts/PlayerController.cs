@@ -36,6 +36,9 @@ public class PlayerController : MonoBehaviour
 
         _player.Kill += (creature, victim) => AddKill();
         _player.Death += (creature) => ShowWasted();
+        _player.ReceiveDamanage += () => PlayReceiveDamageAnimation();
+
+
 
         ResetHUD();
     }
@@ -61,6 +64,10 @@ public class PlayerController : MonoBehaviour
         Vector3 movementInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
         // GetPlayerMovementBasis(out var movementForward, out var movementRight);
+
+        /*
+        // replaced with new movement code 
+
         GetCameraMovementBasis(out var movementForward, out var movementRight);
 
         var movementZ = movementForward * movementInput.z;
@@ -72,14 +79,23 @@ public class PlayerController : MonoBehaviour
         {
             combinedMovement.Normalize();
         }
-
         _characterController.Move(combinedMovement * _player.Speed * Time.deltaTime);
+        */
+        
+        
+
+        var moveVector = (transform.forward * movementInput.z) + (transform.right * movementInput.x);
+
+        Debug.DrawLine(transform.position, transform.position + 1f * moveVector.normalized, Color.yellow);
+
+
+        _characterController.Move(moveVector * _player.Speed * Time.deltaTime);
 
         // HACK: keep player at Y=0
         transform.Translate(0, -transform.position.y, 0);
 
-        Animator.SetFloat("MovementInput.Forward", movementInput.z);
-        Animator.SetFloat("MovementInput.Right", movementInput.x);
+        PlayMoveAnimation(movementInput);
+
     }
 
     private void GetPlayerMovementBasis(out Vector3 forward, out Vector3 right)
@@ -133,8 +149,13 @@ public class PlayerController : MonoBehaviour
         bool fireButtonPressed = Input.GetButton("Fire1");
 
         if (!fireButtonPressed)
+        {
+            PlayShootAnimation(false);
             return;
+        }
 
+        
+        
         _toNextShot += 1f / _player.FireRate;
 
         var aimDirection = _lookAtPointOnGround.Value - transform.position;
@@ -196,6 +217,32 @@ public class PlayerController : MonoBehaviour
 
     private void ShowWasted()
     {
+        PlayPlayerDeathAnimation();
         _hud.ShowWasted();
     }
+
+      
+
+
+    private void PlayReceiveDamageAnimation()
+    {
+        Animator.SetTrigger("IsHit");
+    }
+
+    private void PlayPlayerDeathAnimation()
+    {
+        Animator.SetBool("IsDead", true);
+    }
+
+    private void PlayShootAnimation(bool isShooting)
+    {
+        Animator.SetBool("IsShooting", isShooting);
+    }
+
+    private void PlayMoveAnimation(Vector3 movementInput)
+    {
+        Animator.SetFloat("ForwardMovement", movementInput.z);
+        Animator.SetFloat("RightMovement", movementInput.x);
+    }
 }
+

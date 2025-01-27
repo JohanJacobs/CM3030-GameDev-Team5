@@ -6,8 +6,10 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour
 {
+    [SerializeField] bool SpawnEnemies;
     private class MonsterSpawnerContext
     {
+        
         private readonly WeakReference<GameController> _gameController;
         private readonly MonsterSpawner _spawner;
 
@@ -65,7 +67,6 @@ public class GameController : MonoBehaviour
             _monsters.Remove(monsterGameObject);
         }
     }
-
     public float SpawnDistance = 30f;
 
     public MonsterSpawner[] Spawns;
@@ -99,7 +100,9 @@ public class GameController : MonoBehaviour
             _spawnerContexts.Add(spawner, context);
         }
 
-        context.Update();
+
+        if (SpawnEnemies)
+            context.Update();
     }
 
     private Monster SpawnMonster(MonsterSpawner spawner)

@@ -8,6 +8,7 @@ public class Creature : MonoBehaviour
 {
     public delegate void KillDelegate(Creature creature, Creature victim);
     public delegate void DeathDelegate(Creature creature);
+    public delegate void ReceiveDamangeDelegate();
 
     public float MaxHealth = 10f;
 
@@ -18,6 +19,7 @@ public class Creature : MonoBehaviour
 
     public event KillDelegate Kill;
     public event DeathDelegate Death;
+    public event ReceiveDamangeDelegate ReceiveDamanage;
 
     private float _health;
     private bool _dead = false;
@@ -84,7 +86,7 @@ public class Creature : MonoBehaviour
 
     protected virtual void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
     {
-
+        ReceiveDamanage?.Invoke();
     }
 
     private void Die()
@@ -95,6 +97,6 @@ public class Creature : MonoBehaviour
 
         Death?.Invoke(this);
 
-        GameObject.Destroy(gameObject, 0.2f);
+        //GameObject.Destroy(gameObject, 0.2f);
     }
 }
