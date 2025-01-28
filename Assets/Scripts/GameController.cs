@@ -81,6 +81,9 @@ public class GameController : MonoBehaviour
 
     void Update()
     {
+        if (_player == null)
+            return;
+
         foreach (var spawner in Spawns)
         {
             UpdateMonsterSpawner(spawner);

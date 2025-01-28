@@ -6,15 +6,15 @@ using Random = UnityEngine.Random;
 
 public class Monster : Creature
 {
-    public float Speed = 3f;
-    public float TurnSpeed = 300f;
     public float ApproachDistance = 0.3f;
-    public float KnockBackResistance = 0f;
-    public float DamageMin = 1f;
-    public float DamageMax = 3f;
-    public float AttackRate = 1f;
-    public float AttackRange = 0.5f;
-    public Rigidbody RigidBody;
+
+    public float Speed => AbilitySystemComponent.GetAttributeValue(AttributeType.MoveSpeed);
+    public float TurnSpeed => AbilitySystemComponent.GetAttributeValue(AttributeType.TurnSpeed);
+    public float KnockBackResistance => AbilitySystemComponent.GetAttributeValue(AttributeType.KnockBackResistance);
+    public float DamageMin => AbilitySystemComponent.GetAttributeValue(AttributeType.MinDamage);
+    public float DamageMax => AbilitySystemComponent.GetAttributeValue(AttributeType.MaxDamage);
+    public float AttackRate => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRate);
+    public float AttackRange => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRange);
 
     private GameObject _target;
 

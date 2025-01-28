@@ -132,5 +132,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: RatKing
       objectReference: {fileID: 0}
+    - target: {fileID: 8642331377538256225, guid: 88aff359c5de9744a9a5b01f9edf9f89,
+        type: 3}
+      propertyPath: DefaultAttributeSets.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 822f3ebcdf710744ba1fbd885e6ee5f2,
+        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 88aff359c5de9744a9a5b01f9edf9f89, type: 3}

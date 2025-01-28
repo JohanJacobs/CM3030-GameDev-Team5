@@ -102,6 +102,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3794237158255692186}
+  - component: {fileID: 8642331377538256225}
+  - component: {fileID: 8344635484670693762}
   - component: {fileID: 3794237158255692187}
   m_Layer: 0
   m_Name: Rat
@@ -125,6 +127,33 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8642331377538256225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3794237158255692260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34eaf4fa460d9e24e9cdb1b6d7d2f5e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DefaultAttributeSets:
+  - {fileID: 11400000, guid: bc7e3d4971c89b449b34671bdbc3816e, type: 2}
+  - {fileID: 11400000, guid: 50fb533c6d6feeb46acb570c587a5358, type: 2}
+--- !u!114 &8344635484670693762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3794237158255692260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 945f34f2cc140bb41bb1b2d40fcbe86e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3794237158255692187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,7 +166,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a570f2cfa9529634c809ddaeaaeee986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxHealth: 10
   Speed: 2.5
   TurnSpeed: 300
   ApproachDistance: 0.4

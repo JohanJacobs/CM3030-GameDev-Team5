@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Player : Creature
+﻿public class Player : Creature
 {
-    public float Speed = 5f;
-    public float DamageMin = 2f;
-    public float DamageMax = 5f;
-    public float FireRate = 8f;
-    public float FireRange = 20f;
+    public float Speed => AbilitySystemComponent.GetAttributeValue(AttributeType.MoveSpeed);
+    public float TurnSpeed => AbilitySystemComponent.GetAttributeValue(AttributeType.TurnSpeed);
+    public float DamageMin => AbilitySystemComponent.GetAttributeValue(AttributeType.MinDamage);
+    public float DamageMax => AbilitySystemComponent.GetAttributeValue(AttributeType.MaxDamage);
+    public float FireRate => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRate);
+    public float FireRange => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRange);
 }

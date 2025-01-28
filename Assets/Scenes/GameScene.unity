@@ -5794,9 +5794,11 @@ GameObject:
   m_Component:
   - component: {fileID: 244319273}
   - component: {fileID: 244319272}
+  - component: {fileID: 244319276}
+  - component: {fileID: 244319275}
+  - component: {fileID: 244319274}
   - component: {fileID: 244319271}
   - component: {fileID: 244319270}
-  - component: {fileID: 244319274}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -5884,12 +5886,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae03c4efa1b51644e89cec15fea52b94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxHealth: 100
-  Speed: 5
-  DamageMin: 3
-  DamageMax: 6
-  FireRate: 8
-  FireRange: 20
+--- !u!114 &244319275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244319269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 945f34f2cc140bb41bb1b2d40fcbe86e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &244319276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244319269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34eaf4fa460d9e24e9cdb1b6d7d2f5e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DefaultAttributeSets:
+  - {fileID: 11400000, guid: bc7e3d4971c89b449b34671bdbc3816e, type: 2}
+  - {fileID: 11400000, guid: df3fce6e52a561c47a56dd0378b89d2f, type: 2}
+  - {fileID: 11400000, guid: 08517e24876b6d24688bfe445d755cad, type: 2}
 --- !u!1001 &244594387
 PrefabInstance:
   m_ObjectHideFlags: 0

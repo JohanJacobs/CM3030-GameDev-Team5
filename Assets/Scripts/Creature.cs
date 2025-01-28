@@ -2,29 +2,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class Creature : MonoBehaviour
 {
     public delegate void KillDelegate(Creature creature, Creature victim);
     public delegate void DeathDelegate(Creature creature);
 
-    public float MaxHealth = 10f;
-
-    public bool IsDead => _dead;
-    public bool IsAlive => !_dead;
-    public float Health => _health;
-    public float HealthFraction => Health / MaxHealth;
+    public bool IsDead => HealthComponent.IsDead;
+    public bool IsAlive => HealthComponent.IsAlive;
+    public float Health => HealthComponent.Health;
+    public float MaxHealth => HealthComponent.MaxHealth;
+    public float HealthFraction => HealthComponent.HealthFraction;
 
     public event KillDelegate Kill;
     public event DeathDelegate Death;
 
-    private float _health;
-    private bool _dead = false;
+    protected AbilitySystemComponent AbilitySystemComponent;
+    protected HealthComponent HealthComponent;
 
     void Awake()
     {
-        _health = MaxHealth;
+        AbilitySystemComponent = GetComponent<AbilitySystemComponent>();
+
+        HealthComponent = GetComponent<HealthComponent>();
+        HealthComponent.OutOfHealth += OnOutOfHealth;
     }
 
     public void TakeDamage(GameObject causer, Vector3 origin, float amount)
@@ -35,18 +36,9 @@ public class Creature : MonoBehaviour
         if (!(amount > 0))
             throw new ArgumentOutOfRangeException(nameof(amount), amount, "Damage amount must be positive");
 
-        if (_health > amount)
-        {
-            _health -= amount;
+        AbilitySystemComponent.ApplyAttributeModifier(AttributeType.Damage, ScalarModifier.MakeBonus(amount), false, true);
 
-            OnDamageTaken(causer, origin, amount);
-        }
-        else
-        {
-            _health = 0;
-
-            Die();
-        }
+        OnDamageTaken(causer, origin, amount);
     }
 
     public void DealDamage(Creature victim, Vector3 origin, float amount)
@@ -89,12 +81,15 @@ public class Creature : MonoBehaviour
 
     private void Die()
     {
-        _dead = true;
-
         OnDeath();
 
         Death?.Invoke(this);
 
         GameObject.Destroy(gameObject, 0.2f);
+    }
+
+    private void OnOutOfHealth(HealthComponent healthComponent)
+    {
+        Die();
     }
 }
