@@ -18,8 +18,8 @@ MonoBehaviour:
   - Attribute: 1
     BaseValue: 100
   - Attribute: 2
-    BaseValue: 0
+    BaseValue: 0.1
   - Attribute: 6
-    BaseValue: 0
+    BaseValue: 5
   - Attribute: 7
-    BaseValue: 0
+    BaseValue: 720

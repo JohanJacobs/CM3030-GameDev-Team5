@@ -44,7 +44,8 @@ public class HealthComponent : MonoBehaviour
     private void Awake()
     {
         _asc = GetComponent<AbilitySystemComponent>();
-        _asc.Ready += OnAbilitySystemReady;
+
+        _asc.WhenReady(OnAbilitySystemReady);
     }
 
     private void Start()
@@ -97,7 +98,10 @@ public class HealthComponent : MonoBehaviour
         _healthAttribute.Reset(health);
         _damageAttribute.Reset(0f);
 
-        HealthChanged?.Invoke(this, initialHealth, health);
+        if (initialHealth > health)
+        {
+            HealthChanged?.Invoke(this, initialHealth, health);
+        }
 
         if (wasDead != isDead)
         {
@@ -124,7 +128,7 @@ public class HealthComponent : MonoBehaviour
         _healthAttribute.Reset(health);
         _healingAttribute.Reset(0f);
 
-        if (!Mathf.Approximately(initialHealth, health))
+        if (initialHealth < health)
         {
             HealthChanged?.Invoke(this, initialHealth, health);
         }

@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Quaternion = UnityEngine.Quaternion;
 using Random = UnityEngine.Random;
+using Vector3 = UnityEngine.Vector3;
 
 public class GameController : MonoBehaviour
 {
@@ -63,6 +67,26 @@ public class GameController : MonoBehaviour
             var monsterGameObject = monster.gameObject;
 
             _monsters.Remove(monsterGameObject);
+
+            DropMonsterLoot(monster);
+        }
+
+        private void DropMonsterLoot(Creature monster)
+        {
+            var experience = GetMonsterExperienceReward(monster);
+            if (experience > 0)
+            {
+                GameController.SpawnExperienceOrbPickup(experience, monster.transform.position);
+            }
+        }
+
+        private float GetMonsterExperienceReward(Creature monster)
+        {
+            var asc = monster.GetComponent<AbilitySystemComponent>();
+            if (asc == null)
+                return 0f;
+
+            return asc.GetAttributeValue(AttributeType.Experience);
         }
     }
 
@@ -121,5 +145,16 @@ public class GameController : MonoBehaviour
             throw new Exception("Monster prefab must have Monster component");
 
         return monster;
+    }
+
+    private GameObject SpawnExperienceOrbPickup(float experience, Vector3 position)
+    {
+        var instance = Instantiate(GameData.Instance.ExperienceOrbPickupPrefab, position, Quaternion.identity);
+
+        var pickup = instance.GetComponent<ExperienceOrbPickup>();
+
+        pickup.Experience = experience;
+
+        return instance;
     }
 }

@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
     private Player _player;
     private HUD _hud;
 
+    private AbilitySystemComponent _asc;
+
     private float _toNextShot = 0;
 
     private Vector3? _lookAtPointOnGround = null;
@@ -33,9 +35,16 @@ public class PlayerController : MonoBehaviour
         _characterController = GetComponent<CharacterController>();
         _player = GetComponent<Player>();
 
+        _asc = GetComponent<AbilitySystemComponent>();
+
+        _asc.WhenReady(OnAbilitySystemReady);
+
         _player.Kill += (creature, victim) => AddKill();
         _player.Death += (creature) => ShowWasted();
+    }
 
+    private void OnAbilitySystemReady(AbilitySystemComponent asc)
+    {
         ResetHUD();
     }
 
@@ -52,7 +61,7 @@ public class PlayerController : MonoBehaviour
 
     void LateUpdate()
     {
-        _hud.UpdateHealth(_player.Health, _player.MaxHealth);
+        UpdateHUD();
     }
 
     private void UpdateMovement()
@@ -184,6 +193,15 @@ public class PlayerController : MonoBehaviour
     {
         _hud.UpdateHealth(_player.Health, _player.MaxHealth);
         _hud.UpdateKillCounter(_kills);
+        _hud.UpdateExperience(_player.Experience);
+        _hud.UpdateLevel(_player.Level);
+    }
+
+    private void UpdateHUD()
+    {
+        _hud.UpdateHealth(_player.Health, _player.MaxHealth);
+        _hud.UpdateExperience(_player.Experience);
+        _hud.UpdateLevel(_player.Level);
     }
 
     private void AddKill()

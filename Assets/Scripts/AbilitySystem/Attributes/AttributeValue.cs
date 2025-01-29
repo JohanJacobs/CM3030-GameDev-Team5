@@ -2,35 +2,6 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-public sealed class AttributeModifierHandle
-{
-    public AttributeModifier AttributeModifier => _weakAttributeModifier.TryGetTarget(out var attributeModifier) ? attributeModifier : null;
-    public AttributeValue AttributeValue => _weakAttributeValue.TryGetTarget(out var attributeValue) ? attributeValue : null;
-    public object InternalModifier => _weakInternalModifier.TryGetTarget(out var opaque) ? opaque : null;
-
-    private readonly WeakReference<AttributeModifier> _weakAttributeModifier;
-    private readonly WeakReference<AttributeValue> _weakAttributeValue;
-    private readonly WeakReference<object> _weakInternalModifier;
-
-    public AttributeModifierHandle(AttributeModifier attributeModifier, AttributeValue attributeValue, object internalModifier)
-    {
-        _weakAttributeModifier = new WeakReference<AttributeModifier>(attributeModifier);
-        _weakAttributeValue = new WeakReference<AttributeValue>(attributeValue);
-        _weakInternalModifier = new WeakReference<object>(internalModifier);
-    }
-
-    public bool CancelModifier()
-    {
-        var attributeValue = AttributeValue;
-        if (attributeValue == null)
-            return false;
-
-        attributeValue.CancelModifier(this);
-
-        return true;
-    }
-}
-
 public sealed class AttributeValue
 {
     public delegate void ModifiedDelegate(AttributeValue attributeValue, float oldValue, float value);
@@ -42,18 +13,18 @@ public sealed class AttributeValue
 
         public ScalarModifier Modifier;
 
-        public InternalModifier(int index, ScalarModifier modifier, bool post)
-        {
-            Index = index;
-            Post = post;
-            Modifier = modifier;
-        }
-
         public InternalModifier(int index, AttributeModifier attributeModifier)
         {
             Index = index;
             Post = attributeModifier.Post;
             Modifier = ScalarModifier.MakeFromAttributeModifier(attributeModifier);
+        }
+
+        public InternalModifier(int index, ScalarModifier modifier, bool post)
+        {
+            Index = index;
+            Post = post;
+            Modifier = modifier;
         }
 
         public void Update(AttributeModifier attributeModifier)
@@ -121,14 +92,15 @@ public sealed class AttributeValue
     /// Permanent modifiers are not stored in modifiers list, no handle is returned.
     /// </remarks>
     /// <param name="attributeModifier">Modifier</param>
+    /// <param name="overridePermanent">When specified, overrides attribute modifier's Permanent property</param>
     /// <returns>Applied modifier handle, or null (see remarks)</returns>
-    public AttributeModifierHandle ApplyModifier(AttributeModifier attributeModifier)
+    public AttributeModifierHandle ApplyModifier(AttributeModifier attributeModifier, bool? overridePermanent = null)
     {
         Debug.Assert(Attribute == attributeModifier.Attribute);
 
         var initialValue = Value;
 
-        var handle = ApplyModifierImpl(attributeModifier);
+        var handle = ApplyModifierImpl(attributeModifier, overridePermanent);
 
         var modifiedValue = Value;
 
@@ -307,7 +279,7 @@ public sealed class AttributeValue
         _dirtyValue = true;
     }
 
-    private AttributeModifierHandle ApplyModifierImpl(AttributeModifier attributeModifier)
+    private AttributeModifierHandle ApplyModifierImpl(AttributeModifier attributeModifier, bool? overridePermanent)
     {
         if (attributeModifier.Type == AttributeModifierType.Override)
         {
@@ -316,7 +288,7 @@ public sealed class AttributeValue
             return null;
         }
 
-        if (attributeModifier.Permanent)
+        if (overridePermanent ?? attributeModifier.Permanent)
         {
             if (attributeModifier.Post)
                 _permanentPostModifier.Combine(ScalarModifier.MakeFromAttributeModifier(attributeModifier));

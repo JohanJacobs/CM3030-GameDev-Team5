@@ -34,6 +34,48 @@ public enum AttributeModifierType
     Override,
 }
 
+public interface IAttributeModifierContext
+{
+    GameObject Source { get; }
+    GameObject Target { get; }
+    AbilitySystemComponent SourceAbilitySystem { get; }
+    AbilitySystemComponent TargetAbilitySystem { get; }
+}
+
+public interface IAttributeModifierCalculation
+{
+    float GetValue(IAttributeModifierContext context, AttributeModifier attributeModifier);
+}
+
+public sealed class AttributeModifierHandle
+{
+    public AttributeModifier AttributeModifier => _weakAttributeModifier.TryGetTarget(out var attributeModifier) ? attributeModifier : null;
+    public AttributeValue AttributeValue => _weakAttributeValue.TryGetTarget(out var attributeValue) ? attributeValue : null;
+    public object InternalModifier => _weakInternalModifier.TryGetTarget(out var opaque) ? opaque : null;
+
+    private readonly WeakReference<AttributeModifier> _weakAttributeModifier;
+    private readonly WeakReference<AttributeValue> _weakAttributeValue;
+    private readonly WeakReference<object> _weakInternalModifier;
+
+    public AttributeModifierHandle(AttributeModifier attributeModifier, AttributeValue attributeValue, object internalModifier)
+    {
+        _weakAttributeModifier = new WeakReference<AttributeModifier>(attributeModifier);
+        _weakAttributeValue = new WeakReference<AttributeValue>(attributeValue);
+        _weakInternalModifier = new WeakReference<object>(internalModifier);
+    }
+
+    public bool CancelModifier()
+    {
+        var attributeValue = AttributeValue;
+        if (attributeValue == null)
+            return false;
+
+        attributeValue.CancelModifier(this);
+
+        return true;
+    }
+}
+
 [CreateAssetMenu]
 public sealed class AttributeModifier : ScriptableObject
 {

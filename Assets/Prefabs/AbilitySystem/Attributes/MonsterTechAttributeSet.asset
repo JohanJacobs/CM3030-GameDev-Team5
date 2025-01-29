@@ -10,26 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f5a8ee514608c3a4b91cbee5e3a7e44c, type: 3}
-  m_Name: RatAttributeSet
+  m_Name: MonsterTechAttributeSet
   m_EditorClassIdentifier: 
   DefaultAttributes:
-  - Attribute: 0
+  - Attribute: 16
     BaseValue: 0
-  - Attribute: 1
-    BaseValue: 6
-  - Attribute: 6
-    BaseValue: 2.5
-  - Attribute: 7
-    BaseValue: 300
-  - Attribute: 8
-    BaseValue: 1
-  - Attribute: 9
-    BaseValue: 4
-  - Attribute: 10
-    BaseValue: 0.5
-  - Attribute: 11
-    BaseValue: 1
-  - Attribute: 19
+  - Attribute: 17
     BaseValue: 0
-  - Attribute: 15
-    BaseValue: 1
