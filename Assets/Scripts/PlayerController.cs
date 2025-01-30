@@ -64,10 +64,6 @@ public class PlayerController : MonoBehaviour
         Vector3 movementInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
         // GetPlayerMovementBasis(out var movementForward, out var movementRight);
-
-        /*
-        // replaced with new movement code 
-
         GetCameraMovementBasis(out var movementForward, out var movementRight);
 
         var movementZ = movementForward * movementInput.z;
@@ -79,23 +75,16 @@ public class PlayerController : MonoBehaviour
         {
             combinedMovement.Normalize();
         }
+
         _characterController.Move(combinedMovement * _player.Speed * Time.deltaTime);
-        */
-        
-        
-
-        var moveVector = (transform.forward * movementInput.z) + (transform.right * movementInput.x);
-
-        Debug.DrawLine(transform.position, transform.position + 1f * moveVector.normalized, Color.yellow);
-
-
-        _characterController.Move(moveVector * _player.Speed * Time.deltaTime);
 
         // HACK: keep player at Y=0
         transform.Translate(0, -transform.position.y, 0);
 
-        PlayMoveAnimation(movementInput);
+        var localMovementZ = Vector3.Dot(transform.forward, combinedMovement);
+        var localMovementX = Vector3.Dot(transform.right, combinedMovement);
 
+        PlayMoveAnimation(new Vector3(localMovementX, 0, localMovementZ));
     }
 
     private void GetPlayerMovementBasis(out Vector3 forward, out Vector3 right)
