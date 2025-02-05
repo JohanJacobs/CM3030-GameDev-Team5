@@ -7,6 +7,7 @@ public class Creature : MonoBehaviour
 {
     public delegate void KillDelegate(Creature creature, Creature victim);
     public delegate void DeathDelegate(Creature creature);
+    public delegate void ReceiveDamangeDelegate();
 
     public bool IsDead => HealthComponent.IsDead;
     public bool IsAlive => HealthComponent.IsAlive;
@@ -16,6 +17,7 @@ public class Creature : MonoBehaviour
 
     public event KillDelegate Kill;
     public event DeathDelegate Death;
+    public event ReceiveDamangeDelegate ReceiveDamanage;
 
     protected AbilitySystemComponent AbilitySystemComponent;
     protected HealthComponent HealthComponent;
@@ -76,7 +78,7 @@ public class Creature : MonoBehaviour
 
     protected virtual void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
     {
-
+        ReceiveDamanage?.Invoke();
     }
 
     private void Die()
@@ -85,7 +87,9 @@ public class Creature : MonoBehaviour
 
         Death?.Invoke(this);
 
-        GameObject.Destroy(gameObject, 0.2f);
+        // only destroy non player objects
+        if (!gameObject.CompareTag("Player"))
+            GameObject.Destroy(gameObject, 0.2f);
     }
 
     private void OnOutOfHealth(HealthComponent healthComponent)

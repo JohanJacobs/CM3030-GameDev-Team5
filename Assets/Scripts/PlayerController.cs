@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
 
         _player.Kill += (creature, victim) => AddKill();
         _player.Death += (creature) => ShowWasted();
+        _player.ReceiveDamanage += () => PlayReceiveDamageAnimation();
     }
 
     private void OnAbilitySystemReady(AbilitySystemComponent asc)
@@ -86,8 +87,11 @@ public class PlayerController : MonoBehaviour
         // HACK: keep player at Y=0
         transform.Translate(0, -transform.position.y, 0);
 
-        Animator.SetFloat("MovementInput.Forward", movementInput.z);
-        Animator.SetFloat("MovementInput.Right", movementInput.x);
+        // convert movement to local space for animation
+        var localMovementZ = Vector3.Dot(transform.forward, combinedMovement);
+        var localMovementX = Vector3.Dot(transform.right, combinedMovement);
+
+        PlayMoveAnimation(new Vector3(localMovementX, 0, localMovementZ));        
     }
 
     private void GetPlayerMovementBasis(out Vector3 forward, out Vector3 right)
@@ -141,7 +145,10 @@ public class PlayerController : MonoBehaviour
         bool fireButtonPressed = Input.GetButton("Fire1");
 
         if (!fireButtonPressed)
+        {
+            PlayShootAnimation(false);
             return;
+        }
 
         _toNextShot += 1f / _player.FireRate;
 
@@ -213,6 +220,28 @@ public class PlayerController : MonoBehaviour
 
     private void ShowWasted()
     {
+        PlayPlayerDeathAnimation();
         _hud.ShowWasted();
+    }
+
+    private void PlayReceiveDamageAnimation()
+    {
+        Debug.Log("IsHit");
+        Animator.SetTrigger("IsHit");
+    }
+
+    private void PlayPlayerDeathAnimation()
+    {
+        Animator.SetBool("IsDead", true);
+    }
+
+    private void PlayShootAnimation(bool isShooting)
+    {
+        Animator.SetBool("IsShooting", isShooting);
+    }
+    private void PlayMoveAnimation(Vector3 movementInput)
+    {
+        Animator.SetFloat("ForwardMovement", movementInput.z);
+        Animator.SetFloat("RightMovement", movementInput.x);
     }
 }
