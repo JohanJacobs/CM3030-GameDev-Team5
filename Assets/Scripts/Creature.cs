@@ -97,6 +97,9 @@ public class Creature : MonoBehaviour
 
         Death?.Invoke(this);
 
-        //GameObject.Destroy(gameObject, 0.2f);
+        /// only destroy monster gameobjects.
+        if (!gameObject.CompareTag("Player"))            
+            GameObject.Destroy(gameObject, 0.2f);
+
     }
 }

@@ -81,6 +81,7 @@ public class PlayerController : MonoBehaviour
         // HACK: keep player at Y=0
         transform.Translate(0, -transform.position.y, 0);
 
+        // changes :
         var localMovementZ = Vector3.Dot(transform.forward, combinedMovement);
         var localMovementX = Vector3.Dot(transform.right, combinedMovement);
 
