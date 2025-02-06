@@ -73,7 +73,7 @@ public sealed class AttributeSet : ScriptableObject
                 Debug.LogWarning($"Found duplicate {attributeDefinition.Attribute.GetName()} attribute definition, check attribute set");
             }
 
-            attributeValue.Base = attributeDefinition.BaseValue;
+            attributeValue.BaseValue = attributeDefinition.BaseValue;
         }
     }
 

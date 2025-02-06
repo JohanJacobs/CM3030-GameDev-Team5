@@ -40,20 +40,13 @@ public sealed class AttributeValue
 
     public AttributeType Attribute { get; }
 
-    public float Base
+    public float BaseValue
     {
         get => GetBaseValue();
         set => SetBaseValue(value);
     }
 
-    public float Value
-    {
-        get
-        {
-            InvalidateValue();
-            return _value;
-        }
-    }
+    public float Value => GetValue();
 
     public AttributeSet Owner => _weakOwner.TryGetTarget(out var owner) ? owner : null;
 
@@ -65,8 +58,8 @@ public sealed class AttributeValue
     private readonly List<InternalModifier> _modifiers = new List<InternalModifier>();
     private readonly WeakReference<AttributeSet> _weakOwner;
 
-    private float _base;
-    private float _value;
+    private float _baseValue;
+    private float _currentValue;
 
     private int _internalModifierIndex;
 
@@ -183,8 +176,8 @@ public sealed class AttributeValue
     /// <param name="value">New base value</param>
     public void Reset(float value)
     {
-        _base = value;
-        _value = value;
+        _baseValue = value;
+        _currentValue = value;
 
         _modifiers.Clear();
 
@@ -262,21 +255,28 @@ public sealed class AttributeValue
         if (!_dirtyModifiers && !_dirtyValue)
             return;
 
-        _value = Calculate(_base);
+        _currentValue = Calculate(_baseValue);
 
         _dirtyValue = false;
     }
 
     private float GetBaseValue()
     {
-        return _base;
+        return _baseValue;
     }
 
     private void SetBaseValue(float value)
     {
-        _base = value;
+        _baseValue = value;
 
         _dirtyValue = true;
+    }
+
+    private float GetValue()
+    {
+        InvalidateValue();
+
+        return _currentValue;
     }
 
     private AttributeModifierHandle ApplyModifierImpl(AttributeModifier attributeModifier, bool? overridePermanent)

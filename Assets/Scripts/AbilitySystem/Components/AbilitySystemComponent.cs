@@ -8,28 +8,41 @@ public class AbilitySystemComponent : MonoBehaviour
 
     private class InternalEffect
     {
-        public bool IsFinished { get; private set; }
+        public Effect Effect { get; private set; }
 
-        private readonly Effect _effect;
+        public bool IsFinished => _finished;
+
+        public float TimeLeft => _timeToFinish;
 
         private readonly List<AttributeModifierHandle> _attributeModifierHandles = new List<AttributeModifierHandle>();
 
+        private readonly bool _hasDuration;
+        private readonly bool _hasPeriod;
+
         private float _timeToFinish;
-        private float _timeToNextApplication;
+        private float _timeToApply;
+
+        private bool _finished;
 
         public InternalEffect(AbilitySystemComponent asc, Effect effect)
         {
-            _effect = effect;
+            Effect = effect;
 
             switch (effect.DurationPolicy)
             {
                 case EffectDurationPolicy.Instant:
-                    IsFinished = true;
+                    _hasDuration = false;
+                    _hasPeriod = false;
+                    _finished = true;
                     break;
                 case EffectDurationPolicy.Duration:
+                    _hasDuration = true;
+                    _hasPeriod = Effect.HasPeriod;
                     _timeToFinish = effect.Duration;
                     break;
                 case EffectDurationPolicy.Infinite:
+                    _hasDuration = false;
+                    _hasPeriod = Effect.HasPeriod;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -38,71 +51,45 @@ public class AbilitySystemComponent : MonoBehaviour
 
         public void Apply(AbilitySystemComponent asc)
         {
-            _attributeModifierHandles.AddRange(asc.ApplyEffectModifiers(_effect));
-
-            switch (_effect.ApplicationPolicy)
+            if (asc.CanApplyEffect(Effect))
             {
-                case EffectApplicationPolicy.Instant:
-                    break;
-                case EffectApplicationPolicy.Periodic:
-                    _timeToNextApplication += _effect.Period;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                _attributeModifierHandles.AddRange(asc.ApplyEffectModifiers(Effect));
+            }
+
+            if (_hasPeriod)
+            {
+                _timeToApply += Effect.Period;
             }
         }
 
         public void Cancel(AbilitySystemComponent asc)
         {
-            switch (_effect.CancellationPolicy)
-            {
-                case EffectCancellationPolicy.DoNothing:
-                    break;
-                case EffectCancellationPolicy.CancelAllModifiers:
-                    CancelAllModifiers();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            CancelAllModifiers();
         }
 
         public void Update(AbilitySystemComponent asc, float deltaTime)
         {
-            if (IsFinished)
+            if (_finished)
                 return;
 
-            switch (_effect.ApplicationPolicy)
+            if (_hasDuration)
             {
-                case EffectApplicationPolicy.Instant:
-                    break;
-                case EffectApplicationPolicy.Periodic:
-                    _timeToNextApplication -= deltaTime;
+                _timeToFinish -= deltaTime;
 
-                    if (!(_timeToNextApplication > 0f))
-                    {
-                        Apply(asc);
-                    }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                if (!(_timeToFinish > 0f))
+                {
+                    Finish(asc);
+                }
             }
 
-            switch (_effect.DurationPolicy)
+            if (_hasPeriod)
             {
-                case EffectDurationPolicy.Instant:
-                    break;
-                case EffectDurationPolicy.Duration:
-                    _timeToFinish -= deltaTime;
+                _timeToApply -= deltaTime;
 
-                    if (!(_timeToFinish > 0f))
-                    {
-                        IsFinished = true;
-                    }
-                    break;
-                case EffectDurationPolicy.Infinite:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                if (!(_timeToApply > 0f))
+                {
+                    Apply(asc);
+                }
             }
         }
 
@@ -115,9 +102,15 @@ public class AbilitySystemComponent : MonoBehaviour
 
             _attributeModifierHandles.Clear();
         }
+
+        private void Finish(AbilitySystemComponent asc)
+        {
+            _finished = true;
+        }
     }
 
     public AttributeSet[] DefaultAttributeSets;
+    public Ability[] DefaultAbilities;
 
     public event SelfDelegate Ready;
 
@@ -125,6 +118,8 @@ public class AbilitySystemComponent : MonoBehaviour
     private readonly EnumArray<AttributeValue, AttributeType> _attributeValues = new EnumArray<AttributeValue, AttributeType>();
 
     private readonly List<InternalEffect> _effects = new List<InternalEffect>();
+
+    private readonly TagContainer _tags = new TagContainer();
 
     private bool _ready = false;
 
@@ -189,9 +184,26 @@ public class AbilitySystemComponent : MonoBehaviour
         return attributeValue.ApplyModifier(modifier, post, permanent);
     }
 
+    public bool CanApplyEffect(Effect effect)
+    {
+        if (_tags.ContainsAny(effect.BlockTags))
+            return false;
+
+        return true;
+    }
+
     public EffectHandle ApplyEffect(Effect effect)
     {
-        // TODO: is it OK to apply same effect twice?
+        Debug.Assert(effect.IsInstant || effect.IsFinite || effect.IsInfinite);
+
+        if (!CanApplyEffect(effect))
+        {
+            if (effect.IsInstant)
+                return null;
+
+            if (!effect.HasPeriod)
+                return null;
+        }
 
         var internalEffect = new InternalEffect(this, effect);
 
@@ -203,7 +215,7 @@ public class AbilitySystemComponent : MonoBehaviour
             return null;
         }
 
-        _effects.Add(internalEffect);
+        AddActiveEffect(internalEffect);
 
         var handle = new EffectHandle(this, effect, internalEffect);
 
@@ -217,10 +229,30 @@ public class AbilitySystemComponent : MonoBehaviour
 
         if (handle.InternalEffect is InternalEffect internalEffect)
         {
-            internalEffect.Cancel(this);
-
-            _effects.Remove(internalEffect);
+            CancelAndRemoveActiveEffect(internalEffect);
         }
+    }
+
+    public float GetEffectTimeLeft(Effect effect)
+    {
+        var internalEffect = _effects.Find(e => e.Effect == effect);
+        if (internalEffect == null)
+            return 0f;
+
+        return GetActiveEffectTimeLeft(internalEffect);
+    }
+
+    public float GetEffectTimeLeft(EffectHandle handle)
+    {
+        if (handle.AbilitySystemComponent != this)
+            throw new ArgumentException("Invalid effect handle");
+
+        if (handle.InternalEffect is InternalEffect internalEffect)
+        {
+            return GetActiveEffectTimeLeft(internalEffect);
+        }
+
+        return 0f;
     }
 
     public AttributeSet GetAttributeValueContainer(AttributeType attribute)
@@ -266,20 +298,46 @@ public class AbilitySystemComponent : MonoBehaviour
     {
         var deltaTime = Time.deltaTime;
 
-        UpdateEffects(deltaTime);
+        UpdateActiveEffects(deltaTime);
     }
 
-    private IEnumerable<AttributeModifierHandle> ApplyEffectModifiers(Effect effect)
+    private void AddActiveEffect(InternalEffect internalEffect)
     {
-        foreach (var attributeModifier in effect.Modifiers)
-        {
-            var attributeModifierHandle = ApplyAttributeModifier(attributeModifier);
-            if (attributeModifierHandle != null)
-                yield return attributeModifierHandle;
-        }
+        _effects.Add(internalEffect);
+
+        _tags.AddRange(internalEffect.Effect.GrantedTags);
     }
 
-    private void UpdateEffects(float deltaTime)
+    private void RemoveActiveEffect(InternalEffect internalEffect)
+    {
+        bool removed = _effects.Remove(internalEffect);
+
+        Debug.Assert(removed);
+
+        var tagsToRemove = new HashSet<Tag>(internalEffect.Effect.GrantedTags);
+
+        // we want to remove only those tags that are not granted by other effects
+        _effects.ForEach(e => tagsToRemove.ExceptWith(e.Effect.GrantedTags));
+
+        _tags.RemoveRange(tagsToRemove);
+    }
+
+    private void CancelAndRemoveActiveEffect(InternalEffect internalEffect)
+    {
+        internalEffect.Cancel(this);
+
+        RemoveActiveEffect(internalEffect);
+    }
+
+    private float GetActiveEffectTimeLeft(InternalEffect internalEffect)
+    {
+        if (internalEffect.Effect.IsInfinite)
+            return float.PositiveInfinity;
+
+        return internalEffect.TimeLeft;
+    }
+
+    private void UpdateActiveEffects(float deltaTime)
     {
         for (var i = 0; i < _effects.Count; )
         {
@@ -289,14 +347,22 @@ public class AbilitySystemComponent : MonoBehaviour
 
             if (internalEffect.IsFinished)
             {
-                internalEffect.Cancel(this);
-
-                _effects.RemoveAt(i);
+                CancelAndRemoveActiveEffect(internalEffect);
             }
             else
             {
                 ++i;
             }
+        }
+    }
+
+    private IEnumerable<AttributeModifierHandle> ApplyEffectModifiers(Effect effect)
+    {
+        foreach (var attributeModifier in effect.Modifiers)
+        {
+            var attributeModifierHandle = ApplyAttributeModifier(attributeModifier);
+            if (attributeModifierHandle != null)
+                yield return attributeModifierHandle;
         }
     }
 }

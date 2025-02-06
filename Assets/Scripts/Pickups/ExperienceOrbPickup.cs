@@ -17,10 +17,8 @@ public class ExperienceOrbPickup : PickupWithEffect
 
         var effect = ScriptableObject.CreateInstance<Effect>();
 
-        effect.Modifiers = new List<AttributeModifier> { attributeModifier };
+        effect.Modifiers = new [] { attributeModifier };
         effect.DurationPolicy = EffectDurationPolicy.Instant;
-        effect.ApplicationPolicy = EffectApplicationPolicy.Instant;
-        effect.CancellationPolicy = EffectCancellationPolicy.DoNothing;
 
         Effect = effect;
     }

@@ -67,7 +67,7 @@ public class HealthComponent : MonoBehaviour
 
         // TODO: reset max health if it's less than 1 ?
 
-        _healthAttribute.Base = _maxHealthAttribute.Value;
+        _healthAttribute.BaseValue = _maxHealthAttribute.Value;
 
         _damageAttribute.Modified += OnDamageModified;
         _healingAttribute.Modified += OnHealingModified;

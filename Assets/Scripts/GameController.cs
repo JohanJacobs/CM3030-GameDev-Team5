@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Quaternion = UnityEngine.Quaternion;
@@ -137,12 +138,11 @@ public class GameController : MonoBehaviour
         var position = _player.transform.position + direction * SpawnDistance;
         var rotation = Quaternion.AngleAxis(-directionAngle, Vector3.up);
 
-        var monsterGameObject = GameObject.Instantiate(spawner.Prefab, position, rotation);
+        var instance = Instantiate(spawner.Prefab, position, rotation);
 
-        var monster = monsterGameObject.GetComponent<Monster>();
+        var monster = instance.GetComponent<Monster>();
 
-        if (monster == null)
-            throw new Exception("Monster prefab must have Monster component");
+        Debug.Assert(monster != null, "Monster component is missing");
 
         return monster;
     }
@@ -152,6 +152,8 @@ public class GameController : MonoBehaviour
         var instance = Instantiate(GameData.Instance.ExperienceOrbPickupPrefab, position, Quaternion.identity);
 
         var pickup = instance.GetComponent<ExperienceOrbPickup>();
+
+        Debug.Assert(pickup != null, "Pickup component is missing");
 
         pickup.Experience = experience;
 
