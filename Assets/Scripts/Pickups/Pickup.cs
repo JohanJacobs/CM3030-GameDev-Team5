@@ -12,8 +12,20 @@ public class Pickup : MonoBehaviour
             case Pickup pickup:
                 return pickup.gameObject;
             case PickupTrigger pickupTrigger:
-                // NOTE: specific to pickup prefab
+                // NOTE: specific to current pickup prefab hierarchy
                 return pickupTrigger.gameObject.transform.parent.gameObject;
+        }
+
+        {
+            var siblingContext = context.gameObject.GetComponent<PickupTrigger>();
+            if (siblingContext != null)
+                return GetPickupGameObject(siblingContext);
+        }
+
+        {
+            var siblingContext = context.gameObject.GetComponent<Pickup>();
+            if (siblingContext != null)
+                return GetPickupGameObject(siblingContext);
         }
 
         throw new ArgumentException("Invalid context component", nameof(context));
