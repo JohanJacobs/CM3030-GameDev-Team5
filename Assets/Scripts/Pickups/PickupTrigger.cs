@@ -23,14 +23,19 @@ public class PickupTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!LayerMask.TestGameObjectLayer(other.gameObject))
+        var pickedUpBy = other.gameObject;
+
+        if (!LayerMask.TestGameObjectLayer(pickedUpBy))
             return;
 
-        if (!_pickup.HandlePickUp(other.gameObject))
-            return;
+        if (_pickup.HandlePickUp(pickedUpBy))
+        {
+            OnPickedUp(pickedUpBy);
+        }
+    }
 
+    private void OnPickedUp(GameObject pickedUpBy)
+    {
         _collider.enabled = false;
-
-        Destroy(_pickup.gameObject);
     }
 }
