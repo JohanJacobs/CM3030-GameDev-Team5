@@ -28,7 +28,7 @@ public class Pickup : MonoBehaviour
                 return GetPickupGameObject(siblingContext);
         }
 
-        throw new ArgumentException("Invalid context component", nameof(context));
+        return null;
     }
 
     public event PickedUpDelegate PickedUp;
