@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2633803816128406813}
   - component: {fileID: 70564512764304104}
   - component: {fileID: 3620864012713730024}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Collision
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70,7 +70,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6520459906444902582}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3220404180454290509}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: PickupBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -4,7 +4,7 @@ public class PickupWithEffect : Pickup
 {
     public Effect Effect;
 
-    public override bool HandlePickUp(GameObject target)
+    protected override bool HandlePickUpImpl(GameObject target)
     {
         var asc = target.GetComponent<AbilitySystemComponent>();
         if (asc == null)
