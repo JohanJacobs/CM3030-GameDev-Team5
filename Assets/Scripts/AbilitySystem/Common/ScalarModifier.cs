@@ -101,6 +101,51 @@ public struct ScalarModifier
         };
     }
 
+    public static ScalarModifier MakeFromAttributeModifier(NewAttributeModifier attributeModifier)
+    {
+        float bonus = 0f;
+        float bonusFraction = 0f;
+        float multiplier = 1f;
+        bool identity = true;
+
+        switch (attributeModifier.Type)
+        {
+            case NewAttributeModifierType.Add:
+                if (Mathf.Abs(attributeModifier.Value) > 0f)
+                {
+                    bonus = attributeModifier.Value;
+                    identity = false;
+                }
+                break;
+            case NewAttributeModifierType.AddFraction:
+                if (Mathf.Abs(attributeModifier.Value) > 0f)
+                {
+                    bonusFraction = attributeModifier.Value;
+                    identity = false;
+                }
+                break;
+            case NewAttributeModifierType.Multiply:
+                if (Mathf.Abs(attributeModifier.Value - 1f) > 0f)
+                {
+                    multiplier = attributeModifier.Value;
+                    identity = false;
+                }
+                break;
+            case NewAttributeModifierType.Override:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return new ScalarModifier()
+        {
+            _bonus = bonus,
+            _bonusFraction = bonusFraction,
+            _multiplier = multiplier,
+            _identity = identity,
+        };
+    }
+
     private float _bonus;
     private float _bonusFraction;
     private float _multiplier;
