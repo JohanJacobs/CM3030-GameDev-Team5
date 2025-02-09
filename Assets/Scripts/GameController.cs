@@ -140,9 +140,10 @@ public class GameController : MonoBehaviour
         var rotation = Quaternion.AngleAxis(-directionAngle, Vector3.up);
 
         var monsterGameObject = GameObject.Instantiate(spawner.Prefab, position, rotation);
-        
-        var monster = monsterGameObject.GetComponent<Monster>();
+        monsterGameObject.transform.parent = transform;
 
+        var monster = monsterGameObject.GetComponent<Monster>();
+        
         if (monster == null)
             throw new Exception("Monster prefab must have Monster component");
 
@@ -152,6 +153,7 @@ public class GameController : MonoBehaviour
     private GameObject SpawnExperienceOrbPickup(float experience, Vector3 position)
     {
         var instance = Instantiate(GameData.Instance.ExperienceOrbPickupPrefab, position, Quaternion.identity);
+        instance.transform.parent = transform;
 
         var pickup = instance.GetComponent<ExperienceOrbPickup>();
 
