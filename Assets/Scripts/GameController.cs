@@ -78,6 +78,8 @@ public class GameController : MonoBehaviour
             {
                 GameController.SpawnExperienceOrbPickup(experience, monster.transform.position);
             }
+
+            GameController.SpawnPickups(monster.transform.position);
         }
 
         private float GetMonsterExperienceReward(Creature monster)
@@ -138,7 +140,7 @@ public class GameController : MonoBehaviour
         var rotation = Quaternion.AngleAxis(-directionAngle, Vector3.up);
 
         var monsterGameObject = GameObject.Instantiate(spawner.Prefab, position, rotation);
-
+        
         var monster = monsterGameObject.GetComponent<Monster>();
 
         if (monster == null)
@@ -157,4 +159,34 @@ public class GameController : MonoBehaviour
 
         return instance;
     }
+
+    #region Pickup_spawn
+    [Header("Pickup spawn")]
+    [SerializeField] private float spawnRadius;
+    [SerializeField] private PickupConfigurationSO pickupConfiguration;
+
+    private void SpawnPickups(Vector3 position)
+    {
+        foreach (var pickup in pickupConfiguration.PickupConfigs)
+        {
+            if (Random.Range(0,1f) <= pickup.probability)
+            {
+                SpawnPickup(pickup.prefab, position, spawnRadius);
+            }
+        }
+    }
+
+    private void SpawnPickup(GameObject prefab, Vector3 position, float spawnRadius)
+    {
+        var position_offset = new Vector3(
+                Random.Range(0,spawnRadius),
+                0f,
+                Random.Range(0, spawnRadius));
+
+        var go = Instantiate(prefab, position + position_offset,Quaternion.identity);
+        go.transform.parent = transform;
+    }
+
+    #endregion Pickup_spawn
 }
+
