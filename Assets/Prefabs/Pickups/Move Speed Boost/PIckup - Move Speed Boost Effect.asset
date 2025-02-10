@@ -17,5 +17,5 @@ MonoBehaviour:
   DurationPolicy: 1
   ApplicationPolicy: 0
   CancellationPolicy: 1
-  Duration: 2
+  Duration: 5
   Period: 0.1

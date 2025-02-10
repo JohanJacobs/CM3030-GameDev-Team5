@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d5e78891ed14e0429b3940dd69c1eaf, type: 3}
   m_Name: Pickup - Min Damage Boost Attribute Modifier
   m_EditorClassIdentifier: 
-  Attribute: 9
-  Type: 4
-  Value: 2
+  Attribute: 8
+  Type: 0
+  Value: 1
   Post: 0
   Permanent: 0

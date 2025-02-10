@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: PIckup - Damage Boost Effect
   m_EditorClassIdentifier: 
   Modifiers:
-  - {fileID: 11400000, guid: bd3375533d3a2b0439b8e2a37f6e4440, type: 2}
-  - {fileID: 11400000, guid: bd3375533d3a2b0439b8e2a37f6e4440, type: 2}
+  - {fileID: 11400000, guid: 98bdb59fafaa19c408b00d2876e9ac2b, type: 2}
+  - {fileID: 11400000, guid: a5e77bf48ea862341af9c31ae1ab3538, type: 2}
   DurationPolicy: 1
   ApplicationPolicy: 0
   CancellationPolicy: 1
-  Duration: 2
+  Duration: 5
   Period: 0.1

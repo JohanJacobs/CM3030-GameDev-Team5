@@ -15,7 +15,10 @@ MonoBehaviour:
   PickupConfigs:
   - prefab: {fileID: 2030252188157268672, guid: 60b7d5f44a7c4174680fac70439d46d7,
       type: 3}
-    probability: 0.1
+    probability: 0.05
   - prefab: {fileID: 2030252188157268672, guid: 443d43baf95d1a5429929cb15314e5f1,
       type: 3}
     probability: 0.1
+  - prefab: {fileID: 2030252188157268672, guid: 99403693bc7c34647a5579187ce6e12b,
+      type: 3}
+    probability: 0.3
