@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a23896ef12b5a4a4cab25ea7e38fafe6, type: 3}
+  m_Name: Pickup Configuration
+  m_EditorClassIdentifier: 
+  PickupConfigs:
+  - prefab: {fileID: 2030252188157268672, guid: 60b7d5f44a7c4174680fac70439d46d7,
+      type: 3}
+    probability: 0.1
+  - prefab: {fileID: 2030252188157268672, guid: 443d43baf95d1a5429929cb15314e5f1,
+      type: 3}
+    probability: 0.1
