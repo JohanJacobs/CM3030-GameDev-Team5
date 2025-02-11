@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    AudioManager audioManager;
+
     public Animator Animator;
 
     public Vector3 MuzzleOffset = new Vector3(0, 0.1f, 0);
@@ -25,9 +27,11 @@ public class PlayerController : MonoBehaviour
 
     private int _kills = 0;
 
+
     void Awake()
     {
         CreateHUD();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     void Start()
@@ -150,6 +154,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        audioManager.PlaySFX(audioManager.sfxexample);
         _toNextShot += 1f / _player.FireRate;
 
         var aimDirection = _lookAtPointOnGround.Value - transform.position;

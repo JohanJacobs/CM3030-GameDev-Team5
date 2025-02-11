@@ -12,7 +12,8 @@ public class HUD : MonoBehaviour
     public Text LevelText;
     public Text WastedText;
     public Text MessageField;
-    public int MsgNumber;
+    public RectTransform InitialPanel;
+    int MsgNumber;
 
     public void UpdateHealth(float health, float maxHealth)
     {
@@ -48,13 +49,13 @@ public class HUD : MonoBehaviour
                 MessageField.text = "Use [W] [A] [S] [D] keys for movement";
                 break;
             case 1: 
-                MessageField.text = "Shoot skeletons for points";
+                MessageField.text = "Use [W] [A] [S] [D] keys for movement \nShoot skeletons for points";
                 break;
             case 2: 
-                MessageField.text = "Avoid skeleton contact to remain alive";
+                MessageField.text = "Use [W] [A] [S] [D] keys for movement \nShoot skeletons for points \nAvoid skeleton contact to remain alive";
                 break;
             case 3: 
-                MessageField.text = "Use mouse to aim weapon, click to fire";
+                MessageField.text = "Use [W] [A] [S] [D] keys for movement \nShoot skeletons for points \nAvoid skeleton contact to remain alive \nUse mouse to aim weapon, click to fire";
                 break;
         }
 
@@ -65,6 +66,7 @@ public class HUD : MonoBehaviour
     public void MsgFadeOut()
     {
         MessageField.enabled = false;
+        InitialPanel.localScale = new Vector3 (0, 0, 0);
     }
 
     public void Start()
@@ -72,12 +74,9 @@ public class HUD : MonoBehaviour
         MsgNumber = 0;
         MessageField.enabled = false;
         Invoke("MsgFadeIn", 2.0f);
-        Invoke("MsgFadeOut", 4.0f);
+        Invoke("MsgFadeIn", 4.0f);
         Invoke("MsgFadeIn", 6.0f);
-        Invoke("MsgFadeOut", 8.0f);
-        Invoke("MsgFadeIn", 10.0f);
-        Invoke("MsgFadeOut", 12.0f);
-        Invoke("MsgFadeIn", 14.0f);
-        Invoke("MsgFadeOut", 16.0f);
+        Invoke("MsgFadeIn", 8.0f);
+        Invoke("MsgFadeOut", 10.0f);
     }
 }
