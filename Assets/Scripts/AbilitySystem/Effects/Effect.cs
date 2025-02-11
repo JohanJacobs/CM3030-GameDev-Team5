@@ -53,8 +53,9 @@ public sealed class EffectHandle
 [CreateAssetMenu]
 public sealed class Effect : ScriptableObject
 {
-    public AttributeModifier[] Modifiers;
+    public NewAttributeModifier[] Modifiers;
     public EffectDurationPolicy DurationPolicy = EffectDurationPolicy.Instant;
+    public EffectCancellationPolicy CancellationPolicy = EffectCancellationPolicy.CancelAllModifiers;
     public float Duration = 0f;
     public float Period = 0f;
 

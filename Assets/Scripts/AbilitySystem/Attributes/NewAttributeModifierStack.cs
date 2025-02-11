@@ -3,64 +3,100 @@ using System.Collections.Generic;
 
 public class NewAttributeModifierStack
 {
-    public NewAbilitySystemComponent Owner => _weakOwner.TryGetTarget(out var owner) ? owner : null;
+    public delegate void SelfDelegate(NewAttributeModifierStack attributeModifierStack);
 
-    private readonly WeakReference<NewAbilitySystemComponent> _weakOwner;
+    public AttributeType Attribute { get; }
+
+    public event SelfDelegate Changed;
+
     private readonly List<NewAttributeModifierInstance> _modifiers = new List<NewAttributeModifierInstance>();
 
-    private ScalarModifier _permanentModifier = ScalarModifier.MakeIdentity();
-    private ScalarModifier _permanentPostModifier = ScalarModifier.MakeIdentity();
+    private bool _dirty;
 
-    public NewAttributeModifierStack(NewAbilitySystemComponent owner)
+    public NewAttributeModifierStack(AttributeType attribute)
     {
-        _weakOwner = new WeakReference<NewAbilitySystemComponent>(owner);
+        Attribute = attribute;
     }
 
     public NewAttributeModifierInstance AddModifier(NewAttributeModifier modifier)
     {
-        if (modifier.Permanent)
-        {
-            var scalarModifier = ScalarModifier.MakeFromAttributeModifier(modifier);
+        var modifierInstance = modifier.CreateInstance();
 
-            if (modifier.Post)
-                _permanentPostModifier.Combine(scalarModifier);
-            else
-                _permanentModifier.Combine(scalarModifier);
+        _modifiers.Add(modifierInstance);
+        _dirty = true;
 
-            return null;
-        }
+        Changed?.Invoke(this);
 
-        var instance = new NewAttributeModifierInstance(modifier);
-
-        _modifiers.Add(instance);
-
-        return instance;
+        return modifierInstance;
     }
 
-    public NewAttributeModifierInstance AddModifier(ScalarModifier scalarModifier, bool permanent, bool post)
+    public NewAttributeModifierInstance AddModifier(ScalarModifier scalarModifier, bool post)
     {
-        if (permanent)
-        {
-            if (post)
-                _permanentPostModifier.Combine(scalarModifier);
-            else
-                _permanentModifier.Combine(scalarModifier);
+        var modifierInstance = new NewAttributeModifierInstanceWithModifier(scalarModifier, post);
 
-            return null;
-        }
+        _modifiers.Add(modifierInstance);
+        _dirty = true;
 
-        var instance = new NewAttributeModifierInstance(scalarModifier, false, post);
+        Changed?.Invoke(this);
 
-        _modifiers.Add(instance);
-
-        return instance;
+        return modifierInstance;
     }
 
-    public void RemoveModifier(NewAttributeModifierInstance instance)
+    public NewAttributeModifierInstance AddOverride(float scalarOverride, bool post)
     {
-        var removed = _modifiers.Remove(instance);
-        if (!removed)
-            return;
+        var modifierInstance = new NewAttributeModifierInstanceWithOverride(scalarOverride, post);
 
+        _modifiers.Add(modifierInstance);
+        _dirty = true;
+
+        Changed?.Invoke(this);
+
+        return modifierInstance;
+    }
+
+    public void RemoveModifier(NewAttributeModifierInstance modifierInstance)
+    {
+        if (_modifiers.Remove(modifierInstance))
+        {
+            _dirty = true;
+
+            Changed?.Invoke(this);
+        }
+    }
+
+    public void Reset()
+    {
+        _modifiers.Clear();
+        _dirty = false;
+    }
+
+    public float Calculate(float value)
+    {
+        if (_dirty)
+        {
+            _dirty = false;
+
+            UpdateModifiers();
+        }
+
+        foreach (var modifierInstance in _modifiers)
+        {
+            modifierInstance.Apply(ref value);
+        }
+
+        return value;
+    }
+
+    private static int CompareModifierInstances(NewAttributeModifierInstance lhs, NewAttributeModifierInstance rhs)
+    {
+        if (lhs.Post != rhs.Post)
+            return lhs.Post ? 1 : -1;
+
+        return lhs.Index - rhs.Index;
+    }
+
+    private void UpdateModifiers()
+    {
+        _modifiers.Sort(CompareModifierInstances);
     }
 }

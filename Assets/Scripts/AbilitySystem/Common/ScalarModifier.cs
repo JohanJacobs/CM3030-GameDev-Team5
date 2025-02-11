@@ -50,6 +50,23 @@ public struct ScalarModifier
         };
     }
 
+    public static ScalarModifier MakeInverse(ScalarModifier modifier)
+    {
+        if (modifier._identity)
+            return modifier;
+
+        if (!(Mathf.Abs(modifier._multiplier) > 0f))
+            throw new ArgumentOutOfRangeException(nameof(modifier), "Multiplier is 0");
+
+        return new ScalarModifier()
+        {
+            _bonus = -modifier._bonus,
+            _bonusFraction = -modifier._bonusFraction,
+            _multiplier = 1f / modifier._multiplier,
+            _identity = false,
+        };
+    }
+
     public static ScalarModifier MakeFromAttributeModifier(AttributeModifier attributeModifier)
     {
         float bonus = 0f;
@@ -145,6 +162,8 @@ public struct ScalarModifier
             _identity = identity,
         };
     }
+
+    public bool IsIdentity => _identity;
 
     private float _bonus;
     private float _bonusFraction;

@@ -1,31 +1,72 @@
-using UnityEditor;
+using UnityEngine;
 
-public class NewAttributeModifierInstance
+public abstract class NewAttributeModifierInstance
 {
-    public NewAttributeModifier Modifier { get; }
-    public ScalarModifier ScalarModifier => _scalarModifier;
-    public bool Permanent { get; }
+    public NewAttributeModifier AttributeModifier { get; }
     public bool Post { get; }
     public int Index { get; } = ++_nextIndex;
 
     private static int _nextIndex = 0;
 
-    private ScalarModifier _scalarModifier;
-
-    public NewAttributeModifierInstance(NewAttributeModifier modifier)
+    protected NewAttributeModifierInstance(NewAttributeModifier attributeModifier)
     {
-        Modifier = modifier;
-        Permanent = Modifier.Permanent;
-        Post = Modifier.Post;
-
-        _scalarModifier = ScalarModifier.MakeFromAttributeModifier(modifier);
+        AttributeModifier = attributeModifier;
+        Post = AttributeModifier.Post;
     }
 
-    public NewAttributeModifierInstance(ScalarModifier scalarModifier, bool permanent, bool post)
+    protected NewAttributeModifierInstance(bool post)
     {
-        Permanent = permanent;
+        AttributeModifier = null;
         Post = post;
+    }
 
+    public abstract void Apply(ref float value);
+}
+
+public class NewAttributeModifierInstanceWithModifier : NewAttributeModifierInstance
+{
+    private ScalarModifier _scalarModifier;
+
+    public NewAttributeModifierInstanceWithModifier(NewAttributeModifier attributeModifier)
+        : base(attributeModifier)
+    {
+        Debug.Assert(attributeModifier.Type != NewAttributeModifierType.Override);
+
+        _scalarModifier = ScalarModifier.MakeFromAttributeModifier(attributeModifier);
+    }
+
+    public NewAttributeModifierInstanceWithModifier(ScalarModifier scalarModifier, bool post)
+        : base(post)
+    {
         _scalarModifier = scalarModifier;
+    }
+
+    public override void Apply(ref float value)
+    {
+        value = _scalarModifier.Calculate(value);
+    }
+}
+
+public class NewAttributeModifierInstanceWithOverride : NewAttributeModifierInstance
+{
+    private float _scalarOverride;
+
+    public NewAttributeModifierInstanceWithOverride(NewAttributeModifier attributeModifier)
+        : base(attributeModifier)
+    {
+        Debug.Assert(attributeModifier.Type == NewAttributeModifierType.Override);
+
+        _scalarOverride = attributeModifier.Value;
+    }
+
+    public NewAttributeModifierInstanceWithOverride(float scalarOverride, bool post)
+        : base(post)
+    {
+        _scalarOverride = scalarOverride;
+    }
+
+    public override void Apply(ref float value)
+    {
+        value = _scalarOverride;
     }
 }

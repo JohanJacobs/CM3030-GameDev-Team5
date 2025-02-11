@@ -34,7 +34,16 @@ public class NewAttributeModifier : ScriptableObject
 
     public NewAttributeModifierInstance CreateInstance()
     {
-        var instance = new NewAttributeModifierInstance(this);
+        NewAttributeModifierInstance instance;
+
+        if (Type == NewAttributeModifierType.Override)
+        {
+            instance = new NewAttributeModifierInstanceWithOverride(this);
+        }
+        else
+        {
+            instance = new NewAttributeModifierInstanceWithModifier(this);
+        }
 
         return instance;
     }

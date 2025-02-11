@@ -1,42 +1,69 @@
 using System;
+using UnityEngine;
 
 public class NewAttributeValue
 {
-    public NewAttributeSetInstance Owner => _weakOwner.TryGetTarget(out var owner) ? owner : null;
+    public delegate void ValueDelegate(NewAttributeValue attributeValue, float oldValue, float newValue);
 
     public AttributeType Attribute { get; }
 
     public float BaseValue
     {
         get => _baseValue;
-        set => _baseValue = value;
+        set => SetBaseValue(value);
     }
 
     public float Value
     {
         get => _currentValue;
-        set => _currentValue = value;
+        set => SetCurrentValue(value);
     }
 
-    private readonly WeakReference<NewAttributeSetInstance> _weakOwner;
+    public event ValueDelegate BaseValueChanged;
+    public event ValueDelegate ValueChanged;
 
     private float _baseValue;
     private float _currentValue;
 
-    public NewAttributeValue(NewAttributeSetInstance owner, AttributeType attribute)
+    public NewAttributeValue(AttributeType attribute)
     {
-        if (owner is null)
-            throw new ArgumentNullException(nameof(owner));
-
         Attribute = attribute;
-
-        _weakOwner = new WeakReference<NewAttributeSetInstance>(owner);
     }
 
-    public NewAttributeValue(NewAttributeSetInstance owner, AttributeType attribute, float defaultValue)
-        : this(owner, attribute)
+    public NewAttributeValue(AttributeType attribute, float defaultValue)
+        : this(attribute)
     {
         _baseValue = defaultValue;
         _currentValue = defaultValue;
+    }
+
+    public void Reset(float value)
+    {
+        _baseValue = value;
+        _currentValue = value;
+    }
+
+    private void SetBaseValue(float value)
+    {
+        if (Mathf.Approximately(_baseValue, value))
+            return;
+
+        var oldValue = _baseValue;
+
+        _baseValue = value;
+
+        BaseValueChanged?.Invoke(this, oldValue, value);
+    }
+
+    private void SetCurrentValue(float value)
+    {
+        if (Mathf.Approximately(_currentValue, value))
+            return;
+
+        var oldValue = _currentValue;
+
+        _currentValue = value;
+
+        ValueChanged?.Invoke(this, oldValue, value);
     }
 }

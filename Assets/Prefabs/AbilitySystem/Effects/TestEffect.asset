@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Modifiers: []
   DurationPolicy: 0
-  ApplicationPolicy: 0
-  CancellationPolicy: 1
   Duration: 1
   Period: 0.1
+  Tags: []
+  BlockTags: []
   GrantedTags:
   - _string: Respawn
-  - _string: Player
+  - _string: EditorOnly

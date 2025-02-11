@@ -20,11 +20,14 @@ public class Creature : MonoBehaviour
     public event ReceiveDamangeDelegate ReceiveDamanage;
 
     protected AbilitySystemComponent AbilitySystemComponent;
+    protected NewAbilitySystemComponent NewAbilitySystemComponent;
     protected HealthComponent HealthComponent;
 
     void Awake()
     {
         AbilitySystemComponent = GetComponent<AbilitySystemComponent>();
+
+        NewAbilitySystemComponent = GetComponent<NewAbilitySystemComponent>();
 
         HealthComponent = GetComponent<HealthComponent>();
         HealthComponent.OutOfHealth += OnOutOfHealth;

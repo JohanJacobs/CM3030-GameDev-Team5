@@ -28,7 +28,7 @@ public class NewAttributeSetInstance
                 continue;
             }
 
-            attributeValue = new NewAttributeValue(this, attributeDefinition.Attribute, attributeDefinition.DefaultValue);
+            attributeValue = new NewAttributeValue(attributeDefinition.Attribute, attributeDefinition.DefaultValue);
 
             _attributeValues[attributeDefinition.Attribute] = attributeValue;
         }
