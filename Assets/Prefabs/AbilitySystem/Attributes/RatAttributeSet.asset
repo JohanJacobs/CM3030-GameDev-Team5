@@ -26,7 +26,7 @@ MonoBehaviour:
   - Attribute: 9
     BaseValue: 4
   - Attribute: 10
-    BaseValue: 0.5
+    BaseValue: 1
   - Attribute: 11
     BaseValue: 1
   - Attribute: 19

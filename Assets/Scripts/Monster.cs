@@ -19,10 +19,11 @@ public class Monster : Creature
     private GameObject _target;
 
     private float _toNextAttack = 0f;
+    public Animator animator;
 
     void Start()
     {
-        _target = GameObject.FindGameObjectWithTag("Player");
+        _target = GameObject.FindGameObjectWithTag("Player");        
     }
 
     void Update()
@@ -40,11 +41,13 @@ public class Monster : Creature
 
     protected override void OnDeath()
     {
+        PlayDeathAnimation();
         _target = null;
     }
 
     protected override void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
     {
+        PlayHitAnimation();
         KnockBack(origin, amount / MaxHealth);
     }
 
@@ -86,8 +89,9 @@ public class Monster : Creature
         if (!IsTargetInAttackRange())
             return;
 
-        _toNextAttack += 1f / AttackRate;
+        PlayAttackAnimation();
 
+        _toNextAttack += 1f / AttackRate;        
         var targetCreature = _target.GetComponent<Creature>();
 
         targetCreature.TakeDamage(gameObject, transform.position, Random.Range(DamageMin, DamageMax));
@@ -110,7 +114,7 @@ public class Monster : Creature
         // 30 degrees attack "cone"
         if (Vector3.Dot(targetDelta.normalized, transform.forward) < Mathf.Cos(Mathf.Deg2Rad * 15f))
             return false;
-
+        
         return true;
     }
 
@@ -124,5 +128,20 @@ public class Monster : Creature
         {
             _toNextAttack = 0;
         }
+    }
+
+
+    private void PlayHitAnimation()
+    {
+        animator.SetTrigger("IsHit");
+    }
+    private void PlayDeathAnimation()
+    {
+        animator.SetBool("IsDead", true);
+    }
+    private void PlayAttackAnimation()
+    {
+        Debug.Log("PLay Hit animation");
+        animator.SetTrigger("IsAttacking");
     }
 }
