@@ -13,7 +13,6 @@ public class HUD : MonoBehaviour
     public Text WastedText;
     public Text MessageField;
     public RectTransform InitialPanel;
-    int MsgNumber;
 
     public void UpdateHealth(float health, float maxHealth)
     {
@@ -43,24 +42,9 @@ public class HUD : MonoBehaviour
 
     public void MsgFadeIn()
     {
-        switch(MsgNumber)
-        {
-            case 0: 
-                MessageField.text = "Use [W] [A] [S] [D] keys for movement";
-                break;
-            case 1: 
-                MessageField.text = "Use [W] [A] [S] [D] keys for movement \nShoot skeletons for points";
-                break;
-            case 2: 
-                MessageField.text = "Use [W] [A] [S] [D] keys for movement \nShoot skeletons for points \nAvoid skeleton contact to remain alive";
-                break;
-            case 3: 
-                MessageField.text = "Use [W] [A] [S] [D] keys for movement \nShoot skeletons for points \nAvoid skeleton contact to remain alive \nUse mouse to aim weapon, click to fire";
-                break;
-        }
-
-        MsgNumber++;
+        MessageField.text = "Use [W] [A] [S] [D] keys for movement \nShoot skeletons for points \nAvoid skeleton contact to remain alive \nUse mouse to aim weapon, click to fire";
         MessageField.enabled = true;
+        Time.timeScale = 0;
     }
 
     public void MsgFadeOut()
@@ -69,14 +53,16 @@ public class HUD : MonoBehaviour
         InitialPanel.localScale = new Vector3 (0, 0, 0);
     }
 
+    public void gameStart()
+    {
+        MessageField.enabled = false;
+        InitialPanel.localScale = new Vector3 (0, 0, 0);
+        Time.timeScale = 1;
+    }
+
     public void Start()
     {
-        MsgNumber = 0;
         MessageField.enabled = false;
-        Invoke("MsgFadeIn", 2.0f);
-        Invoke("MsgFadeIn", 4.0f);
-        Invoke("MsgFadeIn", 6.0f);
-        Invoke("MsgFadeIn", 8.0f);
-        Invoke("MsgFadeOut", 10.0f);
+        MsgFadeIn();
     }
 }
