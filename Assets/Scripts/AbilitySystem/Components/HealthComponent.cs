@@ -1,7 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
-using UnityEngine.UIElements.Experimental;
 
 public class HealthComponent : MonoBehaviour
 {
@@ -33,8 +31,6 @@ public class HealthComponent : MonoBehaviour
     public event SelfDelegate OutOfHealth;
     public event HealthChangedDelegate HealthChanged;
 
-    private AbilitySystemComponent _asc;
-
     private AttributeValue _healthAttribute;
     private AttributeValue _maxHealthAttribute;
     private AttributeValue _healthRegenerationAttribute;
@@ -43,9 +39,9 @@ public class HealthComponent : MonoBehaviour
 
     private void Awake()
     {
-        _asc = GetComponent<AbilitySystemComponent>();
+        var asc = GetComponent<AbilitySystemComponent>();
 
-        _asc.WhenReady(OnAbilitySystemReady);
+        asc.OnReady(OnAbilitySystemReady);
     }
 
     private void Start()
@@ -59,18 +55,18 @@ public class HealthComponent : MonoBehaviour
 
     private void OnAbilitySystemReady(AbilitySystemComponent asc)
     {
-        _healthAttribute = _asc.GetAttributeValueObject(AttributeType.Health);
-        _maxHealthAttribute = _asc.GetAttributeValueObject(AttributeType.MaxHealth);
-        _healthRegenerationAttribute = _asc.GetAttributeValueObject(AttributeType.HealthRegeneration);
-        _damageAttribute = _asc.GetAttributeValueObject(AttributeType.Damage);
-        _healingAttribute = _asc.GetAttributeValueObject(AttributeType.Healing);
+        _healthAttribute = asc.GetAttributeValueObject(AttributeType.Health);
+        _maxHealthAttribute = asc.GetAttributeValueObject(AttributeType.MaxHealth);
+        _healthRegenerationAttribute = asc.GetAttributeValueObject(AttributeType.HealthRegeneration);
+        _damageAttribute = asc.GetAttributeValueObject(AttributeType.Damage);
+        _healingAttribute = asc.GetAttributeValueObject(AttributeType.Healing);
 
         // TODO: reset max health if it's less than 1 ?
 
-        _healthAttribute.Base = _maxHealthAttribute.Value;
+        _healthAttribute.BaseValue = _maxHealthAttribute.Value;
 
-        _damageAttribute.Modified += OnDamageModified;
-        _healingAttribute.Modified += OnHealingModified;
+        _damageAttribute.ValueChanged += OnDamageModified;
+        _healingAttribute.ValueChanged += OnHealingModified;
 
         {
             HealthChanged?.Invoke(this, Health, Health);
@@ -142,7 +138,7 @@ public class HealthComponent : MonoBehaviour
 
         if (regeneration > 0f)
         {
-            _asc.ApplyAttributeModifier(AttributeType.Healing, ScalarModifier.MakeBonus(regeneration * Time.deltaTime), false, true);
+            _healingAttribute.Value += regeneration * Time.deltaTime;
         }
     }
 }

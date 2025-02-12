@@ -50,6 +50,23 @@ public struct ScalarModifier
         };
     }
 
+    public static ScalarModifier MakeInverse(ScalarModifier modifier)
+    {
+        if (modifier._identity)
+            return modifier;
+
+        if (!(Mathf.Abs(modifier._multiplier) > 0f))
+            throw new ArgumentOutOfRangeException(nameof(modifier), "Multiplier is 0");
+
+        return new ScalarModifier()
+        {
+            _bonus = -modifier._bonus,
+            _bonusFraction = -modifier._bonusFraction,
+            _multiplier = 1f / modifier._multiplier,
+            _identity = false,
+        };
+    }
+
     public static ScalarModifier MakeFromAttributeModifier(AttributeModifier attributeModifier)
     {
         float bonus = 0f;
@@ -59,34 +76,28 @@ public struct ScalarModifier
 
         switch (attributeModifier.Type)
         {
-            case AttributeModifierType.Add:
+            case NewAttributeModifierType.Add:
                 if (Mathf.Abs(attributeModifier.Value) > 0f)
                 {
                     bonus = attributeModifier.Value;
                     identity = false;
                 }
                 break;
-            case AttributeModifierType.AddProgressive:
-                throw new NotImplementedException();
-            case AttributeModifierType.AddFraction:
+            case NewAttributeModifierType.AddFraction:
                 if (Mathf.Abs(attributeModifier.Value) > 0f)
                 {
                     bonusFraction = attributeModifier.Value;
                     identity = false;
                 }
                 break;
-            case AttributeModifierType.AddFractionProgressive:
-                throw new NotImplementedException();
-            case AttributeModifierType.Multiply:
+            case NewAttributeModifierType.Multiply:
                 if (Mathf.Abs(attributeModifier.Value - 1f) > 0f)
                 {
                     multiplier = attributeModifier.Value;
                     identity = false;
                 }
                 break;
-            case AttributeModifierType.MultiplyProgressive:
-                throw new NotImplementedException();
-            case AttributeModifierType.Override:
+            case NewAttributeModifierType.Override:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -100,6 +111,8 @@ public struct ScalarModifier
             _identity = identity,
         };
     }
+
+    public bool IsIdentity => _identity;
 
     private float _bonus;
     private float _bonusFraction;
@@ -147,18 +160,5 @@ public struct ScalarModifier
             return baseValue;
 
         return baseValue * (_multiplier + _bonusFraction) + _bonus;
-    }
-}
-
-public static class ScalarModifierHelper
-{
-    public static void Reset(this ScalarModifier self, AttributeModifier attributeModifier)
-    {
-        self.Reset(ScalarModifier.MakeFromAttributeModifier(attributeModifier));
-    }
-
-    public static void Combine(this ScalarModifier self, AttributeModifier attributeModifier)
-    {
-        self.Combine(ScalarModifier.MakeFromAttributeModifier(attributeModifier));
     }
 }

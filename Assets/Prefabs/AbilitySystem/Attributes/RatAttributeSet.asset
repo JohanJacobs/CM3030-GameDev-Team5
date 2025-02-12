@@ -9,27 +9,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5a8ee514608c3a4b91cbee5e3a7e44c, type: 3}
+  m_Script: {fileID: 11500000, guid: a4223be30eb280b4c915c26cfda437e9, type: 3}
   m_Name: RatAttributeSet
   m_EditorClassIdentifier: 
-  DefaultAttributes:
-  - Attribute: 0
-    BaseValue: 0
-  - Attribute: 1
-    BaseValue: 6
-  - Attribute: 6
-    BaseValue: 2.5
-  - Attribute: 7
-    BaseValue: 300
-  - Attribute: 8
-    BaseValue: 1
-  - Attribute: 9
-    BaseValue: 4
-  - Attribute: 10
-    BaseValue: 0.5
-  - Attribute: 11
-    BaseValue: 1
-  - Attribute: 19
-    BaseValue: 0
-  - Attribute: 15
-    BaseValue: 1
+  _defaultAttributes:
+  - _attribute: 0
+    _defaultValue: 0
+  - _attribute: 1
+    _defaultValue: 6
+  - _attribute: 6
+    _defaultValue: 2.5
+  - _attribute: 7
+    _defaultValue: 300
+  - _attribute: 8
+    _defaultValue: 1
+  - _attribute: 9
+    _defaultValue: 4
+  - _attribute: 10
+    _defaultValue: 1
+  - _attribute: 11
+    _defaultValue: 1
+  - _attribute: 19
+    _defaultValue: 0
+  - _attribute: 15
+    _defaultValue: 1

@@ -15,12 +15,12 @@ public class Creature : MonoBehaviour
     public float MaxHealth => HealthComponent.MaxHealth;
     public float HealthFraction => HealthComponent.HealthFraction;
 
+    public AbilitySystemComponent AbilitySystemComponent { get; private set; }
+    public HealthComponent HealthComponent { get; private set; }
+
     public event KillDelegate Kill;
     public event DeathDelegate Death;
     public event ReceiveDamangeDelegate ReceiveDamanage;
-
-    protected AbilitySystemComponent AbilitySystemComponent;
-    protected HealthComponent HealthComponent;
 
     void Awake()
     {
@@ -35,10 +35,7 @@ public class Creature : MonoBehaviour
         if (IsDead)
             return;
 
-        if (!(amount > 0))
-            throw new ArgumentOutOfRangeException(nameof(amount), amount, "Damage amount must be positive");
-
-        AbilitySystemComponent.ApplyAttributeModifier(AttributeType.Damage, ScalarModifier.MakeBonus(amount), false, true);
+        AbilitySystemComponent.AddDamage(amount);
 
         OnDamageTaken(causer, origin, amount);
     }

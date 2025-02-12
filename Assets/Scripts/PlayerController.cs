@@ -36,8 +36,7 @@ public class PlayerController : MonoBehaviour
         _player = GetComponent<Player>();
 
         _asc = GetComponent<AbilitySystemComponent>();
-
-        _asc.WhenReady(OnAbilitySystemReady);
+        _asc.OnReady(OnAbilitySystemReady);
 
         _player.Kill += (creature, victim) => AddKill();
         _player.Death += (creature) => ShowWasted();

@@ -1,6 +1,4 @@
 using UnityEngine;
-using System;
-using System.Collections.Generic;
 
 public enum EffectDurationPolicy
 {
@@ -21,42 +19,46 @@ public enum EffectCancellationPolicy
     CancelAllModifiers,
 }
 
-public sealed class EffectHandle
+[CreateAssetMenu(menuName = "Effects/Basic")]
+public class Effect : ScriptableObject, IEffectLogic
 {
-    public AbilitySystemComponent AbilitySystemComponent => _weakAbilitySystemComponent.TryGetTarget(out var asc) ? asc : null;
-    public Effect Effect => _weakEffect.TryGetTarget(out var effect) ? effect : null;
-    public object InternalEffect => _weakInternalEffect.TryGetTarget(out var internalEffect) ? internalEffect : null;
-
-    private readonly WeakReference<AbilitySystemComponent> _weakAbilitySystemComponent;
-    private readonly WeakReference<Effect> _weakEffect;
-    private readonly WeakReference<object> _weakInternalEffect;
-
-    public EffectHandle(AbilitySystemComponent asc, Effect effect, object internalEffect)
-    {
-        _weakAbilitySystemComponent = new WeakReference<AbilitySystemComponent>(asc);
-        _weakEffect = new WeakReference<Effect>(effect);
-        _weakInternalEffect = new WeakReference<object>(internalEffect);
-    }
-
-    public bool CancelEffect()
-    {
-        var asc = AbilitySystemComponent;
-        if (asc == null)
-            return false;
-
-        asc.CancelEffect(this);
-
-        return true;
-    }
-}
-
-[CreateAssetMenu]
-public sealed class Effect : ScriptableObject
-{
-    public List<AttributeModifier> Modifiers;
+    public AttributeModifier[] Modifiers;
     public EffectDurationPolicy DurationPolicy = EffectDurationPolicy.Instant;
-    public EffectApplicationPolicy ApplicationPolicy = EffectApplicationPolicy.Instant;
     public EffectCancellationPolicy CancellationPolicy = EffectCancellationPolicy.CancelAllModifiers;
-    public float Duration = 1f;
-    public float Period = 0.1f;
+    public float Duration = 0f;
+    public float Period = 0f;
+
+    /// <summary>
+    /// This effect's own tags, used to e.g. cancel all effects with tag.
+    /// </summary>
+    public Tag[] Tags;
+    /// <summary>
+    /// Tags that will block effect application if present in target AbilitySystem. Also blocks periodic effect applications.
+    /// </summary>
+    public Tag[] BlockTags;
+    /// <summary>
+    /// Tags that are added to target AbilitySystem as long as this effect is active.
+    /// </summary>
+    /// <remarks>
+    /// Note that instant effects are not granting tags, but they're treated as being granted so i.e. can cancel effects/abilities.
+    /// </remarks>
+    public Tag[] GrantedTags;
+
+    public bool HasDuration => Duration > 0f;
+    public bool HasPeriod => Period > 0f;
+    public bool IsInstant => DurationPolicy == EffectDurationPolicy.Instant;
+    public bool IsFinite => DurationPolicy == EffectDurationPolicy.Duration && HasDuration;
+    public bool IsInfinite => DurationPolicy == EffectDurationPolicy.Infinite;
+
+    public virtual void ApplyEffect(EffectInstance effectInstance)
+    {
+    }
+
+    public virtual void CancelEffect(EffectInstance effectInstance)
+    {
+    }
+
+    public virtual void UpdateEffect(EffectInstance effectInstance, float deltaTime)
+    {
+    }
 }
