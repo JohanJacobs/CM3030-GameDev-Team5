@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-public enum AttributeModifierType
+public enum OldAttributeModifierType
 {
     /// <summary>
     /// Adds an absolute value
@@ -38,29 +38,29 @@ public interface IAttributeModifierContext
 {
     GameObject Source { get; }
     GameObject Target { get; }
-    AbilitySystemComponent SourceAbilitySystem { get; }
-    AbilitySystemComponent TargetAbilitySystem { get; }
+    OldAbilitySystemComponent SourceAbilitySystem { get; }
+    OldAbilitySystemComponent TargetAbilitySystem { get; }
 }
 
 public interface IAttributeModifierCalculation
 {
-    float GetValue(IAttributeModifierContext context, AttributeModifier attributeModifier);
+    float GetValue(IAttributeModifierContext context, OldAttributeModifier attributeModifier);
 }
 
-public sealed class AttributeModifierHandle
+public sealed class OldAttributeModifierHandle
 {
-    public AttributeModifier AttributeModifier => _weakAttributeModifier.TryGetTarget(out var attributeModifier) ? attributeModifier : null;
-    public AttributeValue AttributeValue => _weakAttributeValue.TryGetTarget(out var attributeValue) ? attributeValue : null;
+    public OldAttributeModifier AttributeModifier => _weakAttributeModifier.TryGetTarget(out var attributeModifier) ? attributeModifier : null;
+    public OldAttributeValue AttributeValue => _weakAttributeValue.TryGetTarget(out var attributeValue) ? attributeValue : null;
     public object InternalModifier => _weakInternalModifier.TryGetTarget(out var opaque) ? opaque : null;
 
-    private readonly WeakReference<AttributeModifier> _weakAttributeModifier;
-    private readonly WeakReference<AttributeValue> _weakAttributeValue;
+    private readonly WeakReference<OldAttributeModifier> _weakAttributeModifier;
+    private readonly WeakReference<OldAttributeValue> _weakAttributeValue;
     private readonly WeakReference<object> _weakInternalModifier;
 
-    public AttributeModifierHandle(AttributeModifier attributeModifier, AttributeValue attributeValue, object internalModifier)
+    public OldAttributeModifierHandle(OldAttributeModifier attributeModifier, OldAttributeValue attributeValue, object internalModifier)
     {
-        _weakAttributeModifier = new WeakReference<AttributeModifier>(attributeModifier);
-        _weakAttributeValue = new WeakReference<AttributeValue>(attributeValue);
+        _weakAttributeModifier = new WeakReference<OldAttributeModifier>(attributeModifier);
+        _weakAttributeValue = new WeakReference<OldAttributeValue>(attributeValue);
         _weakInternalModifier = new WeakReference<object>(internalModifier);
     }
 
@@ -77,10 +77,10 @@ public sealed class AttributeModifierHandle
 }
 
 [CreateAssetMenu]
-public sealed class AttributeModifier : ScriptableObject
+public sealed class OldAttributeModifier : ScriptableObject
 {
     public AttributeType Attribute;
-    public AttributeModifierType Type;
+    public OldAttributeModifierType Type;
     public float Value = 0f;
     public bool Post = false;
     public bool Permanent = false;

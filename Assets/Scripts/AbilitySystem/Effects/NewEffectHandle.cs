@@ -13,4 +13,9 @@ public sealed class NewEffectHandle
         _weakAbilitySystemComponent = new WeakReference<NewAbilitySystemComponent>(asc);
         _weakEffectInstance = new WeakReference<EffectInstance>(effectInstance);
     }
+
+    public void Clear()
+    {
+        _weakEffectInstance.SetTarget(null);
+    }
 }

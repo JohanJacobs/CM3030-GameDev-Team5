@@ -2,9 +2,9 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-public sealed class AttributeValue
+public sealed class OldAttributeValue
 {
-    public delegate void ModifiedDelegate(AttributeValue attributeValue, float oldValue, float value);
+    public delegate void ModifiedDelegate(OldAttributeValue attributeValue, float oldValue, float value);
 
     private class InternalModifier
     {
@@ -13,7 +13,7 @@ public sealed class AttributeValue
 
         public ScalarModifier Modifier;
 
-        public InternalModifier(int index, AttributeModifier attributeModifier)
+        public InternalModifier(int index, OldAttributeModifier attributeModifier)
         {
             Index = index;
             Post = attributeModifier.Post;
@@ -27,7 +27,7 @@ public sealed class AttributeValue
             Modifier = modifier;
         }
 
-        public void Update(AttributeModifier attributeModifier)
+        public void Update(OldAttributeModifier attributeModifier)
         {
             Modifier.Reset(attributeModifier);
         }
@@ -48,7 +48,7 @@ public sealed class AttributeValue
 
     public float Value => GetValue();
 
-    public AttributeSet Owner => _weakOwner.TryGetTarget(out var owner) ? owner : null;
+    public OldAttributeSet Owner => _weakOwner.TryGetTarget(out var owner) ? owner : null;
 
     /// <summary>
     /// Event fired when value change is caused by modifier
@@ -56,7 +56,7 @@ public sealed class AttributeValue
     public event ModifiedDelegate Modified;
 
     private readonly List<InternalModifier> _modifiers = new List<InternalModifier>();
-    private readonly WeakReference<AttributeSet> _weakOwner;
+    private readonly WeakReference<OldAttributeSet> _weakOwner;
 
     private float _baseValue;
     private float _currentValue;
@@ -69,11 +69,11 @@ public sealed class AttributeValue
     private ScalarModifier _permanentModifier = ScalarModifier.MakeIdentity();
     private ScalarModifier _permanentPostModifier = ScalarModifier.MakeIdentity();
 
-    public AttributeValue(AttributeType attribute, AttributeSet owner)
+    public OldAttributeValue(AttributeType attribute, OldAttributeSet owner)
     {
         Attribute = attribute;
 
-        _weakOwner = new WeakReference<AttributeSet>(owner);
+        _weakOwner = new WeakReference<OldAttributeSet>(owner);
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public sealed class AttributeValue
     /// <param name="attributeModifier">Modifier</param>
     /// <param name="overridePermanent">When specified, overrides attribute modifier's Permanent property</param>
     /// <returns>Applied modifier handle, or null (see remarks)</returns>
-    public AttributeModifierHandle ApplyModifier(AttributeModifier attributeModifier, bool? overridePermanent = null)
+    public OldAttributeModifierHandle ApplyModifier(OldAttributeModifier attributeModifier, bool? overridePermanent = null)
     {
         Debug.Assert(Attribute == attributeModifier.Attribute);
 
@@ -116,7 +116,7 @@ public sealed class AttributeValue
     /// <param name="post">Is this is a post modifier?</param>
     /// <param name="permanent">Is this a permanent modifier?</param>
     /// <returns>Applied modifier handle, or null (see remarks)</returns>
-    public AttributeModifierHandle ApplyModifier(ScalarModifier modifier, bool post = false, bool permanent = false)
+    public OldAttributeModifierHandle ApplyModifier(ScalarModifier modifier, bool post = false, bool permanent = false)
     {
         var initialValue = Value;
 
@@ -137,7 +137,7 @@ public sealed class AttributeValue
     /// </summary>
     /// <param name="handle">Handle</param>
     /// <exception cref="InvalidOperationException"></exception>
-    public void CancelModifier(AttributeModifierHandle handle)
+    public void CancelModifier(OldAttributeModifierHandle handle)
     {
         var initialValue = Value;
 
@@ -156,7 +156,7 @@ public sealed class AttributeValue
     /// </summary>
     /// <param name="handle"></param>
     /// <exception cref="InvalidOperationException"></exception>
-    public void UpdateModifier(AttributeModifierHandle handle)
+    public void UpdateModifier(OldAttributeModifierHandle handle)
     {
         var initialValue = Value;
 
@@ -279,9 +279,9 @@ public sealed class AttributeValue
         return _currentValue;
     }
 
-    private AttributeModifierHandle ApplyModifierImpl(AttributeModifier attributeModifier, bool? overridePermanent)
+    private OldAttributeModifierHandle ApplyModifierImpl(OldAttributeModifier attributeModifier, bool? overridePermanent)
     {
-        if (attributeModifier.Type == AttributeModifierType.Override)
+        if (attributeModifier.Type == OldAttributeModifierType.Override)
         {
             SetBaseValue(attributeModifier.Value);
 
@@ -310,12 +310,12 @@ public sealed class AttributeValue
             _dirtyModifiers = true;
         }
 
-        var handle = new AttributeModifierHandle(attributeModifier, this, internalModifier);
+        var handle = new OldAttributeModifierHandle(attributeModifier, this, internalModifier);
 
         return handle;
     }
 
-    private AttributeModifierHandle ApplyModifierImpl(ScalarModifier modifier, bool post, bool permanent)
+    private OldAttributeModifierHandle ApplyModifierImpl(ScalarModifier modifier, bool post, bool permanent)
     {
         if (permanent)
         {
@@ -339,12 +339,12 @@ public sealed class AttributeValue
             _dirtyModifiers = true;
         }
 
-        var handle = new AttributeModifierHandle(null, this, internalModifier);
+        var handle = new OldAttributeModifierHandle(null, this, internalModifier);
 
         return handle;
     }
 
-    private void CancelModifierImpl(AttributeModifierHandle handle)
+    private void CancelModifierImpl(OldAttributeModifierHandle handle)
     {
         if (handle.AttributeValue != this)
             throw new InvalidOperationException("Invalid attribute modifier handle");
@@ -357,7 +357,7 @@ public sealed class AttributeValue
         }
     }
 
-    private void UpdateModifierImpl(AttributeModifierHandle handle)
+    private void UpdateModifierImpl(OldAttributeModifierHandle handle)
     {
         if (handle.AttributeValue != this)
             throw new InvalidOperationException("Invalid attribute modifier handle");

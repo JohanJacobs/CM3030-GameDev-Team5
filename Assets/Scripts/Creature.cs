@@ -19,13 +19,13 @@ public class Creature : MonoBehaviour
     public event DeathDelegate Death;
     public event ReceiveDamangeDelegate ReceiveDamanage;
 
-    protected AbilitySystemComponent AbilitySystemComponent;
+    protected OldAbilitySystemComponent AbilitySystemComponent;
     protected NewAbilitySystemComponent NewAbilitySystemComponent;
     protected HealthComponent HealthComponent;
 
     void Awake()
     {
-        AbilitySystemComponent = GetComponent<AbilitySystemComponent>();
+        AbilitySystemComponent = GetComponent<OldAbilitySystemComponent>();
 
         NewAbilitySystemComponent = GetComponent<NewAbilitySystemComponent>();
 

@@ -67,7 +67,7 @@ public struct ScalarModifier
         };
     }
 
-    public static ScalarModifier MakeFromAttributeModifier(AttributeModifier attributeModifier)
+    public static ScalarModifier MakeFromAttributeModifier(OldAttributeModifier attributeModifier)
     {
         float bonus = 0f;
         float bonusFraction = 0f;
@@ -76,34 +76,34 @@ public struct ScalarModifier
 
         switch (attributeModifier.Type)
         {
-            case AttributeModifierType.Add:
+            case OldAttributeModifierType.Add:
                 if (Mathf.Abs(attributeModifier.Value) > 0f)
                 {
                     bonus = attributeModifier.Value;
                     identity = false;
                 }
                 break;
-            case AttributeModifierType.AddProgressive:
+            case OldAttributeModifierType.AddProgressive:
                 throw new NotImplementedException();
-            case AttributeModifierType.AddFraction:
+            case OldAttributeModifierType.AddFraction:
                 if (Mathf.Abs(attributeModifier.Value) > 0f)
                 {
                     bonusFraction = attributeModifier.Value;
                     identity = false;
                 }
                 break;
-            case AttributeModifierType.AddFractionProgressive:
+            case OldAttributeModifierType.AddFractionProgressive:
                 throw new NotImplementedException();
-            case AttributeModifierType.Multiply:
+            case OldAttributeModifierType.Multiply:
                 if (Mathf.Abs(attributeModifier.Value - 1f) > 0f)
                 {
                     multiplier = attributeModifier.Value;
                     identity = false;
                 }
                 break;
-            case AttributeModifierType.MultiplyProgressive:
+            case OldAttributeModifierType.MultiplyProgressive:
                 throw new NotImplementedException();
-            case AttributeModifierType.Override:
+            case OldAttributeModifierType.Override:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -216,12 +216,12 @@ public struct ScalarModifier
 
 public static class ScalarModifierHelper
 {
-    public static void Reset(this ScalarModifier self, AttributeModifier attributeModifier)
+    public static void Reset(this ScalarModifier self, OldAttributeModifier attributeModifier)
     {
         self.Reset(ScalarModifier.MakeFromAttributeModifier(attributeModifier));
     }
 
-    public static void Combine(this ScalarModifier self, AttributeModifier attributeModifier)
+    public static void Combine(this ScalarModifier self, OldAttributeModifier attributeModifier)
     {
         self.Combine(ScalarModifier.MakeFromAttributeModifier(attributeModifier));
     }

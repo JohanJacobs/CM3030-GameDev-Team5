@@ -40,6 +40,16 @@ public class EffectInstance
             default:
                 throw new ArgumentOutOfRangeException();
         }
+
+        if (_hasDuration)
+        {
+            _timeLeftToExpiration = effect.Duration;
+        }
+
+        if (_hasPeriod)
+        {
+            _timeLeftToPeriodicApplication = effect.Period;
+        }
     }
 
     public void Apply()

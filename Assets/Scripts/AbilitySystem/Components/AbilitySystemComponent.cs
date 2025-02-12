@@ -1,10 +1,11 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
-public class AbilitySystemComponent : MonoBehaviour
+public class OldAbilitySystemComponent : MonoBehaviour
 {
-    public delegate void SelfDelegate(AbilitySystemComponent asc);
+    public delegate void SelfDelegate(OldAbilitySystemComponent asc);
 
     private class InternalEffect
     {
@@ -14,7 +15,7 @@ public class AbilitySystemComponent : MonoBehaviour
 
         public float TimeLeft => _timeToFinish;
 
-        private readonly List<AttributeModifierHandle> _attributeModifierHandles = new List<AttributeModifierHandle>();
+        private readonly List<OldAttributeModifierHandle> _attributeModifierHandles = new List<OldAttributeModifierHandle>();
 
         private readonly bool _hasDuration;
         private readonly bool _hasPeriod;
@@ -24,7 +25,7 @@ public class AbilitySystemComponent : MonoBehaviour
 
         private bool _finished;
 
-        public InternalEffect(AbilitySystemComponent asc, Effect effect)
+        public InternalEffect(OldAbilitySystemComponent asc, Effect effect)
         {
             Effect = effect;
 
@@ -49,7 +50,7 @@ public class AbilitySystemComponent : MonoBehaviour
             }
         }
 
-        public void Apply(AbilitySystemComponent asc)
+        public void Apply(OldAbilitySystemComponent asc)
         {
             if (asc.CanApplyEffect(Effect))
             {
@@ -62,12 +63,12 @@ public class AbilitySystemComponent : MonoBehaviour
             }
         }
 
-        public void Cancel(AbilitySystemComponent asc)
+        public void Cancel(OldAbilitySystemComponent asc)
         {
             CancelAllModifiers();
         }
 
-        public void Update(AbilitySystemComponent asc, float deltaTime)
+        public void Update(OldAbilitySystemComponent asc, float deltaTime)
         {
             if (_finished)
                 return;
@@ -103,19 +104,19 @@ public class AbilitySystemComponent : MonoBehaviour
             _attributeModifierHandles.Clear();
         }
 
-        private void Finish(AbilitySystemComponent asc)
+        private void Finish(OldAbilitySystemComponent asc)
         {
             _finished = true;
         }
     }
 
-    public AttributeSet[] DefaultAttributeSets;
+    public OldAttributeSet[] DefaultAttributeSets;
     public Ability[] DefaultAbilities;
 
     public event SelfDelegate Ready;
 
-    private readonly List<AttributeSet> _attributeSets = new List<AttributeSet>();
-    private readonly EnumArray<AttributeValue, AttributeType> _attributeValues = new EnumArray<AttributeValue, AttributeType>();
+    private readonly List<OldAttributeSet> _attributeSets = new List<OldAttributeSet>();
+    private readonly EnumArray<OldAttributeValue, AttributeType> _attributeValues = new EnumArray<OldAttributeValue, AttributeType>();
 
     private readonly List<InternalEffect> _effects = new List<InternalEffect>();
 
@@ -123,7 +124,7 @@ public class AbilitySystemComponent : MonoBehaviour
 
     private bool _ready = false;
 
-    public void AddAttributeSet(AttributeSet template)
+    public void AddAttributeSet(OldAttributeSet template)
     {
         var index = _attributeSets.FindIndex(attributeSet => attributeSet.Template == template);
         if (index >= 0)
@@ -150,7 +151,7 @@ public class AbilitySystemComponent : MonoBehaviour
         _attributeSets.Add(newAttributeSet);
     }
 
-    public void RemoveAttributeSet(AttributeSet template)
+    public void RemoveAttributeSet(OldAttributeSet template)
     {
         var index = _attributeSets.FindIndex(attributeSet => attributeSet.Template == template);
         if (index < 0)
@@ -166,7 +167,7 @@ public class AbilitySystemComponent : MonoBehaviour
         _attributeSets.RemoveAt(index);
     }
 
-    public AttributeModifierHandle ApplyAttributeModifier(AttributeModifier attributeModifer)
+    public OldAttributeModifierHandle ApplyAttributeModifier(OldAttributeModifier attributeModifer)
     {
         var attributeValue = GetAttributeValueObject(attributeModifer.Attribute);
         if (attributeValue == null)
@@ -175,7 +176,7 @@ public class AbilitySystemComponent : MonoBehaviour
         return attributeValue.ApplyModifier(attributeModifer);
     }
 
-    public AttributeModifierHandle ApplyAttributeModifier(AttributeType attribute, ScalarModifier modifier, bool post = false, bool permanent = false)
+    public OldAttributeModifierHandle ApplyAttributeModifier(AttributeType attribute, ScalarModifier modifier, bool post = false, bool permanent = false)
     {
         var attributeValue = GetAttributeValueObject(attribute);
         if (attributeValue == null)
@@ -192,7 +193,7 @@ public class AbilitySystemComponent : MonoBehaviour
         return true;
     }
 
-    public EffectHandle ApplyEffect(Effect effect)
+    public OldEffectHandle ApplyEffect(Effect effect)
     {
         Debug.Assert(effect.IsInstant || effect.IsFinite || effect.IsInfinite);
 
@@ -217,12 +218,12 @@ public class AbilitySystemComponent : MonoBehaviour
 
         AddActiveEffect(internalEffect);
 
-        var handle = new EffectHandle(this, effect, internalEffect);
+        var handle = new OldEffectHandle(this, effect, internalEffect);
 
         return handle;
     }
 
-    public void CancelEffect(EffectHandle handle)
+    public void CancelEffect(OldEffectHandle handle)
     {
         if (handle.AbilitySystemComponent != this)
             throw new ArgumentException("Invalid effect handle");
@@ -242,7 +243,7 @@ public class AbilitySystemComponent : MonoBehaviour
         return GetActiveEffectTimeLeft(internalEffect);
     }
 
-    public float GetEffectTimeLeft(EffectHandle handle)
+    public float GetEffectTimeLeft(OldEffectHandle handle)
     {
         if (handle.AbilitySystemComponent != this)
             throw new ArgumentException("Invalid effect handle");
@@ -255,12 +256,12 @@ public class AbilitySystemComponent : MonoBehaviour
         return 0f;
     }
 
-    public AttributeSet GetAttributeValueContainer(AttributeType attribute)
+    public OldAttributeSet GetAttributeValueContainer(AttributeType attribute)
     {
         return _attributeValues[attribute]?.Owner;
     }
 
-    public AttributeValue GetAttributeValueObject(AttributeType attribute)
+    public OldAttributeValue GetAttributeValueObject(AttributeType attribute)
     {
         return _attributeValues[attribute];
     }
@@ -356,13 +357,15 @@ public class AbilitySystemComponent : MonoBehaviour
         }
     }
 
-    private IEnumerable<AttributeModifierHandle> ApplyEffectModifiers(Effect effect)
+    private IEnumerable<OldAttributeModifierHandle> ApplyEffectModifiers(Effect effect)
     {
-        foreach (var attributeModifier in effect.Modifiers)
-        {
-            var attributeModifierHandle = ApplyAttributeModifier(attributeModifier);
-            if (attributeModifierHandle != null)
-                yield return attributeModifierHandle;
-        }
+        return Enumerable.Empty<OldAttributeModifierHandle>();
+
+        // foreach (var attributeModifier in effect.Modifiers)
+        // {
+        //     var attributeModifierHandle = ApplyAttributeModifier(attributeModifier);
+        //     if (attributeModifierHandle != null)
+        //         yield return attributeModifierHandle;
+        // }
     }
 }

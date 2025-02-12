@@ -83,7 +83,7 @@ public class GameController : MonoBehaviour
 
         private float GetMonsterExperienceReward(Creature monster)
         {
-            var asc = monster.GetComponent<AbilitySystemComponent>();
+            var asc = monster.GetComponent<OldAbilitySystemComponent>();
             if (asc == null)
                 return 0f;
 

@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     private Player _player;
     private HUD _hud;
 
-    private AbilitySystemComponent _asc;
+    private OldAbilitySystemComponent _asc;
 
     private float _toNextShot = 0;
 
@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
         _characterController = GetComponent<CharacterController>();
         _player = GetComponent<Player>();
 
-        _asc = GetComponent<AbilitySystemComponent>();
+        _asc = GetComponent<OldAbilitySystemComponent>();
 
         _asc.WhenReady(OnAbilitySystemReady);
 
@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
         _player.ReceiveDamanage += () => PlayReceiveDamageAnimation();
     }
 
-    private void OnAbilitySystemReady(AbilitySystemComponent asc)
+    private void OnAbilitySystemReady(OldAbilitySystemComponent asc)
     {
         ResetHUD();
     }

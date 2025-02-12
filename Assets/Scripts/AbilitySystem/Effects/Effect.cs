@@ -21,19 +21,19 @@ public enum EffectCancellationPolicy
     CancelAllModifiers,
 }
 
-public sealed class EffectHandle
+public sealed class OldEffectHandle
 {
-    public AbilitySystemComponent AbilitySystemComponent => _weakAbilitySystemComponent.TryGetTarget(out var asc) ? asc : null;
+    public OldAbilitySystemComponent AbilitySystemComponent => _weakAbilitySystemComponent.TryGetTarget(out var asc) ? asc : null;
     public Effect Effect => _weakEffect.TryGetTarget(out var effect) ? effect : null;
     public object InternalEffect => _weakInternalEffect.TryGetTarget(out var internalEffect) ? internalEffect : null;
 
-    private readonly WeakReference<AbilitySystemComponent> _weakAbilitySystemComponent;
+    private readonly WeakReference<OldAbilitySystemComponent> _weakAbilitySystemComponent;
     private readonly WeakReference<Effect> _weakEffect;
     private readonly WeakReference<object> _weakInternalEffect;
 
-    public EffectHandle(AbilitySystemComponent asc, Effect effect, object internalEffect)
+    public OldEffectHandle(OldAbilitySystemComponent asc, Effect effect, object internalEffect)
     {
-        _weakAbilitySystemComponent = new WeakReference<AbilitySystemComponent>(asc);
+        _weakAbilitySystemComponent = new WeakReference<OldAbilitySystemComponent>(asc);
         _weakEffect = new WeakReference<Effect>(effect);
         _weakInternalEffect = new WeakReference<object>(internalEffect);
     }

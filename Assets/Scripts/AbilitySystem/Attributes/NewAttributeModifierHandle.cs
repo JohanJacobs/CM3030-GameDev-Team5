@@ -16,4 +16,10 @@ public sealed class NewAttributeModifierHandle
         _weakModifierStack = new WeakReference<NewAttributeModifierStack>(modifierStack);
         _weakModifierInstance = new WeakReference<NewAttributeModifierInstance>(modifierInstance);
     }
+
+    public void Clear()
+    {
+        _weakModifierStack.SetTarget(null);
+        _weakModifierInstance.SetTarget(null);
+    }
 }

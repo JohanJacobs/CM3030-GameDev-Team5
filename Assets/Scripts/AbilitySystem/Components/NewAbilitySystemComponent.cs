@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class NewAbilitySystemComponent : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class NewAbilitySystemComponent : MonoBehaviour
     private readonly List<NewAttributeSetInstance> _attributeSets = new List<NewAttributeSetInstance>();
     private readonly EnumArray<NewAttributeValue, AttributeType> _attributeValues = new EnumArray<NewAttributeValue, AttributeType>();
     private readonly EnumArray<NewAttributeModifierStack, AttributeType> _attributeModifiers = new EnumArray<NewAttributeModifierStack, AttributeType>();
+
+    private readonly List<EffectInstance> _effects = new List<EffectInstance>();
 
     private bool _ready;
 
@@ -127,15 +130,34 @@ public class NewAbilitySystemComponent : MonoBehaviour
         return handle;
     }
 
+    public NewAttributeModifierHandle ApplyAttributeModifier(AttributeType attribute, ScalarModifier scalarModifier, bool post)
+    {
+        var attributeModifierStack = _attributeModifiers[attribute];
+
+        var attributeModifierInstance = attributeModifierStack.AddModifier(scalarModifier, post);
+
+        var handle = new NewAttributeModifierHandle(this, attributeModifierStack, attributeModifierInstance);
+
+        return handle;
+    }
+
     public void CancelAttributeModifier(NewAttributeModifierHandle handle)
     {
         if (handle.AbilitySystemComponent != this)
             throw new InvalidOperationException("Invalid attribute modifier handle");
 
         var attributeModifierStack = handle.ModifierStack;
+        // NOTE: shouldn't be the case ever but sanity check won't hurt
+        if (attributeModifierStack == null)
+            return;
+
         var attributeModifierInstance = handle.ModifierInstance;
+        if (attributeModifierInstance == null)
+            return;
 
         attributeModifierStack.RemoveModifier(attributeModifierInstance);
+
+        handle.Clear();
     }
 
     public void CollapseAttributeModifiers(AttributeType attribute)
@@ -157,26 +179,35 @@ public class NewAbilitySystemComponent : MonoBehaviour
     {
         Debug.Assert(effect.IsInstant || effect.IsFinite || effect.IsInfinite);
 
-        var effectContext = new EffectContext(this, this);
-        var effectInstance = new EffectInstance(effect, effectContext);
+        var context = new EffectContext(this, this);
 
-        return null;
+        return context.Target.ApplyEffect(effect, context);
     }
 
     public NewEffectHandle ApplyEffectToTarget(Effect effect, NewAbilitySystemComponent target)
     {
         Debug.Assert(effect.IsInstant || effect.IsFinite || effect.IsInfinite);
 
-        var effectContext = new EffectContext(this, target);
-        var effectInstance = new EffectInstance(effect, effectContext);
+        var context = new EffectContext(this, target);
 
-        effectInstance.Apply();
+        return context.Target.ApplyEffect(effect, context);
+    }
 
-        if (effect.IsInstant)
+    public void CancelEffect(NewEffectHandle handle)
+    {
+        if (handle.AbilitySystemComponent != this)
+            throw new InvalidOperationException("Invalid effect handle");
+
+        var effectInstance = handle.EffectInstance;
+        if (effectInstance == null)
+            return;
+
+        if (_effects.Remove(effectInstance))
         {
+            effectInstance.Cancel();
         }
 
-        return null;
+        handle.Clear();
     }
 
     private void Start()
@@ -198,6 +229,13 @@ public class NewAbilitySystemComponent : MonoBehaviour
         _ready = true;
 
         Ready?.Invoke(this);
+    }
+
+    private void Update()
+    {
+        var deltaTime = Time.deltaTime;
+
+        UpdateEffects(deltaTime);
     }
 
     private void OnAttributeBaseValueChanged(NewAttributeValue attributeValue, float oldValue, float newValue)
@@ -226,16 +264,34 @@ public class NewAbilitySystemComponent : MonoBehaviour
         attributeValue.Value = attributeModifierStack.Calculate(attributeValue.BaseValue);
     }
 
-    public NewAttributeModifierHandle ApplyAttributeModifier(AttributeType attribute, ScalarModifier scalarModifier, bool post)
+    private NewEffectHandle ApplyEffect(Effect effect, EffectContext context)
     {
-        var attributeModifierStack = _attributeModifiers[attribute];
-        var attributeModifierInstance = attributeModifierStack.AddModifier(scalarModifier, post);
+        var effectInstance = new EffectInstance(effect, context);
 
-        var handle = new NewAttributeModifierHandle(this, attributeModifierStack, attributeModifierInstance);
+        effectInstance.Apply();
+
+        if (effectInstance.Expired)
+        {
+            effectInstance.Cancel();
+
+            return null;
+        }
+
+        _effects.Add(effectInstance);
+
+        var handle = new NewEffectHandle(this, effectInstance);
 
         return handle;
     }
 
-    
+    private void UpdateEffects(float deltaTime)
+    {
+        foreach (var effectInstance in _effects)
+        {
+            effectInstance.Update(deltaTime);
+        }
+
+        _effects.RemoveAll(effectInstance => effectInstance.Expired);
+    }
 
 }
