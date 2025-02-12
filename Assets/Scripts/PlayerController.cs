@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     private Player _player;
     private HUD _hud;
 
-    private OldAbilitySystemComponent _asc;
+    private AbilitySystemComponent _asc;
 
     private float _toNextShot = 0;
 
@@ -35,16 +35,15 @@ public class PlayerController : MonoBehaviour
         _characterController = GetComponent<CharacterController>();
         _player = GetComponent<Player>();
 
-        _asc = GetComponent<OldAbilitySystemComponent>();
-
-        _asc.WhenReady(OnAbilitySystemReady);
+        _asc = GetComponent<AbilitySystemComponent>();
+        _asc.OnReady(OnAbilitySystemReady);
 
         _player.Kill += (creature, victim) => AddKill();
         _player.Death += (creature) => ShowWasted();
         _player.ReceiveDamanage += () => PlayReceiveDamageAnimation();
     }
 
-    private void OnAbilitySystemReady(OldAbilitySystemComponent asc)
+    private void OnAbilitySystemReady(AbilitySystemComponent asc)
     {
         ResetHUD();
     }

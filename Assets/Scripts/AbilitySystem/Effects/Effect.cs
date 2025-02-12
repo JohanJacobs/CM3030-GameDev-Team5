@@ -1,5 +1,4 @@
 using UnityEngine;
-using System;
 using System.Collections.Generic;
 
 public enum EffectDurationPolicy
@@ -21,39 +20,10 @@ public enum EffectCancellationPolicy
     CancelAllModifiers,
 }
 
-public sealed class OldEffectHandle
-{
-    public OldAbilitySystemComponent AbilitySystemComponent => _weakAbilitySystemComponent.TryGetTarget(out var asc) ? asc : null;
-    public Effect Effect => _weakEffect.TryGetTarget(out var effect) ? effect : null;
-    public object InternalEffect => _weakInternalEffect.TryGetTarget(out var internalEffect) ? internalEffect : null;
-
-    private readonly WeakReference<OldAbilitySystemComponent> _weakAbilitySystemComponent;
-    private readonly WeakReference<Effect> _weakEffect;
-    private readonly WeakReference<object> _weakInternalEffect;
-
-    public OldEffectHandle(OldAbilitySystemComponent asc, Effect effect, object internalEffect)
-    {
-        _weakAbilitySystemComponent = new WeakReference<OldAbilitySystemComponent>(asc);
-        _weakEffect = new WeakReference<Effect>(effect);
-        _weakInternalEffect = new WeakReference<object>(internalEffect);
-    }
-
-    public bool CancelEffect()
-    {
-        var asc = AbilitySystemComponent;
-        if (asc == null)
-            return false;
-
-        asc.CancelEffect(this);
-
-        return true;
-    }
-}
-
 [CreateAssetMenu]
 public sealed class Effect : ScriptableObject
 {
-    public NewAttributeModifier[] Modifiers;
+    public AttributeModifier[] Modifiers;
     public EffectDurationPolicy DurationPolicy = EffectDurationPolicy.Instant;
     public EffectCancellationPolicy CancellationPolicy = EffectCancellationPolicy.CancelAllModifiers;
     public float Duration = 0f;

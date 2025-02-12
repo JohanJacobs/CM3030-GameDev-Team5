@@ -9,17 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5a8ee514608c3a4b91cbee5e3a7e44c, type: 3}
+  m_Script: {fileID: 11500000, guid: a4223be30eb280b4c915c26cfda437e9, type: 3}
   m_Name: PlayerAttributeSet
   m_EditorClassIdentifier: 
-  DefaultAttributes:
-  - Attribute: 0
-    BaseValue: 0
-  - Attribute: 1
-    BaseValue: 100
-  - Attribute: 2
-    BaseValue: 0.1
-  - Attribute: 6
-    BaseValue: 5
-  - Attribute: 7
-    BaseValue: 720
+  _defaultAttributes:
+  - _attribute: 0
+    _defaultValue: 0
+  - _attribute: 1
+    _defaultValue: 100
+  - _attribute: 2
+    _defaultValue: 0.1
+  - _attribute: 6
+    _defaultValue: 5
+  - _attribute: 7
+    _defaultValue: 720

@@ -19,15 +19,12 @@ public class Creature : MonoBehaviour
     public event DeathDelegate Death;
     public event ReceiveDamangeDelegate ReceiveDamanage;
 
-    protected OldAbilitySystemComponent AbilitySystemComponent;
-    protected NewAbilitySystemComponent NewAbilitySystemComponent;
+    protected AbilitySystemComponent AbilitySystemComponent;
     protected HealthComponent HealthComponent;
 
     void Awake()
     {
-        AbilitySystemComponent = GetComponent<OldAbilitySystemComponent>();
-
-        NewAbilitySystemComponent = GetComponent<NewAbilitySystemComponent>();
+        AbilitySystemComponent = GetComponent<AbilitySystemComponent>();
 
         HealthComponent = GetComponent<HealthComponent>();
         HealthComponent.OutOfHealth += OnOutOfHealth;
@@ -38,10 +35,7 @@ public class Creature : MonoBehaviour
         if (IsDead)
             return;
 
-        if (!(amount > 0))
-            throw new ArgumentOutOfRangeException(nameof(amount), amount, "Damage amount must be positive");
-
-        AbilitySystemComponent.ApplyAttributeModifier(AttributeType.Damage, ScalarModifier.MakeBonus(amount), false, true);
+        AbilitySystemComponent.AddDamage(amount);
 
         OnDamageTaken(causer, origin, amount);
     }

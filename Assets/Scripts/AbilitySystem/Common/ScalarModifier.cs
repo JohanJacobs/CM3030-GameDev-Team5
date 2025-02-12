@@ -67,58 +67,7 @@ public struct ScalarModifier
         };
     }
 
-    public static ScalarModifier MakeFromAttributeModifier(OldAttributeModifier attributeModifier)
-    {
-        float bonus = 0f;
-        float bonusFraction = 0f;
-        float multiplier = 1f;
-        bool identity = true;
-
-        switch (attributeModifier.Type)
-        {
-            case OldAttributeModifierType.Add:
-                if (Mathf.Abs(attributeModifier.Value) > 0f)
-                {
-                    bonus = attributeModifier.Value;
-                    identity = false;
-                }
-                break;
-            case OldAttributeModifierType.AddProgressive:
-                throw new NotImplementedException();
-            case OldAttributeModifierType.AddFraction:
-                if (Mathf.Abs(attributeModifier.Value) > 0f)
-                {
-                    bonusFraction = attributeModifier.Value;
-                    identity = false;
-                }
-                break;
-            case OldAttributeModifierType.AddFractionProgressive:
-                throw new NotImplementedException();
-            case OldAttributeModifierType.Multiply:
-                if (Mathf.Abs(attributeModifier.Value - 1f) > 0f)
-                {
-                    multiplier = attributeModifier.Value;
-                    identity = false;
-                }
-                break;
-            case OldAttributeModifierType.MultiplyProgressive:
-                throw new NotImplementedException();
-            case OldAttributeModifierType.Override:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        return new ScalarModifier()
-        {
-            _bonus = bonus,
-            _bonusFraction = bonusFraction,
-            _multiplier = multiplier,
-            _identity = identity,
-        };
-    }
-
-    public static ScalarModifier MakeFromAttributeModifier(NewAttributeModifier attributeModifier)
+    public static ScalarModifier MakeFromAttributeModifier(AttributeModifier attributeModifier)
     {
         float bonus = 0f;
         float bonusFraction = 0f;
@@ -211,18 +160,5 @@ public struct ScalarModifier
             return baseValue;
 
         return baseValue * (_multiplier + _bonusFraction) + _bonus;
-    }
-}
-
-public static class ScalarModifierHelper
-{
-    public static void Reset(this ScalarModifier self, OldAttributeModifier attributeModifier)
-    {
-        self.Reset(ScalarModifier.MakeFromAttributeModifier(attributeModifier));
-    }
-
-    public static void Combine(this ScalarModifier self, OldAttributeModifier attributeModifier)
-    {
-        self.Combine(ScalarModifier.MakeFromAttributeModifier(attributeModifier));
     }
 }

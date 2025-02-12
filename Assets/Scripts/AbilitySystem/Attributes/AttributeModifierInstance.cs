@@ -1,20 +1,20 @@
 using UnityEngine;
 
-public abstract class NewAttributeModifierInstance
+public abstract class AttributeModifierInstance
 {
-    public NewAttributeModifier AttributeModifier { get; }
+    public AttributeModifier AttributeModifier { get; }
     public bool Post { get; }
     public int Index { get; } = ++_nextIndex;
 
     private static int _nextIndex = 0;
 
-    protected NewAttributeModifierInstance(NewAttributeModifier attributeModifier)
+    protected AttributeModifierInstance(AttributeModifier attributeModifier)
     {
         AttributeModifier = attributeModifier;
         Post = AttributeModifier.Post;
     }
 
-    protected NewAttributeModifierInstance(bool post)
+    protected AttributeModifierInstance(bool post)
     {
         AttributeModifier = null;
         Post = post;
@@ -23,11 +23,11 @@ public abstract class NewAttributeModifierInstance
     public abstract void Apply(ref float value);
 }
 
-public class NewAttributeModifierInstanceWithModifier : NewAttributeModifierInstance
+public class AttributeModifierInstanceWithModifier : AttributeModifierInstance
 {
     private ScalarModifier _scalarModifier;
 
-    public NewAttributeModifierInstanceWithModifier(NewAttributeModifier attributeModifier)
+    public AttributeModifierInstanceWithModifier(AttributeModifier attributeModifier)
         : base(attributeModifier)
     {
         Debug.Assert(attributeModifier.Type != NewAttributeModifierType.Override);
@@ -35,7 +35,7 @@ public class NewAttributeModifierInstanceWithModifier : NewAttributeModifierInst
         _scalarModifier = ScalarModifier.MakeFromAttributeModifier(attributeModifier);
     }
 
-    public NewAttributeModifierInstanceWithModifier(ScalarModifier scalarModifier, bool post)
+    public AttributeModifierInstanceWithModifier(ScalarModifier scalarModifier, bool post)
         : base(post)
     {
         _scalarModifier = scalarModifier;
@@ -47,11 +47,11 @@ public class NewAttributeModifierInstanceWithModifier : NewAttributeModifierInst
     }
 }
 
-public class NewAttributeModifierInstanceWithOverride : NewAttributeModifierInstance
+public class AttributeModifierInstanceWithOverride : AttributeModifierInstance
 {
     private float _scalarOverride;
 
-    public NewAttributeModifierInstanceWithOverride(NewAttributeModifier attributeModifier)
+    public AttributeModifierInstanceWithOverride(AttributeModifier attributeModifier)
         : base(attributeModifier)
     {
         Debug.Assert(attributeModifier.Type == NewAttributeModifierType.Override);
@@ -59,7 +59,7 @@ public class NewAttributeModifierInstanceWithOverride : NewAttributeModifierInst
         _scalarOverride = attributeModifier.Value;
     }
 
-    public NewAttributeModifierInstanceWithOverride(float scalarOverride, bool post)
+    public AttributeModifierInstanceWithOverride(float scalarOverride, bool post)
         : base(post)
     {
         _scalarOverride = scalarOverride;

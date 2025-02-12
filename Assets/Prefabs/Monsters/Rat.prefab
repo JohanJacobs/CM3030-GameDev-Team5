@@ -102,7 +102,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3794237158255692186}
-  - component: {fileID: 8642331377538256225}
+  - component: {fileID: 7556682222220320517}
   - component: {fileID: 8344635484670693762}
   - component: {fileID: 3794237158255692187}
   m_Layer: 0
@@ -127,7 +127,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8642331377538256225
+--- !u!114 &7556682222220320517
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -136,10 +136,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3794237158255692260}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34eaf4fa460d9e24e9cdb1b6d7d2f5e8, type: 3}
+  m_Script: {fileID: 11500000, guid: ca04ac20d2990ea4795e7f3793074715, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DefaultAttributeSets:
+  _grantedAttributeSets:
   - {fileID: 11400000, guid: 54b0321299d3ed9449cd167e7455a1b9, type: 2}
   - {fileID: 11400000, guid: 50fb533c6d6feeb46acb570c587a5358, type: 2}
 --- !u!114 &8344635484670693762
@@ -167,3 +167,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ApproachDistance: 0.4
+  animator: {fileID: 0}

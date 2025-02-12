@@ -1,277 +1,28 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
-public class OldAbilitySystemComponent : MonoBehaviour
+public class AbilitySystemComponent : MonoBehaviour
 {
-    public delegate void SelfDelegate(OldAbilitySystemComponent asc);
+    public delegate void SelfDelegate(AbilitySystemComponent asc);
 
-    private class InternalEffect
-    {
-        public Effect Effect { get; private set; }
+    private static readonly AttributeType[] AllAttributes = Enum.GetValues(typeof(AttributeType)).Cast<AttributeType>().ToArray();
 
-        public bool IsFinished => _finished;
+    [SerializeField]
+    private AttributeSet[] _grantedAttributeSets;
 
-        public float TimeLeft => _timeToFinish;
+    private readonly List<AttributeSetInstance> _attributeSets = new List<AttributeSetInstance>();
+    private readonly EnumArray<AttributeValue, AttributeType> _attributeValues = new EnumArray<AttributeValue, AttributeType>();
+    private readonly EnumArray<AttributeModifierStack, AttributeType> _attributeModifiers = new EnumArray<AttributeModifierStack, AttributeType>();
 
-        private readonly List<OldAttributeModifierHandle> _attributeModifierHandles = new List<OldAttributeModifierHandle>();
+    private readonly List<EffectInstance> _effects = new List<EffectInstance>();
 
-        private readonly bool _hasDuration;
-        private readonly bool _hasPeriod;
+    private bool _ready;
 
-        private float _timeToFinish;
-        private float _timeToApply;
+    private event SelfDelegate Ready;
 
-        private bool _finished;
-
-        public InternalEffect(OldAbilitySystemComponent asc, Effect effect)
-        {
-            Effect = effect;
-
-            switch (effect.DurationPolicy)
-            {
-                case EffectDurationPolicy.Instant:
-                    _hasDuration = false;
-                    _hasPeriod = false;
-                    _finished = true;
-                    break;
-                case EffectDurationPolicy.Duration:
-                    _hasDuration = true;
-                    _hasPeriod = Effect.HasPeriod;
-                    _timeToFinish = effect.Duration;
-                    break;
-                case EffectDurationPolicy.Infinite:
-                    _hasDuration = false;
-                    _hasPeriod = Effect.HasPeriod;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public void Apply(OldAbilitySystemComponent asc)
-        {
-            if (asc.CanApplyEffect(Effect))
-            {
-                _attributeModifierHandles.AddRange(asc.ApplyEffectModifiers(Effect));
-            }
-
-            if (_hasPeriod)
-            {
-                _timeToApply += Effect.Period;
-            }
-        }
-
-        public void Cancel(OldAbilitySystemComponent asc)
-        {
-            CancelAllModifiers();
-        }
-
-        public void Update(OldAbilitySystemComponent asc, float deltaTime)
-        {
-            if (_finished)
-                return;
-
-            if (_hasDuration)
-            {
-                _timeToFinish -= deltaTime;
-
-                if (!(_timeToFinish > 0f))
-                {
-                    Finish(asc);
-                }
-            }
-
-            if (_hasPeriod)
-            {
-                _timeToApply -= deltaTime;
-
-                if (!(_timeToApply > 0f))
-                {
-                    Apply(asc);
-                }
-            }
-        }
-
-        private void CancelAllModifiers()
-        {
-            foreach (var attributeModifierHandle in _attributeModifierHandles)
-            {
-                attributeModifierHandle.CancelModifier();
-            }
-
-            _attributeModifierHandles.Clear();
-        }
-
-        private void Finish(OldAbilitySystemComponent asc)
-        {
-            _finished = true;
-        }
-    }
-
-    public OldAttributeSet[] DefaultAttributeSets;
-    public Ability[] DefaultAbilities;
-
-    public event SelfDelegate Ready;
-
-    private readonly List<OldAttributeSet> _attributeSets = new List<OldAttributeSet>();
-    private readonly EnumArray<OldAttributeValue, AttributeType> _attributeValues = new EnumArray<OldAttributeValue, AttributeType>();
-
-    private readonly List<InternalEffect> _effects = new List<InternalEffect>();
-
-    private readonly TagContainer _tags = new TagContainer();
-
-    private bool _ready = false;
-
-    public void AddAttributeSet(OldAttributeSet template)
-    {
-        var index = _attributeSets.FindIndex(attributeSet => attributeSet.Template == template);
-        if (index >= 0)
-            return;
-
-        var newAttributeSet = template.Spawn();
-
-        foreach (var attribute in newAttributeSet.Attributes)
-        {
-            var attributeValue = _attributeValues[attribute];
-            if (attributeValue == null)
-                continue;
-
-            throw new InvalidOperationException($"Ambiguous attribute {attribute.GetName()}");
-        }
-
-        foreach (var attribute in newAttributeSet.Attributes)
-        {
-            var attributeValue = newAttributeSet.GetAttributeValueObject(attribute);
-
-            _attributeValues[attribute] = attributeValue;
-        }
-
-        _attributeSets.Add(newAttributeSet);
-    }
-
-    public void RemoveAttributeSet(OldAttributeSet template)
-    {
-        var index = _attributeSets.FindIndex(attributeSet => attributeSet.Template == template);
-        if (index < 0)
-            return;
-
-        var oldAttributeSet = _attributeSets[index];
-
-        foreach (var attribute in oldAttributeSet.Attributes)
-        {
-            _attributeValues[attribute] = null;
-        }
-
-        _attributeSets.RemoveAt(index);
-    }
-
-    public OldAttributeModifierHandle ApplyAttributeModifier(OldAttributeModifier attributeModifer)
-    {
-        var attributeValue = GetAttributeValueObject(attributeModifer.Attribute);
-        if (attributeValue == null)
-            throw new InvalidOperationException($"Attribute {attributeModifer.Attribute.GetName()} does not exist");
-
-        return attributeValue.ApplyModifier(attributeModifer);
-    }
-
-    public OldAttributeModifierHandle ApplyAttributeModifier(AttributeType attribute, ScalarModifier modifier, bool post = false, bool permanent = false)
-    {
-        var attributeValue = GetAttributeValueObject(attribute);
-        if (attributeValue == null)
-            throw new InvalidOperationException($"Attribute {attribute.GetName()} does not exist");
-
-        return attributeValue.ApplyModifier(modifier, post, permanent);
-    }
-
-    public bool CanApplyEffect(Effect effect)
-    {
-        if (_tags.ContainsAny(effect.BlockTags))
-            return false;
-
-        return true;
-    }
-
-    public OldEffectHandle ApplyEffect(Effect effect)
-    {
-        Debug.Assert(effect.IsInstant || effect.IsFinite || effect.IsInfinite);
-
-        if (!CanApplyEffect(effect))
-        {
-            if (effect.IsInstant)
-                return null;
-
-            if (!effect.HasPeriod)
-                return null;
-        }
-
-        var internalEffect = new InternalEffect(this, effect);
-
-        internalEffect.Apply(this);
-
-        if (internalEffect.IsFinished)
-        {
-            internalEffect.Cancel(this);
-            return null;
-        }
-
-        AddActiveEffect(internalEffect);
-
-        var handle = new OldEffectHandle(this, effect, internalEffect);
-
-        return handle;
-    }
-
-    public void CancelEffect(OldEffectHandle handle)
-    {
-        if (handle.AbilitySystemComponent != this)
-            throw new ArgumentException("Invalid effect handle");
-
-        if (handle.InternalEffect is InternalEffect internalEffect)
-        {
-            CancelAndRemoveActiveEffect(internalEffect);
-        }
-    }
-
-    public float GetEffectTimeLeft(Effect effect)
-    {
-        var internalEffect = _effects.Find(e => e.Effect == effect);
-        if (internalEffect == null)
-            return 0f;
-
-        return GetActiveEffectTimeLeft(internalEffect);
-    }
-
-    public float GetEffectTimeLeft(OldEffectHandle handle)
-    {
-        if (handle.AbilitySystemComponent != this)
-            throw new ArgumentException("Invalid effect handle");
-
-        if (handle.InternalEffect is InternalEffect internalEffect)
-        {
-            return GetActiveEffectTimeLeft(internalEffect);
-        }
-
-        return 0f;
-    }
-
-    public OldAttributeSet GetAttributeValueContainer(AttributeType attribute)
-    {
-        return _attributeValues[attribute]?.Owner;
-    }
-
-    public OldAttributeValue GetAttributeValueObject(AttributeType attribute)
-    {
-        return _attributeValues[attribute];
-    }
-
-    public float GetAttributeValue(AttributeType attribute)
-    {
-        return _attributeValues[attribute]?.Value ?? 0f;
-    }
-
-    public void WhenReady(SelfDelegate callback)
+    public void OnReady(SelfDelegate callback)
     {
         if (_ready)
         {
@@ -283,89 +34,304 @@ public class OldAbilitySystemComponent : MonoBehaviour
         }
     }
 
+    #region Attribute Sets
+
+    public void AddAttributeSet(AttributeSet attributeSet)
+    {
+        var index = _attributeSets.FindIndex(asi => asi.Template == attributeSet);
+        if (index >= 0)
+            return;
+
+        var attributeSetInstance = attributeSet.CreateInstance();
+
+        _attributeSets.Add(attributeSetInstance);
+
+        foreach (var attributeValue in attributeSetInstance.AttributeValues)
+        {
+            var existingAttributeValue = _attributeValues[attributeValue.Attribute];
+            if (existingAttributeValue != null)
+                throw new InvalidOperationException($"Ambiguous attribute {attributeValue.Attribute.GetName()}");
+
+            _attributeValues[attributeValue.Attribute] = attributeValue;
+
+            UpdateAttributeValue(attributeValue);
+
+            attributeValue.BaseValueChanged += OnAttributeBaseValueChanged;
+        }
+    }
+
+    public void RemoveAttributeSet(AttributeSet attributeSet)
+    {
+        var index = _attributeSets.FindIndex(asi => asi.Template == attributeSet);
+        if (index < 0)
+            return;
+
+        var attributeSetInstance = _attributeSets[index];
+
+        foreach (var attributeValue in attributeSetInstance.AttributeValues)
+        {
+            var existingAttributeValue = _attributeValues[attributeValue.Attribute];
+            if (existingAttributeValue != attributeValue)
+                throw new InvalidOperationException($"Ambiguous attribute {attributeValue.Attribute.GetName()}");
+
+            _attributeValues[attributeValue.Attribute] = null;
+
+            attributeValue.BaseValueChanged -= OnAttributeBaseValueChanged;
+        }
+
+        _attributeSets.RemoveAt(index);
+    }
+
+    #endregion
+
+    #region Attribute Values
+
+    public AttributeValue GetAttributeValueObject(AttributeType attribute)
+    {
+        return _attributeValues[attribute];
+    }
+
+    public void SetAttributeBaseValue(AttributeType attribute, float value)
+    {
+        var attributeValue = _attributeValues[attribute];
+        if (attributeValue == null)
+            return;
+
+        attributeValue.BaseValue = value;
+    }
+
+    public float GetAttributeBaseValue(AttributeType attribute)
+    {
+        var attributeValue = _attributeValues[attribute];
+
+        return attributeValue?.BaseValue ?? 0f;
+    }
+
+    public float GetAttributeValue(AttributeType attribute)
+    {
+        var attributeValue = _attributeValues[attribute];
+
+        return attributeValue?.Value ?? 0f;
+    }
+
+    #endregion
+
+    #region Attribute Modifiers
+
+    public AttributeModifierHandle ApplyAttributeModifier(AttributeModifier attributeModifier)
+    {
+        var attributeModifierStack = _attributeModifiers[attributeModifier.Attribute];
+
+        var attributeModifierInstance = attributeModifierStack.AddModifier(attributeModifier);
+
+        var handle = new AttributeModifierHandle(this, attributeModifierStack, attributeModifierInstance);
+
+        return handle;
+    }
+
+    public AttributeModifierHandle ApplyAttributeModifier(AttributeType attribute, ScalarModifier scalarModifier, bool post)
+    {
+        var attributeModifierStack = _attributeModifiers[attribute];
+
+        var attributeModifierInstance = attributeModifierStack.AddModifier(scalarModifier, post);
+
+        var handle = new AttributeModifierHandle(this, attributeModifierStack, attributeModifierInstance);
+
+        return handle;
+    }
+
+    public void CancelAttributeModifier(AttributeModifierHandle handle)
+    {
+        if (handle.AbilitySystemComponent != this)
+            throw new InvalidOperationException("Invalid attribute modifier handle");
+
+        var attributeModifierStack = handle.ModifierStack;
+        // NOTE: shouldn't be the case ever but sanity check won't hurt
+        if (attributeModifierStack == null)
+            return;
+
+        var attributeModifierInstance = handle.ModifierInstance;
+        if (attributeModifierInstance == null)
+            return;
+
+        attributeModifierStack.RemoveModifier(attributeModifierInstance);
+
+        handle.Clear();
+    }
+
+    public void CollapseAttributeModifiers(AttributeType attribute)
+    {
+        var attributeValue = _attributeValues[attribute];
+        if (attributeValue == null)
+            return;
+
+        var attributeModifierStack = _attributeModifiers[attribute];
+
+        attributeValue.Reset(attributeModifierStack.Calculate(attributeValue.BaseValue));
+
+        attributeModifierStack.Reset();
+    }
+
+    #endregion
+
+    public EffectHandle ApplyEffectToSelf(Effect effect)
+    {
+        Debug.Assert(effect.IsInstant || effect.IsFinite || effect.IsInfinite);
+
+        var context = new EffectContext(this, this);
+
+        return context.Target.ApplyEffect(effect, context);
+    }
+
+    public EffectHandle ApplyEffectToTarget(Effect effect, AbilitySystemComponent target)
+    {
+        Debug.Assert(effect.IsInstant || effect.IsFinite || effect.IsInfinite);
+
+        var context = new EffectContext(this, target);
+
+        return context.Target.ApplyEffect(effect, context);
+    }
+
+    public void CancelEffect(EffectHandle handle)
+    {
+        if (handle.AbilitySystemComponent != this)
+            throw new InvalidOperationException("Invalid effect handle");
+
+        var effectInstance = handle.EffectInstance;
+        if (effectInstance == null)
+            return;
+
+        if (_effects.Remove(effectInstance))
+        {
+            effectInstance.Cancel();
+        }
+
+        handle.Clear();
+    }
+
+    private static void EnsureCanApplyAttributeModifier(AttributeType attribute)
+    {
+        if (attribute.IsMetaAttribute())
+            throw new InvalidOperationException($"Meta attribute {attribute.GetName()} can't have modifiers");
+    }
+
     private void Start()
     {
-        foreach (var attributeSet in DefaultAttributeSets)
+        foreach (var attribute in AllAttributes)
+        {
+            var stack = new AttributeModifierStack(attribute);
+
+            stack.Changed += OnAttributeModifierStackChanged;
+
+            _attributeModifiers[attribute] = stack;
+        }
+
+        foreach (var attributeSet in _grantedAttributeSets)
         {
             AddAttributeSet(attributeSet);
         }
 
-        Ready?.Invoke(this);
-
         _ready = true;
+
+        Ready?.Invoke(this);
     }
 
     private void Update()
     {
         var deltaTime = Time.deltaTime;
 
-        UpdateActiveEffects(deltaTime);
+        UpdateEffects(deltaTime);
     }
 
-    private void AddActiveEffect(InternalEffect internalEffect)
+    private void OnAttributeBaseValueChanged(AttributeValue attributeValue, float oldValue, float newValue)
     {
-        _effects.Add(internalEffect);
-
-        _tags.AddRange(internalEffect.Effect.GrantedTags);
+        UpdateAttributeValue(attributeValue);
     }
 
-    private void RemoveActiveEffect(InternalEffect internalEffect)
+    private void OnAttributeModifierStackChanged(AttributeModifierStack attributeModifierStack)
     {
-        bool removed = _effects.Remove(internalEffect);
+        var attributeValue = _attributeValues[attributeModifierStack.Attribute];
+        if (attributeValue == null)
+            return;
 
-        Debug.Assert(removed);
-
-        var tagsToRemove = new HashSet<Tag>(internalEffect.Effect.GrantedTags);
-
-        // we want to remove only those tags that are not granted by other effects
-        _effects.ForEach(e => tagsToRemove.ExceptWith(e.Effect.GrantedTags));
-
-        _tags.RemoveRange(tagsToRemove);
+        UpdateAttributeValue(attributeValue, attributeModifierStack);
     }
 
-    private void CancelAndRemoveActiveEffect(InternalEffect internalEffect)
+    private void UpdateAttributeValue(AttributeValue attributeValue)
     {
-        internalEffect.Cancel(this);
+        var attributeModifierStack = _attributeModifiers[attributeValue.Attribute];
 
-        RemoveActiveEffect(internalEffect);
+        UpdateAttributeValue(attributeValue, attributeModifierStack);
     }
 
-    private float GetActiveEffectTimeLeft(InternalEffect internalEffect)
+    private void UpdateAttributeValue(AttributeValue attributeValue, AttributeModifierStack attributeModifierStack)
     {
-        if (internalEffect.Effect.IsInfinite)
-            return float.PositiveInfinity;
-
-        return internalEffect.TimeLeft;
+        attributeValue.Value = attributeModifierStack.Calculate(attributeValue.BaseValue);
     }
 
-    private void UpdateActiveEffects(float deltaTime)
+    private EffectHandle ApplyEffect(Effect effect, EffectContext context)
     {
-        for (var i = 0; i < _effects.Count; )
+        var effectInstance = new EffectInstance(effect, context);
+
+        effectInstance.Apply();
+
+        if (effectInstance.Expired)
         {
-            var internalEffect = _effects[i];
+            effectInstance.Cancel();
 
-            internalEffect.Update(this, deltaTime);
-
-            if (internalEffect.IsFinished)
-            {
-                CancelAndRemoveActiveEffect(internalEffect);
-            }
-            else
-            {
-                ++i;
-            }
+            return null;
         }
+
+        _effects.Add(effectInstance);
+
+        var handle = new EffectHandle(this, effectInstance);
+
+        return handle;
     }
 
-    private IEnumerable<OldAttributeModifierHandle> ApplyEffectModifiers(Effect effect)
+    private void UpdateEffects(float deltaTime)
     {
-        return Enumerable.Empty<OldAttributeModifierHandle>();
+        foreach (var effectInstance in _effects)
+        {
+            effectInstance.Update(deltaTime);
+        }
 
-        // foreach (var attributeModifier in effect.Modifiers)
-        // {
-        //     var attributeModifierHandle = ApplyAttributeModifier(attributeModifier);
-        //     if (attributeModifierHandle != null)
-        //         yield return attributeModifierHandle;
-        // }
+        _effects.RemoveAll(effectInstance => effectInstance.Expired);
+    }
+}
+
+public static class AbilitySystemHelper
+{
+    private static void AddAttributeValue(this AbilitySystemComponent self, AttributeType attribute, float amount)
+    {
+        var attributeValue = self.GetAttributeValueObject(attribute);
+        if (attributeValue == null)
+            return;
+
+        attributeValue.Value += amount;
+    }
+
+    public static void AddExperience(this AbilitySystemComponent self, float amount)
+    {
+        Debug.Assert(!(amount < 0), "Experience amount must be non-negative");
+
+        if (amount > 0)
+            self.AddAttributeValue(AttributeType.Experience, amount);
+    }
+
+    public static void AddDamage(this AbilitySystemComponent self, float amount)
+    {
+        Debug.Assert(!(amount < 0), "Damage amount must be non-negative");
+
+        if (amount > 0)
+            self.AddAttributeValue(AttributeType.Damage, amount);
+    }
+
+    public static void AddHealing(this AbilitySystemComponent self, float amount)
+    {
+        Debug.Assert(!(amount < 0), "Healing amount must be non-negative");
+
+        if (amount > 0)
+            self.AddAttributeValue(AttributeType.Healing, amount);
     }
 }

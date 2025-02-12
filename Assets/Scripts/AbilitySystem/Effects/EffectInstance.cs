@@ -7,7 +7,7 @@ public class EffectInstance
     public EffectContext Context { get; }
     public bool Expired => _expired;
 
-    private readonly List<NewAttributeModifierHandle> _modifiers = new List<NewAttributeModifierHandle>();
+    private readonly List<AttributeModifierHandle> _modifiers = new List<AttributeModifierHandle>();
 
     private readonly bool _hasDuration;
     private readonly bool _hasPeriod;

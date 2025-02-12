@@ -31,17 +31,17 @@ public class HealthComponent : MonoBehaviour
     public event SelfDelegate OutOfHealth;
     public event HealthChangedDelegate HealthChanged;
 
-    private NewAbilitySystemComponent _asc;
+    private AbilitySystemComponent _asc;
 
-    private NewAttributeValue _healthAttribute;
-    private NewAttributeValue _maxHealthAttribute;
-    private NewAttributeValue _healthRegenerationAttribute;
-    private NewAttributeValue _damageAttribute;
-    private NewAttributeValue _healingAttribute;
+    private AttributeValue _healthAttribute;
+    private AttributeValue _maxHealthAttribute;
+    private AttributeValue _healthRegenerationAttribute;
+    private AttributeValue _damageAttribute;
+    private AttributeValue _healingAttribute;
 
     private void Awake()
     {
-        _asc = GetComponent<NewAbilitySystemComponent>();
+        _asc = GetComponent<AbilitySystemComponent>();
         _asc.OnReady(OnAbilitySystemReady);
     }
 
@@ -54,7 +54,7 @@ public class HealthComponent : MonoBehaviour
         UpdateHealthRegeneration();
     }
 
-    private void OnAbilitySystemReady(NewAbilitySystemComponent asc)
+    private void OnAbilitySystemReady(AbilitySystemComponent asc)
     {
         _healthAttribute = _asc.GetAttributeValueObject(AttributeType.Health);
         _maxHealthAttribute = _asc.GetAttributeValueObject(AttributeType.MaxHealth);
@@ -74,7 +74,7 @@ public class HealthComponent : MonoBehaviour
         }
     }
 
-    private void OnDamageModified(NewAttributeValue attributeValue, float oldValue, float value)
+    private void OnDamageModified(AttributeValue attributeValue, float oldValue, float value)
     {
         Debug.Assert(!(value < 0f), "Damage must be non-negative");
 
@@ -106,7 +106,7 @@ public class HealthComponent : MonoBehaviour
         }
     }
 
-    private void OnHealingModified(NewAttributeValue attributeValue, float oldValue, float value)
+    private void OnHealingModified(AttributeValue attributeValue, float oldValue, float value)
     {
         Debug.Assert(!(value < 0f), "Healing must be non-negative");
 

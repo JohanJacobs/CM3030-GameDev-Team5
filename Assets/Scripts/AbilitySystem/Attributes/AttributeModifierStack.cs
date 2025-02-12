@@ -1,26 +1,31 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class NewAttributeModifierStack
+public class AttributeModifierStack
 {
-    public delegate void SelfDelegate(NewAttributeModifierStack attributeModifierStack);
+    public delegate void SelfDelegate(AttributeModifierStack attributeModifierStack);
 
     public AttributeType Attribute { get; }
 
     public event SelfDelegate Changed;
 
-    private readonly List<NewAttributeModifierInstance> _modifiers = new List<NewAttributeModifierInstance>();
+    private readonly List<AttributeModifierInstance> _modifiers = new List<AttributeModifierInstance>();
 
     private bool _dirty;
 
-    public NewAttributeModifierStack(AttributeType attribute)
+    public AttributeModifierStack(AttributeType attribute)
     {
         Attribute = attribute;
     }
 
-    public NewAttributeModifierInstance AddModifier(NewAttributeModifier modifier)
+    public AttributeModifierInstance AddModifier(AttributeModifier attributeModifier)
     {
-        var modifierInstance = modifier.CreateInstance();
+        Attribute.EnsureCanHaveModifiers();
+
+        Debug.Assert(attributeModifier.Attribute == Attribute);
+
+        var modifierInstance = attributeModifier.CreateInstance();
 
         _modifiers.Add(modifierInstance);
         _dirty = true;
@@ -30,9 +35,11 @@ public class NewAttributeModifierStack
         return modifierInstance;
     }
 
-    public NewAttributeModifierInstance AddModifier(ScalarModifier scalarModifier, bool post)
+    public AttributeModifierInstance AddModifier(ScalarModifier scalarModifier, bool post)
     {
-        var modifierInstance = new NewAttributeModifierInstanceWithModifier(scalarModifier, post);
+        Attribute.EnsureCanHaveModifiers();
+
+        var modifierInstance = new AttributeModifierInstanceWithModifier(scalarModifier, post);
 
         _modifiers.Add(modifierInstance);
         _dirty = true;
@@ -42,9 +49,11 @@ public class NewAttributeModifierStack
         return modifierInstance;
     }
 
-    public NewAttributeModifierInstance AddOverride(float scalarOverride, bool post)
+    public AttributeModifierInstance AddOverride(float scalarOverride, bool post)
     {
-        var modifierInstance = new NewAttributeModifierInstanceWithOverride(scalarOverride, post);
+        Attribute.EnsureCanHaveModifiers();
+
+        var modifierInstance = new AttributeModifierInstanceWithOverride(scalarOverride, post);
 
         _modifiers.Add(modifierInstance);
         _dirty = true;
@@ -54,7 +63,7 @@ public class NewAttributeModifierStack
         return modifierInstance;
     }
 
-    public void RemoveModifier(NewAttributeModifierInstance modifierInstance)
+    public void RemoveModifier(AttributeModifierInstance modifierInstance)
     {
         if (_modifiers.Remove(modifierInstance))
         {
@@ -87,7 +96,7 @@ public class NewAttributeModifierStack
         return value;
     }
 
-    private static int CompareModifierInstances(NewAttributeModifierInstance lhs, NewAttributeModifierInstance rhs)
+    private static int CompareModifierInstances(AttributeModifierInstance lhs, AttributeModifierInstance rhs)
     {
         if (lhs.Post != rhs.Post)
             return lhs.Post ? 1 : -1;

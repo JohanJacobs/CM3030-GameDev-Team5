@@ -6,11 +6,11 @@ public class PickupWithEffect : Pickup
 
     protected override bool HandlePickUpImpl(GameObject target)
     {
-        var asc = target.GetComponent<OldAbilitySystemComponent>();
+        var asc = target.GetComponent<AbilitySystemComponent>();
         if (asc == null)
             return false;
 
-        asc.ApplyEffect(Effect);
+        asc.ApplyEffectToSelf(Effect);
 
         return true;
     }

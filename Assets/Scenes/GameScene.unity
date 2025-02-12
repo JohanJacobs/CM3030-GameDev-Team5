@@ -256,10 +256,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 244319269}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34eaf4fa460d9e24e9cdb1b6d7d2f5e8, type: 3}
+  m_Script: {fileID: 11500000, guid: ca04ac20d2990ea4795e7f3793074715, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DefaultAttributeSets:
+  _grantedAttributeSets:
   - {fileID: 11400000, guid: bc7e3d4971c89b449b34671bdbc3816e, type: 2}
   - {fileID: 11400000, guid: df3fce6e52a561c47a56dd0378b89d2f, type: 2}
   - {fileID: 11400000, guid: 08517e24876b6d24688bfe445d755cad, type: 2}

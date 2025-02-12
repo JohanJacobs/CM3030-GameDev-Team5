@@ -2,15 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class NewAttributeSetInstance
+public class AttributeSetInstance
 {
-    public NewAttributeSet Template { get; }
+    public AttributeSet Template { get; }
     public IEnumerable<AttributeType> Attributes => AttributeValues.Select(attributeValue => attributeValue.Attribute);
-    public IEnumerable<NewAttributeValue> AttributeValues => _attributeValues.Where(attributeValue => attributeValue != null);
+    public IEnumerable<AttributeValue> AttributeValues => _attributeValues.Where(attributeValue => attributeValue != null);
 
-    private readonly EnumArray<NewAttributeValue, AttributeType> _attributeValues = new EnumArray<NewAttributeValue, AttributeType>();
+    private readonly EnumArray<AttributeValue, AttributeType> _attributeValues = new EnumArray<AttributeValue, AttributeType>();
 
-    public NewAttributeSetInstance(NewAttributeSet template)
+    public AttributeSetInstance(AttributeSet template)
     {
         Template = template;
 
@@ -28,7 +28,7 @@ public class NewAttributeSetInstance
                 continue;
             }
 
-            attributeValue = new NewAttributeValue(attributeDefinition.Attribute, attributeDefinition.DefaultValue);
+            attributeValue = new AttributeValue(attributeDefinition.Attribute, attributeDefinition.DefaultValue);
 
             _attributeValues[attributeDefinition.Attribute] = attributeValue;
         }
