@@ -1,12 +1,14 @@
 using System;
 using UnityEngine;
 
+using AbilityLogicClassRegistry = ClassRegistry<AbilityLogic, AbilityLogicClassAttribute>;
+
 [Serializable]
 public struct AbilityLogicClass
 {
     public string ClassName;
 
-    public Type ClassType => ClassRegistry.GetAbilityLogicClassType(ClassName);
+    public Type ClassType => AbilityLogicClassRegistry.GetClassType(ClassName);
 
     public AbilityLogic CreateInstance()
     {

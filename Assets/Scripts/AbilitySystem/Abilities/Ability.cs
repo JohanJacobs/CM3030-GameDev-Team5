@@ -15,8 +15,7 @@ public sealed class AbilityCooldownDefinition
     public float Value;
 }
 
-[CreateAssetMenu]
-public class Ability : ScriptableObject
+public abstract class Ability : ScriptableObject, IAbilityLogic
 {
     public bool ActivateOnGranted = false;
 
@@ -27,5 +26,35 @@ public class Ability : ScriptableObject
     public Tag[] BlockTags;
     public Tag[] CancelTags;
 
-    public AbilityLogicClass AbilityLogicClass;
+    public AbilityInstanceDataClass AbilityInstanceDataClass;
+
+    public virtual void HandleAbilityAdded(AbilityInstance abilityInstance)
+    {
+    }
+
+    public virtual void HandleAbilityRemoved(AbilityInstance abilityInstance)
+    {
+    }
+
+    public virtual void ActivateAbility(AbilityInstance abilityInstance)
+    {
+    }
+
+    public virtual bool CanActivateAbility(AbilityInstance abilityInstance)
+    {
+        return true;
+    }
+
+    public virtual bool CommitAbility(AbilityInstance abilityInstance)
+    {
+        return CanActivateAbility(abilityInstance);
+    }
+
+    public virtual void EndAbility(AbilityInstance abilityInstance)
+    {
+    }
+
+    public virtual void UpdateAbility(AbilityInstance abilityInstance, float deltaTime)
+    {
+    }
 }

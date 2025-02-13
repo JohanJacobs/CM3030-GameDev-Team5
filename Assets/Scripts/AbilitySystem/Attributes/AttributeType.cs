@@ -28,6 +28,14 @@ public enum AttributeType
 
     KnockBack,
     KnockBackResistance,
+
+    AreaOfEffectBonus,
+    AreaOfEffectBonusFraction,
+    AreaOfEffectMultiplier,
+
+    GarlicAttackRange,
+    GarlicAttackRate,
+    GarlicAttackDamage,
 }
 
 public static class AttributeTypeHelper

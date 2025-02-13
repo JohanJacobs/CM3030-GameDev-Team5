@@ -9,15 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1a0424d10eb23f4d9a6cf77471b5f67, type: 3}
-  m_Name: TestEffect
+  m_Script: {fileID: 11500000, guid: 480a73a360976684586c1425512264df, type: 3}
+  m_Name: GarlicEffect_MoveSpeed
   m_EditorClassIdentifier: 
-  Modifiers: []
-  DurationPolicy: 0
-  Duration: 1
-  Period: 0.1
-  Tags: []
-  BlockTags: []
-  GrantedTags:
-  - _string: Respawn
-  - _string: EditorOnly
+  _attribute: 0
+  _type: 0
+  _value: 0
+  _permanent: 0
+  _post: 0

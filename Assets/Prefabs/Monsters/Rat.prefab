@@ -142,6 +142,7 @@ MonoBehaviour:
   _grantedAttributeSets:
   - {fileID: 11400000, guid: 54b0321299d3ed9449cd167e7455a1b9, type: 2}
   - {fileID: 11400000, guid: 50fb533c6d6feeb46acb570c587a5358, type: 2}
+  _grantedAbilities: []
 --- !u!114 &8344635484670693762
 MonoBehaviour:
   m_ObjectHideFlags: 0

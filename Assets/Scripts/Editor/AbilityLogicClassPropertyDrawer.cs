@@ -3,6 +3,8 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
+using AbilityLogicClassRegistry = ClassRegistry<AbilityLogic, AbilityLogicClassAttribute>;
+
 [CustomPropertyDrawer(typeof(AbilityLogicClass))]
 public class AbilityLogicClassPropertyDrawer : PropertyDrawer
 {
@@ -14,7 +16,7 @@ public class AbilityLogicClassPropertyDrawer : PropertyDrawer
         // get inside AbilityLogicClass to access its stored class name
         property.NextVisible(true);
 
-        var abilityLogicClassNames = ClassRegistry.GetAbilityLogicClassNames().ToArray();
+        var abilityLogicClassNames = AbilityLogicClassRegistry.GetClassNames().ToArray();
         var abilityLogicClassItems = abilityLogicClassNames.Select(className => new GUIContent(className)).ToArray();
 
         var selectedIndex = Array.IndexOf(abilityLogicClassNames, property.stringValue);

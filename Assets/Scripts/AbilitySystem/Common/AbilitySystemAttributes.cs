@@ -1,7 +1,13 @@
 using System;
 
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+[AttributeUsage(AttributeTargets.Class)]
 public class AbilityLogicClassAttribute : Attribute
+{
+
+}
+
+[AttributeUsage(AttributeTargets.Class)]
+public class AbilityInstanceDataClassAttribute : Attribute
 {
 
 }

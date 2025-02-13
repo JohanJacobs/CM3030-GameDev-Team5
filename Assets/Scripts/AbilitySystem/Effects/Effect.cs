@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public enum EffectDurationPolicy
 {
@@ -20,8 +19,8 @@ public enum EffectCancellationPolicy
     CancelAllModifiers,
 }
 
-[CreateAssetMenu]
-public sealed class Effect : ScriptableObject
+[CreateAssetMenu(menuName = "Effects/Basic")]
+public class Effect : ScriptableObject, IEffectLogic
 {
     public AttributeModifier[] Modifiers;
     public EffectDurationPolicy DurationPolicy = EffectDurationPolicy.Instant;
@@ -41,7 +40,7 @@ public sealed class Effect : ScriptableObject
     /// Tags that are added to target AbilitySystem as long as this effect is active.
     /// </summary>
     /// <remarks>
-    /// Note that instant effects are not granting tags.
+    /// Note that instant effects are not granting tags, but they're treated as being granted so i.e. can cancel effects/abilities.
     /// </remarks>
     public Tag[] GrantedTags;
 
@@ -50,4 +49,16 @@ public sealed class Effect : ScriptableObject
     public bool IsInstant => DurationPolicy == EffectDurationPolicy.Instant;
     public bool IsFinite => DurationPolicy == EffectDurationPolicy.Duration && HasDuration;
     public bool IsInfinite => DurationPolicy == EffectDurationPolicy.Infinite;
+
+    public virtual void ApplyEffect(EffectInstance effectInstance)
+    {
+    }
+
+    public virtual void CancelEffect(EffectInstance effectInstance)
+    {
+    }
+
+    public virtual void UpdateEffect(EffectInstance effectInstance, float deltaTime)
+    {
+    }
 }

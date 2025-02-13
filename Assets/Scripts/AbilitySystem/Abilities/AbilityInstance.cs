@@ -6,6 +6,7 @@ public class AbilityInstance
     public AbilitySystemComponent AbilitySystemComponent => _weakAbilitySystemComponent.TryGetTarget(out var asc) ? asc : null;
     public Ability Ability { get; }
     public bool Active => _active;
+    public object Data => _data;
 
     public float CooldownTimeRemainingFraction
     {
@@ -21,10 +22,12 @@ public class AbilityInstance
 
     private readonly WeakReference<AbilitySystemComponent> _weakAbilitySystemComponent;
 
-    private AbilityLogic _abilityLogic;
+    private IAbilityLogic _abilityLogic;
 
     private EffectHandle _costEffectHandle;
     private EffectHandle _cooldownEffectHandle;
+
+    private object _data;
 
     private bool _active;
 
@@ -34,13 +37,25 @@ public class AbilityInstance
 
         _weakAbilitySystemComponent = new WeakReference<AbilitySystemComponent>(asc);
 
-        _abilityLogic = ability.AbilityLogicClass.CreateInstance();
+        _abilityLogic = ability;
+    }
+
+    public void NotifyAdded()
+    {
+        _abilityLogic.HandleAbilityAdded(this);
+    }
+
+    public void NotifyRemoved()
+    {
+        _abilityLogic.HandleAbilityRemoved(this);
     }
 
     public void Destroy()
     {
         // NOTE: required to break cross-reference chain
         _abilityLogic = null;
+
+        _data = null;
     }
 
     public bool TryActivate()
@@ -79,6 +94,8 @@ public class AbilityInstance
 
         _active = true;
 
+        _data = Ability.AbilityInstanceDataClass.CreateInstance();
+
         _abilityLogic.ActivateAbility(this);
     }
 
@@ -90,6 +107,8 @@ public class AbilityInstance
         _active = false;
 
         _abilityLogic.EndAbility(this);
+
+        _data = null;
     }
 
     private bool Commit()

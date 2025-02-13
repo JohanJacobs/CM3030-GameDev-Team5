@@ -25,6 +25,8 @@ public class EffectInstance
     private readonly bool _hasDuration;
     private readonly bool _hasPeriod;
 
+    private IEffectLogic _effectLogic;
+
     private float _timeLeftToExpiration;
     private float _timeLeftToPeriodicApplication;
 
@@ -34,6 +36,8 @@ public class EffectInstance
     {
         Effect = effect;
         Context = context;
+
+        _effectLogic = effect;
 
         switch (effect.DurationPolicy)
         {
@@ -75,10 +79,14 @@ public class EffectInstance
 
             _modifiers.Add(handle);
         }
+
+        _effectLogic.ApplyEffect(this);
     }
 
     public void Cancel()
     {
+        _effectLogic.CancelEffect(this);
+
         switch (Effect.CancellationPolicy)
         {
             case EffectCancellationPolicy.DoNothing:
@@ -116,6 +124,8 @@ public class EffectInstance
                 HandlePeriodicApplication();
             }
         }
+
+        _effectLogic.UpdateEffect(this, deltaTime);
     }
 
     private void CancelAllModifiers()

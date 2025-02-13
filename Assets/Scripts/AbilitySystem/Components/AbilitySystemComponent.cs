@@ -259,6 +259,8 @@ public class AbilitySystemComponent : MonoBehaviour
 
         _abilityInstances.Add(abilityInstance);
 
+        abilityInstance.NotifyAdded();
+
         var handle = new AbilityHandle(this, abilityInstance);
 
         if (ability.ActivateOnGranted)
@@ -279,6 +281,8 @@ public class AbilitySystemComponent : MonoBehaviour
         abilityInstance.Destroy();
 
         _abilityInstances.Remove(abilityInstance);
+
+        abilityInstance.NotifyRemoved();
     }
 
     public void ActivateAbility(AbilityHandle handle)
@@ -410,6 +414,11 @@ public class AbilitySystemComponent : MonoBehaviour
         foreach (var effectInstance in _effectInstances)
         {
             effectInstance.Update(deltaTime);
+
+            if (effectInstance.Expired)
+            {
+                effectInstance.Cancel();
+            }
         }
 
         _effectInstances.RemoveAll(effectInstance => effectInstance.Expired);

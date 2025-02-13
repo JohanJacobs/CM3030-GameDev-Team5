@@ -4,44 +4,60 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-public class ClassRegistry
+using AbilityLogicClassRegistry = ClassRegistry<AbilityLogic, AbilityLogicClassAttribute>;
+
+public static class ClassRegistry<T, TagAttribute> where T : class where TagAttribute : Attribute
 {
-    private static readonly Dictionary<string, Type> AbilityLogicClasses = GetAbilityLogicClassesDictionary();
+    private static readonly Dictionary<string, Type> ClassDictionary;
 
-    private static IEnumerable<Type> GetAbilityLogicClasses()
+    static ClassRegistry()
     {
-        var assembly = Assembly.GetExecutingAssembly();
-
-        foreach (var type in assembly.ExportedTypes)
-        {
-            if (!type.IsClass)
-                continue;
-            if (type.IsAbstract)
-                continue;
-
-            var attrAbilityLogicClass = type.GetCustomAttribute<AbilityLogicClassAttribute>();
-            if (attrAbilityLogicClass == null)
-                continue;
-
-            yield return type;
-        }
+        ClassDictionary = GetClassDictionary();
     }
 
-    private static Dictionary<string, Type> GetAbilityLogicClassesDictionary()
+    public static IEnumerable<string> GetClassNames()
     {
-        return GetAbilityLogicClasses().ToDictionary(type => type.Name);
+        return ClassDictionary.Keys;
     }
 
-    public static IEnumerable<string> GetAbilityLogicClassNames()
+    public static Type GetClassType(string name)
     {
-        return AbilityLogicClasses.Keys;
-    }
-
-    public static Type GetAbilityLogicClassType(string name)
-    {
-        if (AbilityLogicClasses.TryGetValue(name, out var type))
+        if (ClassDictionary.TryGetValue(name, out var type))
             return type;
 
         return null;
+    }
+
+    public static string GetClassTypeName(Type type)
+    {
+        if (IsClassType(type))
+            return type.Name;
+
+        return null;
+    }
+
+    private static bool IsClassType(Type type)
+    {
+        if (!type.IsClass)
+            return false;
+        if (type.IsAbstract)
+            return false;
+
+        var attrTag = type.GetCustomAttribute<TagAttribute>();
+        if (attrTag == null)
+            return false;
+
+        return true;
+    }
+
+    private static IEnumerable<Type> GetClasses()
+    {
+        return Assembly.GetExecutingAssembly().ExportedTypes
+            .Where(IsClassType);
+    }
+
+    private static Dictionary<string, Type> GetClassDictionary()
+    {
+        return GetClasses().ToDictionary(type => type.Name);
     }
 }

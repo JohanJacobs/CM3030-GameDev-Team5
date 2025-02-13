@@ -1,10 +1,34 @@
 using System;
 
-public abstract class AbilityLogic
+public interface IAbilityLogic
 {
+    void HandleAbilityAdded(AbilityInstance abilityInstance);
+
+    void HandleAbilityRemoved(AbilityInstance abilityInstance);
+
+    void ActivateAbility(AbilityInstance abilityInstance);
+
+    bool CanActivateAbility(AbilityInstance abilityInstance);
+
+    bool CommitAbility(AbilityInstance abilityInstance);
+
+    void EndAbility(AbilityInstance abilityInstance);
+
+    void UpdateAbility(AbilityInstance abilityInstance, float deltaTime);
+}
+
+public abstract class AbilityLogic : IAbilityLogic
+{
+    public virtual void HandleAbilityAdded(AbilityInstance abilityInstance)
+    {
+    }
+
+    public virtual void HandleAbilityRemoved(AbilityInstance abilityInstance)
+    {
+    }
+
     public virtual void ActivateAbility(AbilityInstance abilityInstance)
     {
-
     }
 
     public virtual bool CanActivateAbility(AbilityInstance abilityInstance)
@@ -19,12 +43,10 @@ public abstract class AbilityLogic
 
     public virtual void EndAbility(AbilityInstance abilityInstance)
     {
-
     }
 
     public virtual void UpdateAbility(AbilityInstance abilityInstance, float deltaTime)
     {
-
     }
 }
 
