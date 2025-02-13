@@ -8,4 +8,10 @@
     public float FireRange => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRange);
     public float Experience => AbilitySystemComponent.GetAttributeValue(AttributeType.Experience);
     public float Level => AbilitySystemComponent.GetAttributeValue(AttributeType.Level);
+
+    public Player()
+    {
+        // player GO should exist even if player died
+        _autoDestroyOnDeath = false;
+    }
 }

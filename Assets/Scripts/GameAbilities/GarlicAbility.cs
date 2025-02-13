@@ -62,6 +62,7 @@ public class GarlicAbility : Ability
     private void Attack(AbilityInstance abilityInstance, float range, float damage)
     {
         var asc = abilityInstance.AbilitySystemComponent;
+        var ascAvatar = asc.GetComponent<Creature>();
 
         var colliders = Physics.OverlapSphere(asc.transform.position, range, LayerMask);
 
@@ -76,7 +77,7 @@ public class GarlicAbility : Ability
                 asc.ApplyEffectToTarget(TargetEffect, monster.AbilitySystemComponent);
             }
 
-            monster.TakeDamage(asc.gameObject, asc.transform.position, damage);
+            ascAvatar.DealDamage(monster, asc.transform.position, damage);
         }
     }
 }

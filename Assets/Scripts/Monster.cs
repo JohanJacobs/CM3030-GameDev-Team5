@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Random = UnityEngine.Random;
+﻿using UnityEngine;
 
 public class Monster : Creature
 {
     public float ApproachDistance = 0.3f;
+
+    public Animator animator;
 
     public float Speed => AbilitySystemComponent.GetAttributeValue(AttributeType.MoveSpeed);
     public float TurnSpeed => AbilitySystemComponent.GetAttributeValue(AttributeType.TurnSpeed);
@@ -19,11 +17,10 @@ public class Monster : Creature
     private GameObject _target;
 
     private float _toNextAttack = 0f;
-    public Animator animator;
 
     void Start()
     {
-        _target = GameObject.FindGameObjectWithTag("Player");        
+        _target = GameObject.FindGameObjectWithTag("Player");
     }
 
     void Update()
@@ -91,10 +88,11 @@ public class Monster : Creature
 
         PlayAttackAnimation();
 
-        _toNextAttack += 1f / AttackRate;        
+        _toNextAttack += 1f / AttackRate;
+
         var targetCreature = _target.GetComponent<Creature>();
 
-        targetCreature.TakeDamage(gameObject, transform.position, Random.Range(DamageMin, DamageMax));
+        DealDamage(targetCreature, transform.position, Random.Range(DamageMin, DamageMax));
     }
 
     private bool IsTargetInAttackRange()
@@ -114,7 +112,7 @@ public class Monster : Creature
         // 30 degrees attack "cone"
         if (Vector3.Dot(targetDelta.normalized, transform.forward) < Mathf.Cos(Mathf.Deg2Rad * 15f))
             return false;
-        
+
         return true;
     }
 
@@ -130,18 +128,18 @@ public class Monster : Creature
         }
     }
 
-
     private void PlayHitAnimation()
     {
         animator.SetTrigger("IsHit");
     }
+
     private void PlayDeathAnimation()
     {
         animator.SetBool("IsDead", true);
     }
+
     private void PlayAttackAnimation()
     {
-        Debug.Log("PLay Hit animation");
         animator.SetTrigger("IsAttacking");
     }
 }

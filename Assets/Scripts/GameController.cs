@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
-using System.Threading;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Quaternion = UnityEngine.Quaternion;
 using Random = UnityEngine.Random;
-using Vector3 = UnityEngine.Vector3;
 
 public class GameController : MonoBehaviour
 {

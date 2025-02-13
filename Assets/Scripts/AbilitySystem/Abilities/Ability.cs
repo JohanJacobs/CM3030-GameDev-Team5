@@ -1,6 +1,6 @@
-using UnityEngine;
 using System;
 using JetBrains.Annotations;
+using UnityEngine;
 
 [Serializable]
 public sealed class AbilityCostDefinition

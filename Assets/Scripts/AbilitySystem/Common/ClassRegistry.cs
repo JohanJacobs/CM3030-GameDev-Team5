@@ -8,21 +8,21 @@ using AbilityLogicClassRegistry = ClassRegistry<AbilityLogic, AbilityLogicClassA
 
 public static class ClassRegistry<T, TagAttribute> where T : class where TagAttribute : Attribute
 {
-    private static readonly Dictionary<string, Type> ClassDictionary;
+    private static readonly Dictionary<string, Type> ClassTypeDictionary;
 
     static ClassRegistry()
     {
-        ClassDictionary = GetClassDictionary();
+        ClassTypeDictionary = CreateClassTypeDictionary();
     }
 
     public static IEnumerable<string> GetClassNames()
     {
-        return ClassDictionary.Keys;
+        return ClassTypeDictionary.Keys;
     }
 
     public static Type GetClassType(string name)
     {
-        if (ClassDictionary.TryGetValue(name, out var type))
+        if (ClassTypeDictionary.TryGetValue(name, out var type))
             return type;
 
         return null;
@@ -50,14 +50,14 @@ public static class ClassRegistry<T, TagAttribute> where T : class where TagAttr
         return true;
     }
 
-    private static IEnumerable<Type> GetClasses()
+    private static IEnumerable<Type> GetClassTypes()
     {
         return Assembly.GetExecutingAssembly().ExportedTypes
             .Where(IsClassType);
     }
 
-    private static Dictionary<string, Type> GetClassDictionary()
+    private static Dictionary<string, Type> CreateClassTypeDictionary()
     {
-        return GetClasses().ToDictionary(type => type.Name);
+        return GetClassTypes().ToDictionary(type => type.Name);
     }
 }

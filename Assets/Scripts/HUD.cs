@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Globalization;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Globalization;
 
 public class HUD : MonoBehaviour
 {

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -38,9 +36,9 @@ public class PlayerController : MonoBehaviour
         _asc = GetComponent<AbilitySystemComponent>();
         _asc.OnReady(OnAbilitySystemReady);
 
-        _player.Kill += (creature, victim) => AddKill();
-        _player.Death += (creature) => ShowWasted();
-        _player.ReceiveDamanage += () => PlayReceiveDamageAnimation();
+        _player.Kill += HandlePlayerKill;
+        _player.Death += HandlePlayerDeath;
+        _player.DamageTaken += HandlePlayerDamageTaken;
     }
 
     private void OnAbilitySystemReady(AbilitySystemComponent asc)
@@ -183,9 +181,9 @@ public class PlayerController : MonoBehaviour
 
         var rotation = Quaternion.LookRotation(direction);
 
-        var fxGameObject = GameObject.Instantiate(BulletTracerFX, origin, rotation);
+        var fxGameObject = Instantiate(BulletTracerFX, origin, rotation);
 
-        GameObject.Destroy(fxGameObject, 0.2f);
+        Destroy(fxGameObject, 0.2f);
     }
 
     private void CreateHUD()
@@ -219,17 +217,15 @@ public class PlayerController : MonoBehaviour
 
     private void ShowWasted()
     {
-        PlayPlayerDeathAnimation();
         _hud.ShowWasted();
     }
 
-    private void PlayReceiveDamageAnimation()
+    private void PlayHitAnimation()
     {
-        Debug.Log("IsHit");
         Animator.SetTrigger("IsHit");
     }
 
-    private void PlayPlayerDeathAnimation()
+    private void PlayDeathAnimation()
     {
         Animator.SetBool("IsDead", true);
     }
@@ -238,9 +234,27 @@ public class PlayerController : MonoBehaviour
     {
         Animator.SetBool("IsShooting", isShooting);
     }
+
     private void PlayMoveAnimation(Vector3 movementInput)
     {
         Animator.SetFloat("ForwardMovement", movementInput.z);
         Animator.SetFloat("RightMovement", movementInput.x);
+    }
+
+    private void HandlePlayerKill(Creature creature, Creature victim)
+    {
+        AddKill();
+    }
+
+    private void HandlePlayerDeath(Creature creature)
+    {
+        PlayDeathAnimation();
+
+        ShowWasted();
+    }
+
+    private void HandlePlayerDamageTaken()
+    {
+        PlayHitAnimation();
     }
 }
