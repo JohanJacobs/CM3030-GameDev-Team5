@@ -1,11 +1,24 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class EffectInstance
 {
     public Effect Effect { get; }
     public EffectContext Context { get; }
     public bool Expired => _expired;
+    public float TimeRemaining => _timeLeftToExpiration;
+
+    public float TimeRemainingFraction
+    {
+        get
+        {
+            if (_hasDuration)
+                return Mathf.Clamp(_timeLeftToExpiration / Effect.Duration, 0f, 1f);
+
+            return 1f;
+        }
+    }
 
     private readonly List<AttributeModifierHandle> _modifiers = new List<AttributeModifierHandle>();
 

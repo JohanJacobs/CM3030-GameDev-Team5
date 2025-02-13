@@ -9,14 +9,22 @@ public class AbilitySystemComponent : MonoBehaviour
 
     private static readonly AttributeType[] AllAttributes = Enum.GetValues(typeof(AttributeType)).Cast<AttributeType>().ToArray();
 
+    public IReadOnlyCollection<Tag> Tags => _tags;
+
     [SerializeField]
     private AttributeSet[] _grantedAttributeSets;
+    [SerializeField]
+    private Ability[] _grantedAbilities;
 
-    private readonly List<AttributeSetInstance> _attributeSets = new List<AttributeSetInstance>();
+    private readonly List<AttributeSetInstance> _attributeSetInstances = new List<AttributeSetInstance>();
     private readonly EnumArray<AttributeValue, AttributeType> _attributeValues = new EnumArray<AttributeValue, AttributeType>();
     private readonly EnumArray<AttributeModifierStack, AttributeType> _attributeModifiers = new EnumArray<AttributeModifierStack, AttributeType>();
 
-    private readonly List<EffectInstance> _effects = new List<EffectInstance>();
+    private readonly List<EffectInstance> _effectInstances = new List<EffectInstance>();
+
+    private readonly List<AbilityInstance> _abilityInstances = new List<AbilityInstance>();
+
+    private readonly TagContainer _tags = new TagContainer();
 
     private bool _ready;
 
@@ -38,13 +46,13 @@ public class AbilitySystemComponent : MonoBehaviour
 
     public void AddAttributeSet(AttributeSet attributeSet)
     {
-        var index = _attributeSets.FindIndex(asi => asi.Template == attributeSet);
+        var index = _attributeSetInstances.FindIndex(asi => asi.Template == attributeSet);
         if (index >= 0)
             return;
 
         var attributeSetInstance = attributeSet.CreateInstance();
 
-        _attributeSets.Add(attributeSetInstance);
+        _attributeSetInstances.Add(attributeSetInstance);
 
         foreach (var attributeValue in attributeSetInstance.AttributeValues)
         {
@@ -62,11 +70,11 @@ public class AbilitySystemComponent : MonoBehaviour
 
     public void RemoveAttributeSet(AttributeSet attributeSet)
     {
-        var index = _attributeSets.FindIndex(asi => asi.Template == attributeSet);
+        var index = _attributeSetInstances.FindIndex(asi => asi.Template == attributeSet);
         if (index < 0)
             return;
 
-        var attributeSetInstance = _attributeSets[index];
+        var attributeSetInstance = _attributeSetInstances[index];
 
         foreach (var attributeValue in attributeSetInstance.AttributeValues)
         {
@@ -79,7 +87,7 @@ public class AbilitySystemComponent : MonoBehaviour
             attributeValue.BaseValueChanged -= OnAttributeBaseValueChanged;
         }
 
-        _attributeSets.RemoveAt(index);
+        _attributeSetInstances.RemoveAt(index);
     }
 
     #endregion
@@ -112,6 +120,17 @@ public class AbilitySystemComponent : MonoBehaviour
         var attributeValue = _attributeValues[attribute];
 
         return attributeValue?.Value ?? 0f;
+    }
+
+    public float GetAttributeValueWithExtraModifier(AttributeType attribute, ScalarModifier scalarModifier, bool post)
+    {
+        var attributeValue = _attributeValues[attribute];
+        if (attributeValue == null)
+            return 0f;
+
+        var attributeModifierStack = _attributeModifiers[attribute];
+
+        return attributeModifierStack.CalculateWithExtraModifier(attributeValue.BaseValue, scalarModifier, post);
     }
 
     #endregion
@@ -201,7 +220,7 @@ public class AbilitySystemComponent : MonoBehaviour
         if (effectInstance == null)
             return;
 
-        if (_effects.Remove(effectInstance))
+        if (_effectInstances.Remove(effectInstance))
         {
             effectInstance.Cancel();
         }
@@ -209,10 +228,78 @@ public class AbilitySystemComponent : MonoBehaviour
         handle.Clear();
     }
 
-    private static void EnsureCanApplyAttributeModifier(AttributeType attribute)
+    public EffectInstance FindActiveEffect(Effect effect)
     {
-        if (attribute.IsMetaAttribute())
-            throw new InvalidOperationException($"Meta attribute {attribute.GetName()} can't have modifiers");
+        return _effectInstances.Find(effectInstance => effectInstance.Effect == effect);
+    }
+
+    public bool HasActiveEffect(Effect effect)
+    {
+        var effectInstance = FindActiveEffect(effect);
+
+        return !(effectInstance?.Expired ?? true);
+    }
+
+    public float GetActiveEffectTimeRemainingFraction(Effect effect)
+    {
+        var effectInstance = FindActiveEffect(effect);
+
+        return effectInstance?.TimeRemainingFraction ?? 0f;
+    }
+
+    public AbilityHandle AddAbility(Ability ability)
+    {
+        var existingAbilityInstance = _abilityInstances.Find(ai => ai.Ability == ability);
+        if (existingAbilityInstance != null)
+        {
+            return new AbilityHandle(this, existingAbilityInstance);
+        }
+
+        var abilityInstance = new AbilityInstance(this, ability);
+
+        _abilityInstances.Add(abilityInstance);
+
+        var handle = new AbilityHandle(this, abilityInstance);
+
+        if (ability.ActivateOnGranted)
+        {
+            ActivateAbility(handle);
+        }
+
+        return handle;
+    }
+
+    public void RemoveAbility(AbilityHandle handle)
+    {
+        var abilityInstance = GetAbilityInstanceChecked(handle);
+        if (abilityInstance == null)
+            return;
+
+        abilityInstance.End();
+        abilityInstance.Destroy();
+
+        _abilityInstances.Remove(abilityInstance);
+    }
+
+    public void ActivateAbility(AbilityHandle handle)
+    {
+        var abilityInstance = GetAbilityInstanceChecked(handle);
+        if (abilityInstance == null)
+            return;
+
+        if (_tags.ContainsAny(abilityInstance.Ability.BlockTags))
+            return;
+
+        abilityInstance.TryActivate();
+    }
+
+    public void EndAbility(AbilityHandle handle)
+    {
+        var abilityInstance = GetAbilityInstanceChecked(handle);
+        if (abilityInstance == null)
+            return;
+
+        abilityInstance.End();
     }
 
     private void Start()
@@ -231,6 +318,11 @@ public class AbilitySystemComponent : MonoBehaviour
             AddAttributeSet(attributeSet);
         }
 
+        foreach (var ability in _grantedAbilities)
+        {
+            AddAbility(ability);
+        }
+
         _ready = true;
 
         Ready?.Invoke(this);
@@ -240,7 +332,31 @@ public class AbilitySystemComponent : MonoBehaviour
     {
         var deltaTime = Time.deltaTime;
 
-        UpdateEffects(deltaTime);
+        UpdateActiveEffects(deltaTime);
+        UpdateActiveAbilities(deltaTime);
+    }
+
+    private void OnDestroy()
+    {
+        foreach (var abilityInstance in _abilityInstances)
+        {
+            abilityInstance.Destroy();
+        }
+
+        foreach (var attributeModifierInstance in _attributeModifiers)
+        {
+            attributeModifierInstance.Reset();
+        }
+
+        _attributeSetInstances.Clear();
+
+        _attributeValues.Fill(null);
+
+        _effectInstances.Clear();
+
+        _abilityInstances.Clear();
+
+        _tags.Clear();
     }
 
     private void OnAttributeBaseValueChanged(AttributeValue attributeValue, float oldValue, float newValue)
@@ -282,21 +398,40 @@ public class AbilitySystemComponent : MonoBehaviour
             return null;
         }
 
-        _effects.Add(effectInstance);
+        _effectInstances.Add(effectInstance);
 
         var handle = new EffectHandle(this, effectInstance);
 
         return handle;
     }
 
-    private void UpdateEffects(float deltaTime)
+    private void UpdateActiveEffects(float deltaTime)
     {
-        foreach (var effectInstance in _effects)
+        foreach (var effectInstance in _effectInstances)
         {
             effectInstance.Update(deltaTime);
         }
 
-        _effects.RemoveAll(effectInstance => effectInstance.Expired);
+        _effectInstances.RemoveAll(effectInstance => effectInstance.Expired);
+    }
+
+    private void UpdateActiveAbilities(float deltaTime)
+    {
+        foreach (var abilityInstance in _abilityInstances)
+        {
+            abilityInstance.Update(deltaTime);
+        }
+    }
+
+    private AbilityInstance GetAbilityInstanceChecked(AbilityHandle handle)
+    {
+        Debug.Assert(handle.AbilitySystemComponent == this, "Foreign ability handle");
+
+        var abilityInstance = handle.AbilityInstance;
+
+        Debug.Assert(abilityInstance == null || _abilityInstances.Contains(abilityInstance), "Invalid ability handle");
+
+        return abilityInstance;
     }
 }
 

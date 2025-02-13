@@ -31,8 +31,6 @@ public class HealthComponent : MonoBehaviour
     public event SelfDelegate OutOfHealth;
     public event HealthChangedDelegate HealthChanged;
 
-    private AbilitySystemComponent _asc;
-
     private AttributeValue _healthAttribute;
     private AttributeValue _maxHealthAttribute;
     private AttributeValue _healthRegenerationAttribute;
@@ -41,8 +39,9 @@ public class HealthComponent : MonoBehaviour
 
     private void Awake()
     {
-        _asc = GetComponent<AbilitySystemComponent>();
-        _asc.OnReady(OnAbilitySystemReady);
+        var asc = GetComponent<AbilitySystemComponent>();
+
+        asc.OnReady(OnAbilitySystemReady);
     }
 
     private void Start()
@@ -56,11 +55,11 @@ public class HealthComponent : MonoBehaviour
 
     private void OnAbilitySystemReady(AbilitySystemComponent asc)
     {
-        _healthAttribute = _asc.GetAttributeValueObject(AttributeType.Health);
-        _maxHealthAttribute = _asc.GetAttributeValueObject(AttributeType.MaxHealth);
-        _healthRegenerationAttribute = _asc.GetAttributeValueObject(AttributeType.HealthRegeneration);
-        _damageAttribute = _asc.GetAttributeValueObject(AttributeType.Damage);
-        _healingAttribute = _asc.GetAttributeValueObject(AttributeType.Healing);
+        _healthAttribute = asc.GetAttributeValueObject(AttributeType.Health);
+        _maxHealthAttribute = asc.GetAttributeValueObject(AttributeType.MaxHealth);
+        _healthRegenerationAttribute = asc.GetAttributeValueObject(AttributeType.HealthRegeneration);
+        _damageAttribute = asc.GetAttributeValueObject(AttributeType.Damage);
+        _healingAttribute = asc.GetAttributeValueObject(AttributeType.Healing);
 
         // TODO: reset max health if it's less than 1 ?
 

@@ -1,21 +1,24 @@
-using System;
-
-public sealed class EffectHandle
+public sealed class EffectHandle : GenericInstanceHandle<EffectInstance>
 {
-    public AbilitySystemComponent AbilitySystemComponent => _weakAbilitySystemComponent.TryGetTarget(out var asc) ? asc : null;
-    public EffectInstance EffectInstance => _weakEffectInstance.TryGetTarget(out var instance) ? instance : null;
+    public EffectInstance EffectInstance => Instance;
 
-    private readonly WeakReference<AbilitySystemComponent> _weakAbilitySystemComponent;
-    private readonly WeakReference<EffectInstance> _weakEffectInstance;
-
-    public EffectHandle(AbilitySystemComponent asc, EffectInstance effectInstance)
+    /// <summary>
+    /// Will be <see langword="true" /> if this handle points to an active effect instance, <see langword="false" /> otherwise
+    /// </summary>
+    public bool Active
     {
-        _weakAbilitySystemComponent = new WeakReference<AbilitySystemComponent>(asc);
-        _weakEffectInstance = new WeakReference<EffectInstance>(effectInstance);
+        get
+        {
+            if (AbilitySystemComponent == null)
+                return false;
+
+            // check if EffectInstance is null or expired
+            return !(EffectInstance?.Expired ?? true);
+        }
     }
 
-    public void Clear()
+    public EffectHandle(AbilitySystemComponent asc, EffectInstance effectInstance)
+        : base(asc, effectInstance)
     {
-        _weakEffectInstance.SetTarget(null);
     }
 }

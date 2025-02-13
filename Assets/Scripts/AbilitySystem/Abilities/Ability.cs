@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using JetBrains.Annotations;
 
 [Serializable]
 public sealed class AbilityCostDefinition
@@ -26,31 +27,5 @@ public class Ability : ScriptableObject
     public Tag[] BlockTags;
     public Tag[] CancelTags;
 
-    public virtual bool TryActivateAbility()
-    {
-        if (!CommitAbility())
-        {
-            EndAbility();
-            return false;
-        }
-
-        ActivateAbility();
-
-        return true;
-    }
-
-    public virtual void ActivateAbility()
-    {
-
-    }
-
-    public virtual void EndAbility()
-    {
-
-    }
-
-    public virtual bool CommitAbility()
-    {
-        return true;
-    }
+    public AbilityLogicClass AbilityLogicClass;
 }

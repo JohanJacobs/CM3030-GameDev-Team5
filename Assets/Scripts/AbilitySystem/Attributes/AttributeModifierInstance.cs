@@ -23,7 +23,7 @@ public abstract class AttributeModifierInstance
     public abstract void Apply(ref float value);
 }
 
-public class AttributeModifierInstanceWithModifier : AttributeModifierInstance
+public sealed class AttributeModifierInstanceWithModifier : AttributeModifierInstance
 {
     private ScalarModifier _scalarModifier;
 
@@ -47,7 +47,7 @@ public class AttributeModifierInstanceWithModifier : AttributeModifierInstance
     }
 }
 
-public class AttributeModifierInstanceWithOverride : AttributeModifierInstance
+public sealed class AttributeModifierInstanceWithOverride : AttributeModifierInstance
 {
     private float _scalarOverride;
 

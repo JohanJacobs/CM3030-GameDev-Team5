@@ -6,31 +6,36 @@ using System.Linq;
 
 public sealed class TagContainer : IReadOnlyCollection<Tag>
 {
-    private readonly HashSet<Tag> _tags = new HashSet<Tag>();
+    private readonly HashSet<Tag> _tagSet = new HashSet<Tag>();
 
     public void Add(Tag tag)
     {
-        _tags.Add(tag);
+        _tagSet.Add(tag);
     }
 
     public void AddRange(IEnumerable<Tag> tags)
     {
-        _tags.UnionWith(tags);
+        _tagSet.UnionWith(tags);
     }
 
     public void Remove(Tag tag)
     {
-        _tags.Remove(tag);
+        _tagSet.Remove(tag);
     }
 
     public void RemoveRange(IEnumerable<Tag> tags)
     {
-        _tags.ExceptWith(tags);
+        _tagSet.ExceptWith(tags);
+    }
+
+    public void Clear()
+    {
+        _tagSet.Clear();
     }
 
     public bool Contains(Tag tag)
     {
-        return _tags.Contains(tag);
+        return _tagSet.Contains(tag);
     }
 
     public bool ContainsAny(IEnumerable<Tag> tags)
@@ -45,13 +50,13 @@ public sealed class TagContainer : IReadOnlyCollection<Tag>
 
     public IEnumerator<Tag> GetEnumerator()
     {
-        return _tags.GetEnumerator();
+        return _tagSet.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return _tags.GetEnumerator();
+        return _tagSet.GetEnumerator();
     }
 
-    public int Count => _tags.Count;
+    public int Count => _tagSet.Count;
 }

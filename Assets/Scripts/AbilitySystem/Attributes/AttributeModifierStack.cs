@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class AttributeModifierStack
@@ -81,16 +82,52 @@ public class AttributeModifierStack
 
     public float Calculate(float value)
     {
-        if (_dirty)
-        {
-            _dirty = false;
-
-            UpdateModifiers();
-        }
+        UpdateModifiers();
 
         foreach (var modifierInstance in _modifiers)
         {
             modifierInstance.Apply(ref value);
+        }
+
+        return value;
+    }
+
+    public float CalculateWithExtraModifier(float value, ScalarModifier scalarModifier, bool post)
+    {
+        if (scalarModifier.IsIdentity)
+            return Calculate(value);
+
+        // if it's a post modifier, it will be applied last so shortcut is possible
+        if (post)
+            return scalarModifier.Calculate(Calculate(value));
+
+        UpdateModifiers();
+
+        if (_modifiers.Count == 0)
+        {
+            return scalarModifier.Calculate(value);
+        }
+
+        if (_modifiers.Last().Post)
+        {
+            bool applied = false;
+
+            foreach (var modifierInstance in _modifiers)
+            {
+                // apply extra modifier before first post modifier
+                if (!applied && modifierInstance.Post)
+                {
+                    value = scalarModifier.Calculate(value);
+                    applied = true;
+                }
+
+                modifierInstance.Apply(ref value);
+            }
+        }
+        else
+        {
+            // there are no post modifiers
+            value = scalarModifier.Calculate(Calculate(value));
         }
 
         return value;
@@ -106,6 +143,10 @@ public class AttributeModifierStack
 
     private void UpdateModifiers()
     {
-        _modifiers.Sort(CompareModifierInstances);
+        if (_dirty)
+        {
+            _modifiers.Sort(CompareModifierInstances);
+            _dirty = false;
+        }
     }
 }

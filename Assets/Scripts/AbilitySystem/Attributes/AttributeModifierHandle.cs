@@ -1,25 +1,22 @@
 using System;
 
-public sealed class AttributeModifierHandle
+public sealed class AttributeModifierHandle : GenericInstanceHandle<AttributeModifierInstance>
 {
-    public AbilitySystemComponent AbilitySystemComponent => _weakAbilitySystemComponent.TryGetTarget(out var asc) ? asc : null;
     public AttributeModifierStack ModifierStack => _weakModifierStack.TryGetTarget(out var stack) ? stack : null;
-    public AttributeModifierInstance ModifierInstance => _weakModifierInstance.TryGetTarget(out var instance) ? instance : null;
+    public AttributeModifierInstance ModifierInstance => Instance;
 
-    private readonly WeakReference<AbilitySystemComponent> _weakAbilitySystemComponent;
     private readonly WeakReference<AttributeModifierStack> _weakModifierStack;
-    private readonly WeakReference<AttributeModifierInstance> _weakModifierInstance;
 
     public AttributeModifierHandle(AbilitySystemComponent asc, AttributeModifierStack modifierStack, AttributeModifierInstance modifierInstance)
+        : base(asc, modifierInstance)
     {
-        _weakAbilitySystemComponent = new WeakReference<AbilitySystemComponent>(asc);
         _weakModifierStack = new WeakReference<AttributeModifierStack>(modifierStack);
-        _weakModifierInstance = new WeakReference<AttributeModifierInstance>(modifierInstance);
     }
 
-    public void Clear()
+    public override void Clear()
     {
+        base.Clear();
+
         _weakModifierStack.SetTarget(null);
-        _weakModifierInstance.SetTarget(null);
     }
 }
