@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 480a73a360976684586c1425512264df, type: 3}
   m_Name: GarlicEffect_KnockBackResistance
   m_EditorClassIdentifier: 
-  _attribute: 0
-  _type: 0
-  _value: 0
+  _attribute: 19
+  _type: 2
+  _value: 0.1
   _permanent: 0
   _post: 0

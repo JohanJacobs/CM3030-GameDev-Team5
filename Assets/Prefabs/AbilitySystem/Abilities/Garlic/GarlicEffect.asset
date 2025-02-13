@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1a0424d10eb23f4d9a6cf77471b5f67, type: 3}
   m_Name: GarlicEffect
   m_EditorClassIdentifier: 
-  Modifiers: []
-  DurationPolicy: 0
+  Modifiers:
+  - {fileID: 11400000, guid: bbd8d7107bef3284f9a397346b716a21, type: 2}
+  - {fileID: 11400000, guid: 50d95c5fd4e89db4f90138d743fb31ec, type: 2}
+  - {fileID: 11400000, guid: 8727b5f736ef3af45b561a7602362ac5, type: 2}
+  DurationPolicy: 1
   CancellationPolicy: 1
-  Duration: 0
+  Duration: 1
   Period: 0
   Tags: []
   BlockTags: []

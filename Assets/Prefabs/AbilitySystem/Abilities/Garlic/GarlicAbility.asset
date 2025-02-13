@@ -20,6 +20,9 @@ MonoBehaviour:
   CancelTags: []
   AbilityInstanceDataClass:
     ClassName: GarlicAbilityInstanceData
-  TargetEffects: []
+  TargetEffect: {fileID: 11400000, guid: 92f98b1da81f8a14ea7ef155be329e3b, type: 2}
   AbilityAttributeSet: {fileID: 11400000, guid: f6274323e166a1541a4ce344c12f8cba,
     type: 2}
+  LayerMask:
+    serializedVersion: 2
+    m_Bits: 512

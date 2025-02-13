@@ -16,4 +16,6 @@ MonoBehaviour:
   - _attribute: 23
     _defaultValue: 3
   - _attribute: 24
-    _defaultValue: 1
+    _defaultValue: 2
+  - _attribute: 25
+    _defaultValue: 0.5
