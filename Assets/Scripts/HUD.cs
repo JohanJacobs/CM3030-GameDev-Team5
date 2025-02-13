@@ -44,13 +44,8 @@ public class HUD : MonoBehaviour
     {
         MessageField.text = "Use [W] [A] [S] [D] keys for movement \nShoot skeletons for points \nAvoid skeleton contact to remain alive \nUse mouse to aim weapon, click to fire";
         MessageField.enabled = true;
+        InitialPanel.localScale = new Vector3 (0.8f, 0.8f, 0);
         Time.timeScale = 0;
-    }
-
-    public void MsgFadeOut()
-    {
-        MessageField.enabled = false;
-        InitialPanel.localScale = new Vector3 (0, 0, 0);
     }
 
     public void gameStart()
@@ -64,5 +59,10 @@ public class HUD : MonoBehaviour
     {
         MessageField.enabled = false;
         MsgFadeIn();
+    }
+
+    public void gameQuit()
+    {
+        Application.Quit();
     }
 }
