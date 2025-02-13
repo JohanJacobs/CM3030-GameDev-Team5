@@ -21,7 +21,7 @@ MonoBehaviour:
   DurationPolicy: 1
   CancellationPolicy: 1
   Duration: 2
-  Period: 0.1
+  Period: 0
   Tags: []
   BlockTags: []
   GrantedTags: []
