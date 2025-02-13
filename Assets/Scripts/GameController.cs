@@ -95,6 +95,11 @@ public class GameController : MonoBehaviour
 
     private readonly Dictionary<MonsterSpawner, MonsterSpawnerContext> _spawnerContexts = new Dictionary<MonsterSpawner, MonsterSpawnerContext>();
 
+    void Awake()
+    {
+        _pickupSpawnConfiguration = GameData.Instance.PickupSpawnConfiguration;
+    }
+
     void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player");
@@ -160,33 +165,34 @@ public class GameController : MonoBehaviour
         return instance;
     }
 
-    #region Pickup_spawn
+    #region Pickups Spawn
     [Header("Pickup spawn")]
-    [SerializeField] private float spawnRadius;
-    [SerializeField] private PickupConfigurationSO pickupConfiguration;
+
+    [SerializeField]
+    private float _pickupSpawnRadius = 2f;
+
+    private PickupSpawnConfiguration _pickupSpawnConfiguration;
 
     private void SpawnPickups(Vector3 position)
     {
-        foreach (var pickup in pickupConfiguration.PickupConfigs)
+        foreach (var configEntry in GameData.Instance.PickupSpawnConfiguration.PickupConfigs)
         {
-            if (Random.Range(0,1f) <= pickup.probability)
-            {
-                SpawnPickup(pickup.prefab, position, spawnRadius);
-            }
+            if (Random.Range(0, 1f) > configEntry.probability)
+                continue;
+
+            SpawnPickup(configEntry.prefab, position, _pickupSpawnRadius);
         }
     }
 
     private void SpawnPickup(GameObject prefab, Vector3 position, float spawnRadius)
     {
-        var position_offset = new Vector3(
-                Random.Range(0,spawnRadius),
-                0f,
-                Random.Range(0, spawnRadius));
+        var positionOffset = new Vector3(Random.Range(0, spawnRadius), 0f, Random.Range(0, spawnRadius));
 
-        var go = Instantiate(prefab, position + position_offset,Quaternion.identity);
-        go.transform.parent = transform;
+        var instance = Instantiate(prefab, position + positionOffset,Quaternion.identity);
+
+        instance.transform.parent = transform;
     }
 
-    #endregion Pickup_spawn
+    #endregion Pickups Spawn
 }
 
