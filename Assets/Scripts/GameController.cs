@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Quaternion = UnityEngine.Quaternion;
 using Random = UnityEngine.Random;
-using Vector3 = UnityEngine.Vector3;
 
 public class GameController : MonoBehaviour
 {
@@ -139,13 +134,13 @@ public class GameController : MonoBehaviour
         var position = _player.transform.position + direction * SpawnDistance;
         var rotation = Quaternion.AngleAxis(-directionAngle, Vector3.up);
 
-        var monsterGameObject = GameObject.Instantiate(spawner.Prefab, position, rotation);
-        monsterGameObject.transform.parent = transform;
+        var instance = Instantiate(spawner.Prefab, position, rotation);
 
-        var monster = monsterGameObject.GetComponent<Monster>();
-        
-        if (monster == null)
-            throw new Exception("Monster prefab must have Monster component");
+        instance.transform.parent = transform;
+
+        var monster = instance.GetComponent<Monster>();
+
+        Debug.Assert(monster != null, "Monster component is missing");
 
         return monster;
     }
@@ -153,9 +148,12 @@ public class GameController : MonoBehaviour
     private GameObject SpawnExperienceOrbPickup(float experience, Vector3 position)
     {
         var instance = Instantiate(GameData.Instance.ExperienceOrbPickupPrefab, position, Quaternion.identity);
+        
         instance.transform.parent = transform;
 
         var pickup = instance.GetComponent<ExperienceOrbPickup>();
+
+        Debug.Assert(pickup != null, "Pickup component is missing");
 
         pickup.Experience = experience;
 

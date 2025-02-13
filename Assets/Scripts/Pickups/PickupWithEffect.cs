@@ -10,7 +10,7 @@ public class PickupWithEffect : Pickup
         if (asc == null)
             return false;
 
-        asc.ApplyEffect(Effect);
+        asc.ApplyEffectToSelf(Effect);
 
         return true;
     }
