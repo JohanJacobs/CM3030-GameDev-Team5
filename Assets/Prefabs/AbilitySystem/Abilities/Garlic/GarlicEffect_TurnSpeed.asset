@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _attribute: 7
   _type: 2
-  _value: 0.8
+  _value: 0.75
   _permanent: 0
   _post: 0

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _defaultAttributes:
   - _attribute: 23
-    _defaultValue: 3
+    _defaultValue: 3.5
   - _attribute: 24
-    _defaultValue: 2
+    _defaultValue: 1.5
   - _attribute: 25
     _defaultValue: 0.5

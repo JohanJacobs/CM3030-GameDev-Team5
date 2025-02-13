@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GarlicEffect_KnockBackResistance
   m_EditorClassIdentifier: 
   _attribute: 19
-  _type: 2
-  _value: 0.1
+  _type: 1
+  _value: -1
   _permanent: 0
-  _post: 0
+  _post: 1

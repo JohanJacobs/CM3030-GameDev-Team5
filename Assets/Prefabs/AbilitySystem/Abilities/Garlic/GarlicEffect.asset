@@ -18,7 +18,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8727b5f736ef3af45b561a7602362ac5, type: 2}
   DurationPolicy: 1
   CancellationPolicy: 1
-  Duration: 1
+  Duration: 0.3
   Period: 0
   Tags: []
   BlockTags: []
