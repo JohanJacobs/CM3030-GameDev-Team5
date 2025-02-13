@@ -13,9 +13,21 @@ MonoBehaviour:
   m_Name: GarlicEffect
   m_EditorClassIdentifier: 
   Modifiers:
-  - {fileID: 11400000, guid: bbd8d7107bef3284f9a397346b716a21, type: 2}
-  - {fileID: 11400000, guid: 50d95c5fd4e89db4f90138d743fb31ec, type: 2}
-  - {fileID: 11400000, guid: 8727b5f736ef3af45b561a7602362ac5, type: 2}
+  - Attribute: 19
+    Type: 1
+    Value: -1
+    Permanent: 0
+    Post: 1
+  - Attribute: 6
+    Type: 2
+    Value: 0.75
+    Permanent: 0
+    Post: 0
+  - Attribute: 7
+    Type: 2
+    Value: 0.75
+    Permanent: 0
+    Post: 0
   DurationPolicy: 1
   CancellationPolicy: 1
   Duration: 0.3
