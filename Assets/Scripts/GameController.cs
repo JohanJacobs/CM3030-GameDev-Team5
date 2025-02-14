@@ -186,9 +186,9 @@ public class GameController : MonoBehaviour
 
     private void SpawnPickup(GameObject prefab, Vector3 position, float spawnRadius)
     {
-        var positionOffset = new Vector3(Random.Range(0, spawnRadius), 0f, Random.Range(0, spawnRadius));
+        var positionOffset = new Vector3(Random.Range(-spawnRadius, spawnRadius), 0f, Random.Range(-spawnRadius, spawnRadius));
 
-        var instance = Instantiate(prefab, position + positionOffset,Quaternion.identity);
+        var instance = Instantiate(prefab, position + positionOffset, Quaternion.identity);
 
         instance.transform.parent = transform;
     }
