@@ -73,6 +73,8 @@ public class GameController : MonoBehaviour
             {
                 GameController.SpawnExperienceOrbPickup(experience, monster.transform.position);
             }
+
+            GameController.SpawnPickups(monster.transform.position);
         }
 
         private float GetMonsterExperienceReward(Creature monster)
@@ -92,6 +94,11 @@ public class GameController : MonoBehaviour
     private GameObject _player;
 
     private readonly Dictionary<MonsterSpawner, MonsterSpawnerContext> _spawnerContexts = new Dictionary<MonsterSpawner, MonsterSpawnerContext>();
+
+    void Awake()
+    {
+        _pickupSpawnConfiguration = GameData.Instance.PickupSpawnConfiguration;
+    }
 
     void Start()
     {
@@ -134,6 +141,8 @@ public class GameController : MonoBehaviour
 
         var instance = Instantiate(spawner.Prefab, position, rotation);
 
+        instance.transform.parent = transform;
+
         var monster = instance.GetComponent<Monster>();
 
         Debug.Assert(monster != null, "Monster component is missing");
@@ -144,6 +153,8 @@ public class GameController : MonoBehaviour
     private GameObject SpawnExperienceOrbPickup(float experience, Vector3 position)
     {
         var instance = Instantiate(GameData.Instance.ExperienceOrbPickupPrefab, position, Quaternion.identity);
+        
+        instance.transform.parent = transform;
 
         var pickup = instance.GetComponent<ExperienceOrbPickup>();
 
@@ -153,4 +164,35 @@ public class GameController : MonoBehaviour
 
         return instance;
     }
+
+    #region Pickups Spawn
+    [Header("Pickup spawn")]
+
+    [SerializeField]
+    private float _pickupSpawnRadius = 2f;
+
+    private PickupSpawnConfiguration _pickupSpawnConfiguration;
+
+    private void SpawnPickups(Vector3 position)
+    {
+        foreach (var configEntry in GameData.Instance.PickupSpawnConfiguration.PickupConfigs)
+        {
+            if (Random.Range(0, 1f) > configEntry.probability)
+                continue;
+
+            SpawnPickup(configEntry.prefab, position, _pickupSpawnRadius);
+        }
+    }
+
+    private void SpawnPickup(GameObject prefab, Vector3 position, float spawnRadius)
+    {
+        var positionOffset = new Vector3(Random.Range(-spawnRadius, spawnRadius), 0f, Random.Range(-spawnRadius, spawnRadius));
+
+        var instance = Instantiate(prefab, position + positionOffset, Quaternion.identity);
+
+        instance.transform.parent = transform;
+    }
+
+    #endregion Pickups Spawn
 }
+
