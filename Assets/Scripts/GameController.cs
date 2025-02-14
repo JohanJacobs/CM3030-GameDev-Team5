@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Quaternion = UnityEngine.Quaternion;
 using Random = UnityEngine.Random;
-using Vector3 = UnityEngine.Vector3;
 
 
 public class GameController : MonoBehaviour
@@ -82,6 +77,8 @@ public class GameController : MonoBehaviour
             {
                 GameController.SpawnExperienceOrbPickup(experience, monster.transform.position);
             }
+
+            GameController.SpawnPickups(monster.transform.position);
         }
 
         private float GetMonsterExperienceReward(Creature monster)
@@ -101,6 +98,11 @@ public class GameController : MonoBehaviour
     private GameObject _player;
 
     private readonly Dictionary<MonsterSpawner, MonsterSpawnerContext> _spawnerContexts = new Dictionary<MonsterSpawner, MonsterSpawnerContext>();
+
+    void Awake()
+    {
+        _pickupSpawnConfiguration = GameData.Instance.PickupSpawnConfiguration;
+    }
 
     void Start()
     {
@@ -141,12 +143,13 @@ public class GameController : MonoBehaviour
         var position = _player.transform.position + direction * SpawnDistance;
         var rotation = Quaternion.AngleAxis(-directionAngle, Vector3.up);
 
-        var monsterGameObject = GameObject.Instantiate(spawner.Prefab, position, rotation);
+        var instance = Instantiate(spawner.Prefab, position, rotation);
 
-        var monster = monsterGameObject.GetComponent<Monster>();
+        instance.transform.parent = transform;
 
-        if (monster == null)
-            throw new Exception("Monster prefab must have Monster component");
+        var monster = instance.GetComponent<Monster>();
+
+        Debug.Assert(monster != null, "Monster component is missing");
 
         return monster;
     }
@@ -154,11 +157,46 @@ public class GameController : MonoBehaviour
     private GameObject SpawnExperienceOrbPickup(float experience, Vector3 position)
     {
         var instance = Instantiate(GameData.Instance.ExperienceOrbPickupPrefab, position, Quaternion.identity);
+        
+        instance.transform.parent = transform;
 
         var pickup = instance.GetComponent<ExperienceOrbPickup>();
+
+        Debug.Assert(pickup != null, "Pickup component is missing");
 
         pickup.Experience = experience;
 
         return instance;
     }
+
+    #region Pickups Spawn
+    [Header("Pickup spawn")]
+
+    [SerializeField]
+    private float _pickupSpawnRadius = 2f;
+
+    private PickupSpawnConfiguration _pickupSpawnConfiguration;
+
+    private void SpawnPickups(Vector3 position)
+    {
+        foreach (var configEntry in GameData.Instance.PickupSpawnConfiguration.PickupConfigs)
+        {
+            if (Random.Range(0, 1f) > configEntry.probability)
+                continue;
+
+            SpawnPickup(configEntry.prefab, position, _pickupSpawnRadius);
+        }
+    }
+
+    private void SpawnPickup(GameObject prefab, Vector3 position, float spawnRadius)
+    {
+        var positionOffset = new Vector3(Random.Range(-spawnRadius, spawnRadius), 0f, Random.Range(-spawnRadius, spawnRadius));
+
+        var instance = Instantiate(prefab, position + positionOffset, Quaternion.identity);
+
+        instance.transform.parent = transform;
+    }
+
+    #endregion Pickups Spawn
 }
+

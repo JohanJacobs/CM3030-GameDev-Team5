@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4495008, g: 0.49649626, b: 0.5591468, a: 1}
+  m_IndirectSpecularColor: {r: 0.44950086, g: 0.49649626, b: 0.5591468, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &4
 LightmapSettings:
@@ -190,6 +190,8 @@ MonoBehaviour:
   BulletTracerFX: {fileID: 152064199033550963, guid: f9c529009fde2c34788ec592910c8df6,
     type: 3}
   HUD: {fileID: 3295631389104268107, guid: 1d93c96e35fbbad4f83157b334b57d1a, type: 3}
+  GameMenu: {fileID: 4582877542644609672, guid: e3e799eccfbdf6446bc9562935782e0c,
+    type: 3}
 --- !u!143 &244319272
 CharacterController:
   m_ObjectHideFlags: 0
@@ -235,6 +237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae03c4efa1b51644e89cec15fea52b94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _autoDestroyOnDeath: 0
 --- !u!114 &244319275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,13 +259,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 244319269}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34eaf4fa460d9e24e9cdb1b6d7d2f5e8, type: 3}
+  m_Script: {fileID: 11500000, guid: ca04ac20d2990ea4795e7f3793074715, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DefaultAttributeSets:
+  _grantedAttributeSets:
   - {fileID: 11400000, guid: bc7e3d4971c89b449b34671bdbc3816e, type: 2}
   - {fileID: 11400000, guid: df3fce6e52a561c47a56dd0378b89d2f, type: 2}
   - {fileID: 11400000, guid: 08517e24876b6d24688bfe445d755cad, type: 2}
+  _grantedAbilities:
+  - {fileID: 11400000, guid: 2769a3e19038dc84a8d86833488c93e4, type: 2}
 --- !u!1 &264663483
 GameObject:
   m_ObjectHideFlags: 0
@@ -1088,6 +1093,10 @@ MonoBehaviour:
   Spawns:
   - {fileID: 11400000, guid: 1888bf49ef907524dba05c17496b2dd6, type: 2}
   - {fileID: 11400000, guid: 555f33c7a68936b4eb64b2c8177b7df3, type: 2}
+  - {fileID: 11400000, guid: 555f33c7a68936b4eb64b2c8177b7df3, type: 2}
+  spawnRadius: 2
+  pickupConfiguration: {fileID: 11400000, guid: 6ff65fc43e000004d983952f0c649f64,
+    type: 2}
 --- !u!4 &1571807413
 Transform:
   m_ObjectHideFlags: 0

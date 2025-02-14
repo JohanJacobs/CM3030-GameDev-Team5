@@ -17,6 +17,7 @@ public class GameData : ScriptableObject
     }
 
     public GameObject ExperienceOrbPickupPrefab;
+    public PickupSpawnConfiguration PickupSpawnConfiguration;
 
     private static GameData _instance;
 }

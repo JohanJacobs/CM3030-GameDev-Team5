@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Random = UnityEngine.Random;
+﻿using UnityEngine;
 
 public class Monster : Creature
 {
     public float ApproachDistance = 0.3f;
+
+    public Animator animator;
 
     public float Speed => AbilitySystemComponent.GetAttributeValue(AttributeType.MoveSpeed);
     public float TurnSpeed => AbilitySystemComponent.GetAttributeValue(AttributeType.TurnSpeed);
@@ -40,11 +38,13 @@ public class Monster : Creature
 
     protected override void OnDeath()
     {
+        PlayDeathAnimation();
         _target = null;
     }
 
     protected override void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
     {
+        PlayHitAnimation();
         KnockBack(origin, amount / MaxHealth);
     }
 
@@ -86,11 +86,13 @@ public class Monster : Creature
         if (!IsTargetInAttackRange())
             return;
 
+        PlayAttackAnimation();
+
         _toNextAttack += 1f / AttackRate;
 
         var targetCreature = _target.GetComponent<Creature>();
 
-        targetCreature.TakeDamage(gameObject, transform.position, Random.Range(DamageMin, DamageMax));
+        DealDamage(targetCreature, transform.position, Random.Range(DamageMin, DamageMax));
     }
 
     private bool IsTargetInAttackRange()
@@ -124,5 +126,20 @@ public class Monster : Creature
         {
             _toNextAttack = 0;
         }
+    }
+
+    private void PlayHitAnimation()
+    {
+        animator.SetTrigger("IsHit");
+    }
+
+    private void PlayDeathAnimation()
+    {
+        animator.SetBool("IsDead", true);
+    }
+
+    private void PlayAttackAnimation()
+    {
+        animator.SetTrigger("IsAttacking");
     }
 }

@@ -7,7 +7,7 @@ public class Creature : MonoBehaviour
 {
     public delegate void KillDelegate(Creature creature, Creature victim);
     public delegate void DeathDelegate(Creature creature);
-    public delegate void ReceiveDamangeDelegate();
+    public delegate void SimpleDelegate();
 
     public bool IsDead => HealthComponent.IsDead;
     public bool IsAlive => HealthComponent.IsAlive;
@@ -15,12 +15,15 @@ public class Creature : MonoBehaviour
     public float MaxHealth => HealthComponent.MaxHealth;
     public float HealthFraction => HealthComponent.HealthFraction;
 
+    public AbilitySystemComponent AbilitySystemComponent { get; private set; }
+    public HealthComponent HealthComponent { get; private set; }
+
     public event KillDelegate Kill;
     public event DeathDelegate Death;
-    public event ReceiveDamangeDelegate ReceiveDamanage;
+    public event SimpleDelegate DamageTaken;
 
-    protected AbilitySystemComponent AbilitySystemComponent;
-    protected HealthComponent HealthComponent;
+    [SerializeField]
+    protected bool _autoDestroyOnDeath = true;
 
     void Awake()
     {
@@ -35,12 +38,11 @@ public class Creature : MonoBehaviour
         if (IsDead)
             return;
 
-        if (!(amount > 0))
-            throw new ArgumentOutOfRangeException(nameof(amount), amount, "Damage amount must be positive");
-
-        AbilitySystemComponent.ApplyAttributeModifier(AttributeType.Damage, ScalarModifier.MakeBonus(amount), false, true);
+        AbilitySystemComponent.AddDamage(amount);
 
         OnDamageTaken(causer, origin, amount);
+
+        DamageTaken?.Invoke();
     }
 
     public void DealDamage(Creature victim, Vector3 origin, float amount)
@@ -68,17 +70,14 @@ public class Creature : MonoBehaviour
 
     protected virtual void OnKill(Creature victim)
     {
-
     }
 
     protected virtual void OnDeath()
     {
-
     }
 
     protected virtual void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
     {
-        ReceiveDamanage?.Invoke();
     }
 
     private void Die()
@@ -87,9 +86,10 @@ public class Creature : MonoBehaviour
 
         Death?.Invoke(this);
 
-        // only destroy non player objects
-        if (!gameObject.CompareTag("Player"))
-            GameObject.Destroy(gameObject, 0.2f);
+        if (_autoDestroyOnDeath)
+        {
+            Destroy(gameObject, 0.2f);
+        }
     }
 
     private void OnOutOfHealth(HealthComponent healthComponent)

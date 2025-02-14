@@ -1,27 +1,17 @@
 using UnityEngine;
-using System.Collections.Generic;
 
-public class ExperienceOrbPickup : PickupWithEffect
+public class ExperienceOrbPickup : Pickup
 {
     public float Experience;
 
-    private void Start()
+    protected override bool HandlePickUpImpl(GameObject target)
     {
-        var attributeModifier = ScriptableObject.CreateInstance<AttributeModifier>();
+        var asc = target.GetComponent<AbilitySystemComponent>();
+        if (asc == null)
+            return false;
 
-        attributeModifier.Attribute = AttributeType.Experience;
-        attributeModifier.Type = AttributeModifierType.Add;
-        attributeModifier.Value = Experience;
-        attributeModifier.Post = false;
-        attributeModifier.Permanent = true;
+        asc.AddExperience(Experience);
 
-        var effect = ScriptableObject.CreateInstance<Effect>();
-
-        effect.Modifiers = new List<AttributeModifier> { attributeModifier };
-        effect.DurationPolicy = EffectDurationPolicy.Instant;
-        effect.ApplicationPolicy = EffectApplicationPolicy.Instant;
-        effect.CancellationPolicy = EffectCancellationPolicy.DoNothing;
-
-        Effect = effect;
+        return true;
     }
 }
