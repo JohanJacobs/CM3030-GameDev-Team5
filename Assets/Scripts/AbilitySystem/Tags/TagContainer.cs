@@ -8,6 +8,16 @@ public sealed class TagContainer : IReadOnlyCollection<Tag>
 {
     private readonly HashSet<Tag> _tagSet = new HashSet<Tag>();
 
+    public TagContainer()
+    {
+
+    }
+
+    public TagContainer(IEnumerable<Tag> tags)
+    {
+        AddRange(tags);
+    }
+
     public void Add(Tag tag)
     {
         _tagSet.Add(tag);
