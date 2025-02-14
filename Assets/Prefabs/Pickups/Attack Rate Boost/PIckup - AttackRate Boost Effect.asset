@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a1a0424d10eb23f4d9a6cf77471b5f67, type: 3}
-  m_Name: Pickup - AttackRate Boost Effect
+  m_Name: PIckup - AttackRate Boost Effect
   m_EditorClassIdentifier: 
   Modifiers:
   - Attribute: 11
@@ -24,4 +24,5 @@ MonoBehaviour:
   Period: 0
   Tags: []
   BlockTags: []
+  CancelTags: []
   GrantedTags: []
