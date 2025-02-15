@@ -28,12 +28,14 @@ public class PlayerController : MonoBehaviour
 
     private int _kills = 0;
 
+    public HighScoreManager HighScoreManager;
+
 
     void Awake()
     {
         CreateUI();
 
-        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();        
     }
 
     void Start()
@@ -206,7 +208,7 @@ public class PlayerController : MonoBehaviour
 
     private void ShowWasted()
     {
-        _hud.ShowWasted();
+        _hud.ShowWasted(HighScoreManager.GetHighestScore(), _kills);
     }
 
     private void PlayHitAnimation()
@@ -238,8 +240,8 @@ public class PlayerController : MonoBehaviour
     private void HandlePlayerDeath(Creature creature)
     {
         PlayDeathAnimation();
-
         ShowWasted();
+        UpdatePlayerScore();
     }
 
     private void HandlePlayerDamageTaken()
@@ -286,4 +288,9 @@ public class PlayerController : MonoBehaviour
     }
     #endregion UI
 
+
+    private void UpdatePlayerScore()
+    {
+        HighScoreManager.AddNewScore(_kills);
+    }
 }

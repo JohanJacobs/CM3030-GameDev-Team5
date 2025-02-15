@@ -35,7 +35,7 @@ public class HUD : MonoBehaviour
         LevelText.text = Mathf.FloorToInt(level).ToString(CultureInfo.InvariantCulture);
     }
 
-    public void ShowWasted()
+    public void ShowWasted(int highestScore, int currentScore)
     {
         WastedText.enabled = true;
     }
