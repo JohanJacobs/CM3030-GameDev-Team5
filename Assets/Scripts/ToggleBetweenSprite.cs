@@ -20,7 +20,6 @@ public class ToggleBetweenSprite : MonoBehaviour
         īmage = GetComponent<Image>();
     }
 
-
     public void ToggleSprite()
     {        
         showDefaultSprite = !showDefaultSprite;

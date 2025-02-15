@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 using TMPro;
 using UnityEngine.UI;
+using UnityEditor;
 public class GameMenu : MonoBehaviour
 {
     [SerializeField] GameObject Menu;
@@ -45,5 +46,17 @@ public class GameMenu : MonoBehaviour
         Menu.SetActive(menuState);
         MiniUIPanel.SetActive(!menuState);
         Time.timeScale = (!menuState)?1f:0f;
+    }
+
+    public void QuitGame()
+    {
+        if (Application.isEditor)
+        {
+            EditorApplication.isPlaying = false;
+        }
+        else
+        {
+            Application.Quit();
+        }
     }
 }
