@@ -31,8 +31,8 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        CreateHUD();
-        CreateGameMenu();
+        CreateUI();
+
         audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
@@ -197,28 +197,6 @@ public class PlayerController : MonoBehaviour
         Destroy(fxGameObject, 0.2f);
     }
 
-    private void CreateHUD()
-    {
-        var hudGameObject = GameObject.Instantiate(HUD);
-
-        _hud = hudGameObject.GetComponent<HUD>();
-    }
-
-    private void ResetHUD()
-    {
-        _hud.UpdateHealth(_player.Health, _player.MaxHealth);
-        _hud.UpdateKillCounter(_kills);
-        _hud.UpdateExperience(_player.Experience);
-        _hud.UpdateLevel(_player.Level);
-    }
-
-    private void UpdateHUD()
-    {
-        _hud.UpdateHealth(_player.Health, _player.MaxHealth);
-        _hud.UpdateExperience(_player.Experience);
-        _hud.UpdateLevel(_player.Level);
-    }
-
     private void AddKill()
     {
         ++_kills;
@@ -269,13 +247,43 @@ public class PlayerController : MonoBehaviour
         PlayHitAnimation();
     }
 
-    #region GameMenu
-    private void CreateGameMenu()
+    #region UI
+    private void CreateUI()
+    {
+        CreateHUD();
+        CreateGameMenu(_hud);
+    }
+
+    private void CreateHUD()
+    {
+        var hudGameObject = GameObject.Instantiate(HUD);
+
+        _hud = hudGameObject.GetComponent<HUD>();
+    }
+
+    private void ResetHUD()
+    {
+        _hud.UpdateHealth(_player.Health, _player.MaxHealth);
+        _hud.UpdateKillCounter(_kills);
+        _hud.UpdateExperience(_player.Experience);
+        _hud.UpdateLevel(_player.Level);
+    }
+
+    private void UpdateHUD()
+    {
+        _hud.UpdateHealth(_player.Health, _player.MaxHealth);
+        _hud.UpdateExperience(_player.Experience);
+        _hud.UpdateLevel(_player.Level);
+    }
+
+    private void CreateGameMenu(HUD hud)
     {
         var gameMenuGameObject = GameObject.Instantiate(GameMenu);
         _gameMenu = gameMenuGameObject.GetComponent<GameMenu>();
 
+        // callback to hide the hud when the menu is displayed
+        _gameMenu.SetHudVisibilityToggleCallback((bool isVisible) => { _hud.gameObject.SetActive(isVisible); });
     }
-    #endregion GameMenu
+    #endregion UI
 
 }

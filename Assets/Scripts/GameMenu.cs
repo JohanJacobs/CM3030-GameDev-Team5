@@ -14,8 +14,9 @@ public class GameMenu : MonoBehaviour
     
     bool menuVisibleState;
     bool switchStartButton=false;
+    System.Action<bool> toggleHudVisibile;
 
-    public void Awake()
+    public void Start()
     {
         
         SetMenuState(true);
@@ -42,10 +43,17 @@ public class GameMenu : MonoBehaviour
 
     private void SetMenuState(bool menuState)
     { 
+        // menu 
         menuVisibleState = menuState;
         Menu.SetActive(menuState);
         MiniUIPanel.SetActive(!menuState);
-        Time.timeScale = (!menuState)?1f:0f;        
+
+        // game state 
+        Time.timeScale = (!menuState)?1f:0f;
+
+        // update the hud 
+        toggleHudVisibile.Invoke(!menuState);
+
     }
 
     public void QuitGame()
@@ -58,5 +66,10 @@ public class GameMenu : MonoBehaviour
         {
             Application.Quit();
         }
+    }
+
+    public void SetHudVisibilityToggleCallback(System.Action<bool> ToggleHudCallbackAction)
+    {
+        toggleHudVisibile = ToggleHudCallbackAction;
     }
 }
