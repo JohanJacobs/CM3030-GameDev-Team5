@@ -45,7 +45,7 @@ public class GameMenu : MonoBehaviour
         menuVisibleState = menuState;
         Menu.SetActive(menuState);
         MiniUIPanel.SetActive(!menuState);
-        Time.timeScale = (!menuState)?1f:0f;
+        Time.timeScale = (!menuState)?1f:0f;        
     }
 
     public void QuitGame()
