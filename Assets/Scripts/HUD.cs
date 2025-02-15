@@ -39,13 +39,17 @@ public class HUD : MonoBehaviour
         LevelText.text = Mathf.FloorToInt(level).ToString(CultureInfo.InvariantCulture);
     }
 
-    public void ShowGameOver(int highestScore,int currentScore)
+    public void ShowGameOver(int highestScore, int currentScore)
     {
-        HighestScoreText.text = highestScore.ToString(CultureInfo.InvariantCulture);
-        CurrentScoreText.text = currentScore.ToString(CultureInfo.InvariantCulture);
+        UpdateScoreText(highestScore,currentScore);
         GameOver.SetActive(true);
     }
 
+    private void UpdateScoreText(int highestScore, int currentScore)
+    {
+        HighestScoreText.text = $"BEST: {highestScore.ToString(CultureInfo.InvariantCulture)}";
+        CurrentScoreText.text = $"CURRENT:{currentScore.ToString(CultureInfo.InvariantCulture)}";
+    }
     public void OnRestartClicked()
     {
         SceneManager.LoadScene("GameScene");

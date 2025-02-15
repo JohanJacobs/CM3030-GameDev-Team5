@@ -4,17 +4,19 @@ using UnityEngine;
 
 public class HighScoreManager :MonoBehaviour
 {
-    int lastHighScore;
+    private static int lastHighScore=0;
 
     private void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(this.gameObject);        
     }
 
     public void AddNewScore(int score)
     {
-       if (score > lastHighScore)
-           lastHighScore = score; 
+        if (score > lastHighScore)
+        {
+            lastHighScore = score;            
+        }
     }
 
     public int GetHighestScore()
