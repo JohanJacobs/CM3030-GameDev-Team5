@@ -1,5 +1,6 @@
 using System.Globalization;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using TMPro;
@@ -12,7 +13,7 @@ public class HUD : MonoBehaviour
     public Text KillCountText;
     public Text ExperienceText;
     public Text LevelText;
-    public Text WastedText;
+    public GameObject GameOver;
 
     public void UpdateHealth(float health, float maxHealth)
     {
@@ -35,8 +36,13 @@ public class HUD : MonoBehaviour
         LevelText.text = Mathf.FloorToInt(level).ToString(CultureInfo.InvariantCulture);
     }
 
-    public void ShowWasted(int highestScore, int currentScore)
+    public void ShowGameOver()
     {
-        WastedText.enabled = true;
+        GameOver.SetActive(true);
+    }
+
+    public void OnRestartClicked()
+    {
+        SceneManager.LoadScene("GameScene");
     }
 }

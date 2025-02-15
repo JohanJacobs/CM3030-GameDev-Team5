@@ -208,7 +208,7 @@ public class PlayerController : MonoBehaviour
 
     private void ShowWasted()
     {
-        _hud.ShowWasted(HighScoreManager.GetHighestScore(), _kills);
+        _hud.ShowGameOver();
     }
 
     private void PlayHitAnimation()
