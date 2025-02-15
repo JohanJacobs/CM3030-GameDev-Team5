@@ -193,9 +193,21 @@ public class AbilitySystemComponent : MonoBehaviour
 
     #endregion
 
+    #region Effects
+
+    public bool CanApplyEffect(Effect effect)
+    {
+        if (effect.HasBlockTags)
+        {
+            return _tags.ContainsAny(effect.BlockTags);
+        }
+
+        return true;
+    }
+
     public EffectHandle ApplyEffectToSelf(Effect effect)
     {
-        Debug.Assert(effect.IsInstant || effect.IsFinite || effect.IsInfinite);
+        effect.Validate();
 
         var context = new EffectContext(this, this);
 
@@ -204,7 +216,7 @@ public class AbilitySystemComponent : MonoBehaviour
 
     public EffectHandle ApplyEffectToTarget(Effect effect, AbilitySystemComponent target)
     {
-        Debug.Assert(effect.IsInstant || effect.IsFinite || effect.IsInfinite);
+        effect.Validate();
 
         var context = new EffectContext(this, target);
 
@@ -220,32 +232,40 @@ public class AbilitySystemComponent : MonoBehaviour
         if (effectInstance == null)
             return;
 
-        if (_effectInstances.Remove(effectInstance))
+        // TODO: get rid of Contains call
+        if (_effectInstances.Contains(effectInstance))
         {
-            effectInstance.Cancel();
+            RemoveEffectInstance(effectInstance);
         }
 
         handle.Clear();
     }
 
-    public EffectInstance FindActiveEffect(Effect effect)
+    public EffectInstance FindEffectInstance(Effect effect)
     {
         return _effectInstances.Find(effectInstance => effectInstance.Effect == effect);
     }
 
     public bool HasActiveEffect(Effect effect)
     {
-        var effectInstance = FindActiveEffect(effect);
+        var effectInstance = FindEffectInstance(effect);
 
-        return !(effectInstance?.Expired ?? true);
+        return effectInstance?.Active ?? false;
     }
 
     public float GetActiveEffectTimeRemainingFraction(Effect effect)
     {
-        var effectInstance = FindActiveEffect(effect);
+        var effectInstance = FindEffectInstance(effect);
 
-        return effectInstance?.TimeRemainingFraction ?? 0f;
+        if (effectInstance != null && effectInstance.Active)
+            return effectInstance.TimeRemainingFraction;
+
+        return 0f;
     }
+
+    #endregion
+
+    #region Abilities
 
     public AbilityHandle AddAbility(Ability ability)
     {
@@ -255,9 +275,19 @@ public class AbilitySystemComponent : MonoBehaviour
             return new AbilityHandle(this, existingAbilityInstance);
         }
 
+        if (ability.HasGrantedTags)
+        {
+            HandleTagsAdded(ability.GrantedTags);
+        }
+
         var abilityInstance = new AbilityInstance(this, ability);
 
         _abilityInstances.Add(abilityInstance);
+
+        if (ability.HasGrantedTags)
+        {
+            AddTags(ability.GrantedTags);
+        }
 
         abilityInstance.NotifyAdded();
 
@@ -277,10 +307,15 @@ public class AbilitySystemComponent : MonoBehaviour
         if (abilityInstance == null)
             return;
 
-        abilityInstance.End();
+        abilityInstance.Abort();
         abilityInstance.Destroy();
 
         _abilityInstances.Remove(abilityInstance);
+
+        if (abilityInstance.Ability.HasGrantedTags)
+        {
+            RemoveTags(abilityInstance.Ability.GrantedTags);
+        }
 
         abilityInstance.NotifyRemoved();
     }
@@ -291,20 +326,24 @@ public class AbilitySystemComponent : MonoBehaviour
         if (abilityInstance == null)
             return;
 
-        if (_tags.ContainsAny(abilityInstance.Ability.BlockTags))
+        if (abilityInstance.Ability.HasBlockTags && _tags.ContainsAny(abilityInstance.Ability.BlockTags))
             return;
 
         abilityInstance.TryActivate();
     }
 
-    public void EndAbility(AbilityHandle handle)
+    public void AbortAbility(AbilityHandle handle)
     {
         var abilityInstance = GetAbilityInstanceChecked(handle);
         if (abilityInstance == null)
             return;
 
-        abilityInstance.End();
+        abilityInstance.Abort();
     }
+
+    #endregion
+
+    #region Unity Messages
 
     private void Start()
     {
@@ -344,7 +383,14 @@ public class AbilitySystemComponent : MonoBehaviour
     {
         foreach (var abilityInstance in _abilityInstances)
         {
+            abilityInstance.Abort();
             abilityInstance.Destroy();
+        }
+
+        foreach (var effectInstance in _effectInstances)
+        {
+            effectInstance.Cancel();
+            effectInstance.Destroy();
         }
 
         foreach (var attributeModifierInstance in _attributeModifiers)
@@ -353,15 +399,16 @@ public class AbilitySystemComponent : MonoBehaviour
         }
 
         _attributeSetInstances.Clear();
-
         _attributeValues.Fill(null);
-
+        _attributeModifiers.Fill(null);
         _effectInstances.Clear();
-
         _abilityInstances.Clear();
-
         _tags.Clear();
     }
+
+    #endregion
+
+    #region Private
 
     private void OnAttributeBaseValueChanged(AttributeValue attributeValue, float oldValue, float newValue)
     {
@@ -391,37 +438,147 @@ public class AbilitySystemComponent : MonoBehaviour
 
     private EffectHandle ApplyEffect(Effect effect, EffectContext context)
     {
+        bool canApplyEffect = CanApplyEffect(effect);
+
+        switch (effect.DurationPolicy)
+        {
+            case EffectDurationPolicy.Instant:
+                if (!canApplyEffect)
+                    return null;
+                break;
+            case EffectDurationPolicy.Duration:
+            case EffectDurationPolicy.Infinite:
+                if (!canApplyEffect && !effect.HasPeriod)
+                    return null;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        // TODO: should this also trigger when periodic effect is applied?
+        if (effect.HasGrantedTags)
+        {
+            HandleTagsAdded(effect.GrantedTags);
+        }
+
         var effectInstance = new EffectInstance(effect, context);
 
-        effectInstance.Apply();
-
-        if (effectInstance.Expired)
+        if (effect.Instant)
         {
+            effectInstance.Apply();
             effectInstance.Cancel();
-
+            effectInstance.Destroy();
             return null;
         }
 
+        if (canApplyEffect)
+        {
+            effectInstance.Apply();
+        }
+
         _effectInstances.Add(effectInstance);
+
+        if (effect.HasGrantedTags)
+        {
+            AddTags(effect.GrantedTags);
+        }
 
         var handle = new EffectHandle(this, effectInstance);
 
         return handle;
     }
 
-    private void UpdateActiveEffects(float deltaTime)
+    private void RemoveEffectInstance(EffectInstance effectInstance)
     {
-        foreach (var effectInstance in _effectInstances)
-        {
-            effectInstance.Update(deltaTime);
+        effectInstance.Cancel();
+        effectInstance.Destroy();
 
-            if (effectInstance.Expired)
-            {
-                effectInstance.Cancel();
-            }
+        _effectInstances.Remove(effectInstance);
+
+        if (effectInstance.Effect.HasGrantedTags)
+        {
+            RemoveTags(effectInstance.Effect.GrantedTags);
+        }
+    }
+
+    private void RemoveEffectInstance(EffectInstance effectInstance, int index)
+    {
+        Debug.Assert(_effectInstances[index] == effectInstance);
+
+        effectInstance.Cancel();
+        effectInstance.Destroy();
+
+        _effectInstances.RemoveAt(index);
+
+        if (effectInstance.Effect.HasGrantedTags)
+        {
+            RemoveTags(effectInstance.Effect.GrantedTags);
+        }
+    }
+
+    private void HandleTagsAdded(IEnumerable<Tag> tags)
+    {
+        var addedTagsContainer = new TagContainer(tags);
+
+        var abilitiesToAbort = _abilityInstances
+            .Where(abilityInstance => abilityInstance.Ability.HasCancelTags)
+            .Where(abilityInstance => addedTagsContainer.ContainsAny(abilityInstance.Ability.CancelTags));
+        var effectsToCancel = _effectInstances
+            .Where(effectInstance => effectInstance.Effect.HasCancelTags)
+            .Where(effectInstance => addedTagsContainer.ContainsAny(effectInstance.Effect.CancelTags));
+
+        foreach (var abilityInstance in abilitiesToAbort)
+        {
+            abilityInstance.Abort();
         }
 
-        _effectInstances.RemoveAll(effectInstance => effectInstance.Expired);
+        foreach (var effectInstance in effectsToCancel)
+        {
+            RemoveEffectInstance(effectInstance);
+        }
+    }
+
+    private void AddTags(IEnumerable<Tag> tags)
+    {
+        _tags.AddRange(tags);
+    }
+
+    private void RemoveTags(IEnumerable<Tag> tags)
+    {
+        // TODO: keep and update these lists separately?
+        var abilitiesGrantedTags = _abilityInstances
+            .Where(abilityInstance => abilityInstance.Ability.HasGrantedTags)
+            .SelectMany(abilityInstance => abilityInstance.Ability.GrantedTags);
+        var activeEffectsGrantedTags = _effectInstances
+            .Where(effectInstance => effectInstance.Active)
+            .Where(effectInstance => effectInstance.Effect.HasGrantedTags)
+            .SelectMany(effectInstance => effectInstance.Effect.GrantedTags);
+
+        var removedTagsContainer = new TagContainer(tags);
+
+        removedTagsContainer.RemoveRange(abilitiesGrantedTags);
+        removedTagsContainer.RemoveRange(activeEffectsGrantedTags);
+
+        _tags.RemoveRange(removedTagsContainer);
+    }
+
+    private void UpdateActiveEffects(float deltaTime)
+    {
+        for (var i = 0; i < _effectInstances.Count; )
+        {
+            var effectInstance = _effectInstances[i];
+
+            effectInstance.Update(deltaTime);
+
+            if (effectInstance.Inactive)
+            {
+                RemoveEffectInstance(effectInstance, i);
+            }
+            else
+            {
+                ++i;
+            }
+        }
     }
 
     private void UpdateActiveAbilities(float deltaTime)
@@ -442,6 +599,8 @@ public class AbilitySystemComponent : MonoBehaviour
 
         return abilityInstance;
     }
+
+    #endregion
 }
 
 public static class AbilitySystemHelper

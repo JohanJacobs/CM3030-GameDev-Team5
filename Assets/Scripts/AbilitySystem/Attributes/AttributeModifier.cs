@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public enum NewAttributeModifierType
@@ -8,29 +9,14 @@ public enum NewAttributeModifierType
     Override,
 }
 
-[CreateAssetMenu]
-public class AttributeModifier : ScriptableObject
+[Serializable]
+public struct AttributeModifier
 {
-    public AttributeType Attribute => _attribute;
-    public NewAttributeModifierType Type => _type;
-    public float Value => _value;
-    public bool Permanent => _permanent;
-    public bool Post => _post;
-
-    [SerializeField]
-    private AttributeType _attribute;
-
-    [SerializeField]
-    private NewAttributeModifierType _type;
-
-    [SerializeField]
-    private float _value;
-
-    [SerializeField]
-    private bool _permanent;
-
-    [SerializeField]
-    private bool _post;
+    public AttributeType Attribute;
+    public NewAttributeModifierType Type;
+    public float Value;
+    public bool Permanent;
+    public bool Post;
 
     public AttributeModifierInstance CreateInstance()
     {

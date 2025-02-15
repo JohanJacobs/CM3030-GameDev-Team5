@@ -1,21 +1,24 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    AudioManager audioManager;
+
     public Animator Animator;
 
-    public Vector3 MuzzleOffset = new Vector3(0, 0.1f, 0);
+    public Vector3 MuzzleOffset = new Vector3(0, 0.25f, 0);
 
     public LayerMask MonsterLayerMask;
 
     public GameObject BulletTracerFX;
     public GameObject HUD;
+    public GameObject GameMenu;
+
 
     private CharacterController _characterController;
     private Player _player;
     private HUD _hud;
+    private GameMenu _gameMenu;
 
     private AbilitySystemComponent _asc;
 
@@ -25,9 +28,12 @@ public class PlayerController : MonoBehaviour
 
     private int _kills = 0;
 
+
     void Awake()
     {
-        CreateHUD();
+        CreateUI();
+
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     void Start()
@@ -38,9 +44,9 @@ public class PlayerController : MonoBehaviour
         _asc = GetComponent<AbilitySystemComponent>();
         _asc.OnReady(OnAbilitySystemReady);
 
-        _player.Kill += (creature, victim) => AddKill();
-        _player.Death += (creature) => ShowWasted();
-        _player.ReceiveDamanage += () => PlayReceiveDamageAnimation();
+        _player.Kill += HandlePlayerKill;
+        _player.Death += HandlePlayerDeath;
+        _player.DamageTaken += HandlePlayerDamageTaken;
     }
 
     private void OnAbilitySystemReady(AbilitySystemComponent asc)
@@ -81,16 +87,15 @@ public class PlayerController : MonoBehaviour
             combinedMovement.Normalize();
         }
 
-        _characterController.Move(combinedMovement * _player.Speed * Time.deltaTime);
+        var gravity = Vector3.down * 10f;
 
-        // HACK: keep player at Y=0
-        transform.Translate(0, -transform.position.y, 0);
+        _characterController.Move((combinedMovement * _player.Speed + gravity) * Time.deltaTime);
 
         // convert movement to local space for animation
         var localMovementZ = Vector3.Dot(transform.forward, combinedMovement);
         var localMovementX = Vector3.Dot(transform.right, combinedMovement);
 
-        PlayMoveAnimation(new Vector3(localMovementX, 0, localMovementZ));        
+        PlayMoveAnimation(new Vector3(localMovementX, 0, localMovementZ));
     }
 
     private void GetPlayerMovementBasis(out Vector3 forward, out Vector3 right)
@@ -120,10 +125,13 @@ public class PlayerController : MonoBehaviour
         if (plane.Raycast(mouseAimRay, out var rayEnter))
         {
             var lookAtPointOnGround = mouseAimRay.GetPoint(rayEnter);
+            var lookAtPointOnGroundDelta = lookAtPointOnGround - transform.position;
 
-            if (Vector3.Distance(transform.position, lookAtPointOnGround) > 0.1)
+            lookAtPointOnGroundDelta.y = 0;
+
+            if (lookAtPointOnGroundDelta.sqrMagnitude > 0.01f)
             {
-                transform.LookAt(lookAtPointOnGround);
+                transform.rotation = Quaternion.LookRotation(lookAtPointOnGroundDelta, Vector3.up);
 
                 _lookAtPointOnGround = lookAtPointOnGround;
             }
@@ -149,6 +157,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        audioManager.PlaySFX(audioManager.sfxexample);
         _toNextShot += 1f / _player.FireRate;
 
         var aimDirection = _lookAtPointOnGround.Value - transform.position;
@@ -183,9 +192,66 @@ public class PlayerController : MonoBehaviour
 
         var rotation = Quaternion.LookRotation(direction);
 
-        var fxGameObject = GameObject.Instantiate(BulletTracerFX, origin, rotation);
+        var fxGameObject = Instantiate(BulletTracerFX, origin, rotation);
 
-        GameObject.Destroy(fxGameObject, 0.2f);
+        Destroy(fxGameObject, 0.2f);
+    }
+
+    private void AddKill()
+    {
+        ++_kills;
+
+        _hud.UpdateKillCounter(_kills);
+    }
+
+    private void ShowWasted()
+    {
+        _hud.ShowWasted();
+    }
+
+    private void PlayHitAnimation()
+    {
+        Animator.SetTrigger("IsHit");
+    }
+
+    private void PlayDeathAnimation()
+    {
+        Animator.SetBool("IsDead", true);
+    }
+
+    private void PlayShootAnimation(bool isShooting)
+    {
+        Animator.SetBool("IsShooting", isShooting);
+    }
+
+    private void PlayMoveAnimation(Vector3 movementInput)
+    {
+        Animator.SetFloat("ForwardMovement", movementInput.z);
+        Animator.SetFloat("RightMovement", movementInput.x);
+    }
+
+    private void HandlePlayerKill(Creature creature, Creature victim)
+    {
+        AddKill();
+    }
+
+    private void HandlePlayerDeath(Creature creature)
+    {
+        PlayDeathAnimation();
+
+        ShowWasted();
+    }
+
+    private void HandlePlayerDamageTaken()
+    {
+        PlayHitAnimation();
+    }
+
+    #region UI
+    private void CreateUI()
+    {
+        CreateHUD();
+        CreateGameMenu(_hud);
     }
 
     private void CreateHUD()
@@ -210,37 +276,14 @@ public class PlayerController : MonoBehaviour
         _hud.UpdateLevel(_player.Level);
     }
 
-    private void AddKill()
+    private void CreateGameMenu(HUD hud)
     {
-        ++_kills;
+        var gameMenuGameObject = GameObject.Instantiate(GameMenu);
+        _gameMenu = gameMenuGameObject.GetComponent<GameMenu>();
 
-        _hud.UpdateKillCounter(_kills);
+        // callback to hide the hud when the menu is displayed
+        _gameMenu.SetHudVisibilityToggleCallback((bool isVisible) => { _hud.gameObject.SetActive(isVisible); });
     }
+    #endregion UI
 
-    private void ShowWasted()
-    {
-        PlayPlayerDeathAnimation();
-        _hud.ShowWasted();
-    }
-
-    private void PlayReceiveDamageAnimation()
-    {
-        Debug.Log("IsHit");
-        Animator.SetTrigger("IsHit");
-    }
-
-    private void PlayPlayerDeathAnimation()
-    {
-        Animator.SetBool("IsDead", true);
-    }
-
-    private void PlayShootAnimation(bool isShooting)
-    {
-        Animator.SetBool("IsShooting", isShooting);
-    }
-    private void PlayMoveAnimation(Vector3 movementInput)
-    {
-        Animator.SetFloat("ForwardMovement", movementInput.z);
-        Animator.SetFloat("RightMovement", movementInput.x);
-    }
 }

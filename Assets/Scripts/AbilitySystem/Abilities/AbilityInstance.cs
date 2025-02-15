@@ -52,7 +52,9 @@ public class AbilityInstance
 
     public void Destroy()
     {
-        // NOTE: required to break cross-reference chain
+        Debug.Assert(!Active, "Destroying active ability instance probably points to logic error");
+
+        // NOTE: might be required to break cross-reference chain
         _abilityLogic = null;
 
         _data = null;
@@ -109,6 +111,13 @@ public class AbilityInstance
         _abilityLogic.EndAbility(this);
 
         _data = null;
+    }
+
+    public void Abort()
+    {
+        // TODO: implement abortion logic
+
+        End();
     }
 
     private bool Commit()

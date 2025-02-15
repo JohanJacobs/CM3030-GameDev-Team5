@@ -12,8 +12,8 @@ public sealed class EffectHandle : GenericInstanceHandle<EffectInstance>
             if (AbilitySystemComponent == null)
                 return false;
 
-            // check if EffectInstance is null or expired
-            return !(EffectInstance?.Expired ?? true);
+            // check if EffectInstance exists and active
+            return EffectInstance?.Active ?? false;
         }
     }
 

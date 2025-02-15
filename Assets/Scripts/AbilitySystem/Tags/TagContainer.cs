@@ -1,12 +1,22 @@
-using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public sealed class TagContainer : IReadOnlyCollection<Tag>
 {
     private readonly HashSet<Tag> _tagSet = new HashSet<Tag>();
+
+    public TagContainer()
+    {
+
+    }
+
+    public TagContainer(IEnumerable<Tag> tags)
+    {
+        AddRange(tags);
+    }
 
     public void Add(Tag tag)
     {

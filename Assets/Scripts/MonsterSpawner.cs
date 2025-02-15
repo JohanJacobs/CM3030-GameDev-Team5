@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System;
 
 [CreateAssetMenu]
 public class MonsterSpawner : ScriptableObject

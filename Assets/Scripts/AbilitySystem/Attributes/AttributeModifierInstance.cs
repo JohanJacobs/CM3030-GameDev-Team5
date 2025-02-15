@@ -2,21 +2,18 @@ using UnityEngine;
 
 public abstract class AttributeModifierInstance
 {
-    public AttributeModifier AttributeModifier { get; }
+    private static int _nextIndex = 0;
+
     public bool Post { get; }
     public int Index { get; } = ++_nextIndex;
 
-    private static int _nextIndex = 0;
-
     protected AttributeModifierInstance(AttributeModifier attributeModifier)
     {
-        AttributeModifier = attributeModifier;
-        Post = AttributeModifier.Post;
+        Post = attributeModifier.Post;
     }
 
     protected AttributeModifierInstance(bool post)
     {
-        AttributeModifier = null;
         Post = post;
     }
 

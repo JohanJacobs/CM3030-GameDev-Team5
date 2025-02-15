@@ -1,5 +1,5 @@
-using UnityEngine;
 using System;
+using UnityEngine;
 
 /// <summary>
 /// Defines several simple add/multiply components to transform a scalar value. Keeps track of identity to prevent float error buildup.
