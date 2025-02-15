@@ -4,7 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     public Animator Animator;
 
-    public Vector3 MuzzleOffset = new Vector3(0, 0.1f, 0);
+    public Vector3 MuzzleOffset = new Vector3(0, 0.25f, 0);
 
     public LayerMask MonsterLayerMask;
 
@@ -79,16 +79,15 @@ public class PlayerController : MonoBehaviour
             combinedMovement.Normalize();
         }
 
-        _characterController.Move(combinedMovement * _player.Speed * Time.deltaTime);
+        var gravity = Vector3.down * 10f;
 
-        // HACK: keep player at Y=0
-        transform.Translate(0, -transform.position.y, 0);
+        _characterController.Move((combinedMovement * _player.Speed + gravity) * Time.deltaTime);
 
         // convert movement to local space for animation
         var localMovementZ = Vector3.Dot(transform.forward, combinedMovement);
         var localMovementX = Vector3.Dot(transform.right, combinedMovement);
 
-        PlayMoveAnimation(new Vector3(localMovementX, 0, localMovementZ));        
+        PlayMoveAnimation(new Vector3(localMovementX, 0, localMovementZ));
     }
 
     private void GetPlayerMovementBasis(out Vector3 forward, out Vector3 right)
@@ -118,10 +117,13 @@ public class PlayerController : MonoBehaviour
         if (plane.Raycast(mouseAimRay, out var rayEnter))
         {
             var lookAtPointOnGround = mouseAimRay.GetPoint(rayEnter);
+            var lookAtPointOnGroundDelta = lookAtPointOnGround - transform.position;
 
-            if (Vector3.Distance(transform.position, lookAtPointOnGround) > 0.1)
+            lookAtPointOnGroundDelta.y = 0;
+
+            if (lookAtPointOnGroundDelta.sqrMagnitude > 0.01f)
             {
-                transform.LookAt(lookAtPointOnGround);
+                transform.rotation = Quaternion.LookRotation(lookAtPointOnGroundDelta, Vector3.up);
 
                 _lookAtPointOnGround = lookAtPointOnGround;
             }

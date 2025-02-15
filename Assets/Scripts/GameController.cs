@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour
@@ -97,7 +98,7 @@ public class GameController : MonoBehaviour
 
     void Awake()
     {
-        _pickupSpawnConfiguration = GameData.Instance.PickupSpawnConfiguration;
+        _navMeshWalkableAreaMask = (1 << NavMesh.GetAreaFromName("Walkable"));
     }
 
     void Start()
@@ -114,6 +115,43 @@ public class GameController : MonoBehaviour
         {
             UpdateMonsterSpawner(spawner);
         }
+    }
+
+    #region Monster Spawn
+
+    private static int _navMeshWalkableAreaMask;
+
+    private static Vector3 GetRandomPointOnUnitCircle(out float angle)
+    {
+        angle = Random.Range(-Mathf.PI, Mathf.PI);
+
+        return new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+    }
+
+    private Vector3 GetMonsterSpawnPoint(out float angle)
+    {
+        var playerPositionXZ = _player.transform.position;
+
+        playerPositionXZ.y = 0;
+
+        Vector3 point;
+
+        int attempt = 0;
+
+        do
+        {
+            point = playerPositionXZ + GetRandomPointOnUnitCircle(out angle) * SpawnDistance;
+
+            if (NavMesh.SamplePosition(point, out var hit, 1f, _navMeshWalkableAreaMask))
+            {
+                return hit.position;
+            }
+
+        } while (++attempt < 5);
+
+        Debug.LogAssertion("Failed to generate monster spawn point");
+
+        return point;
     }
 
     private void UpdateMonsterSpawner(MonsterSpawner spawner)
@@ -133,10 +171,7 @@ public class GameController : MonoBehaviour
 
     private Monster SpawnMonster(MonsterSpawner spawner)
     {
-        var directionAngle = Random.Range(-Mathf.PI, Mathf.PI);
-        var direction = new Vector3(Mathf.Cos(directionAngle), 0, Mathf.Sin(directionAngle));
-
-        var position = _player.transform.position + direction * SpawnDistance;
+        var position = GetMonsterSpawnPoint(out var directionAngle);
         var rotation = Quaternion.AngleAxis(-directionAngle, Vector3.up);
 
         var instance = Instantiate(spawner.Prefab, position, rotation);
@@ -150,28 +185,13 @@ public class GameController : MonoBehaviour
         return monster;
     }
 
-    private GameObject SpawnExperienceOrbPickup(float experience, Vector3 position)
-    {
-        var instance = Instantiate(GameData.Instance.ExperienceOrbPickupPrefab, position, Quaternion.identity);
-        
-        instance.transform.parent = transform;
-
-        var pickup = instance.GetComponent<ExperienceOrbPickup>();
-
-        Debug.Assert(pickup != null, "Pickup component is missing");
-
-        pickup.Experience = experience;
-
-        return instance;
-    }
+    #endregion
 
     #region Pickups Spawn
     [Header("Pickup spawn")]
 
     [SerializeField]
     private float _pickupSpawnRadius = 2f;
-
-    private PickupSpawnConfiguration _pickupSpawnConfiguration;
 
     private void SpawnPickups(Vector3 position)
     {
@@ -191,6 +211,21 @@ public class GameController : MonoBehaviour
         var instance = Instantiate(prefab, position + positionOffset, Quaternion.identity);
 
         instance.transform.parent = transform;
+    }
+
+    private GameObject SpawnExperienceOrbPickup(float experience, Vector3 position)
+    {
+        var instance = Instantiate(GameData.Instance.ExperienceOrbPickupPrefab, position, Quaternion.identity);
+
+        instance.transform.parent = transform;
+
+        var pickup = instance.GetComponent<ExperienceOrbPickup>();
+
+        Debug.Assert(pickup != null, "Pickup component is missing");
+
+        pickup.Experience = experience;
+
+        return instance;
     }
 
     #endregion Pickups Spawn
