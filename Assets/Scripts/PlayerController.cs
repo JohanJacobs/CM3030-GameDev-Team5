@@ -2,6 +2,8 @@
 
 public class PlayerController : MonoBehaviour
 {
+    AudioManager audioManager;
+
     public Animator Animator;
 
     public Vector3 MuzzleOffset = new Vector3(0, 0.25f, 0);
@@ -10,10 +12,13 @@ public class PlayerController : MonoBehaviour
 
     public GameObject BulletTracerFX;
     public GameObject HUD;
+    public GameObject GameMenu;
+
 
     private CharacterController _characterController;
     private Player _player;
     private HUD _hud;
+    private GameMenu _gameMenu;
 
     private AbilitySystemComponent _asc;
 
@@ -23,9 +28,12 @@ public class PlayerController : MonoBehaviour
 
     private int _kills = 0;
 
+
     void Awake()
     {
         CreateHUD();
+        CreateGameMenu();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     void Start()
@@ -149,6 +157,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        audioManager.PlaySFX(audioManager.sfxexample);
         _toNextShot += 1f / _player.FireRate;
 
         var aimDirection = _lookAtPointOnGround.Value - transform.position;
@@ -259,4 +268,14 @@ public class PlayerController : MonoBehaviour
     {
         PlayHitAnimation();
     }
+
+    #region GameMenu
+    private void CreateGameMenu()
+    {
+        var gameMenuGameObject = GameObject.Instantiate(GameMenu);
+        _gameMenu = gameMenuGameObject.GetComponent<GameMenu>();
+
+    }
+    #endregion GameMenu
+
 }

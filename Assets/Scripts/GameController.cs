@@ -6,8 +6,10 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour
 {
+
     private class MonsterSpawnerContext
     {
+
         private readonly WeakReference<GameController> _gameController;
         private readonly MonsterSpawner _spawner;
 
@@ -45,6 +47,7 @@ public class GameController : MonoBehaviour
 
                 OnMonsterSpawn(monster);
             }
+            
         }
 
         private void OnMonsterSpawn(Creature monster)
