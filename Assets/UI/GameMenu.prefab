@@ -862,8 +862,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a47a09c22b41cc54d93d1995d405b975, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DefaultSprite: {fileID: 21300000, guid: b5e095ff8cc1e154abda0ccf0c617fb9, type: 3}
-  TogggledSprite: {fileID: 21300000, guid: 66622e06e56e8e34cb84d6927d687e5b, type: 3}
+  notMuteSprite: {fileID: 21300000, guid: b5e095ff8cc1e154abda0ccf0c617fb9, type: 3}
+  muteSprite: {fileID: 21300000, guid: 66622e06e56e8e34cb84d6927d687e5b, type: 3}
+  volumeSettings: {fileID: 2674554628515919407}
 --- !u!114 &9122840761013359034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -947,8 +948,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2919264639239280118}
-        m_MethodName: ToggleSprite
+      - m_Target: {fileID: 0}
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -957,7 +958,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
 --- !u!1 &4203175911995107126
 GameObject:
   m_ObjectHideFlags: 0
