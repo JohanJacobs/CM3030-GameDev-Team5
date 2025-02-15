@@ -268,6 +268,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 08517e24876b6d24688bfe445d755cad, type: 2}
   _grantedAbilities:
   - {fileID: 11400000, guid: 2769a3e19038dc84a8d86833488c93e4, type: 2}
+  - {fileID: 11400000, guid: 722cc5cd35cd5b942bd35b237e7cd958, type: 2}
 --- !u!1 &264663483
 GameObject:
   m_ObjectHideFlags: 0
@@ -685,7 +686,7 @@ Transform:
   - {fileID: 1520601969}
   - {fileID: 1553191903}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1416758922
 GameObject:
