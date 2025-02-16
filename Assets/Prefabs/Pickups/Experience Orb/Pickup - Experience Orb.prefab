@@ -1,24 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-2781465302081455740
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6611762310022879551}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a2a9dbdebca35340adbe23fddc7d597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Player:
-    serializedVersion: 2
-    m_Bits: 256
-  absorptionRadius: 4
-  absorptionSpeed: 0
-  maxAbsorptionSpeed: 13
-  absorptionAcceleration: 3
 --- !u!114 &7140434868695686566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e9fbdd126c73bb49a64eed2d134ae91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Effect: {fileID: 0}
   Experience: 0
 --- !u!23 &979771012913867282
 MeshRenderer:
@@ -165,7 +145,7 @@ PrefabInstance:
     - target: {fileID: 8395805053951077916, guid: 2ec4949677211ae4faef5b2980a9a1ca,
         type: 3}
       propertyPath: m_Name
-      value: ExperienceOrbPickup
+      value: Pickup - Experience Orb
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ec4949677211ae4faef5b2980a9a1ca, type: 3}
