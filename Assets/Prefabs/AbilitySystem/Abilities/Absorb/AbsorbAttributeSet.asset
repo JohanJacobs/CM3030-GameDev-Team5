@@ -9,11 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca0e5057a89c0294692491a39804bfda, type: 3}
-  m_Name: Spawner_RatKing
+  m_Script: {fileID: 11500000, guid: a4223be30eb280b4c915c26cfda437e9, type: 3}
+  m_Name: AbsorbAttributeSet
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 1837103161426741387, guid: 8e416c25db0a2a8409f8c5de2a08df02, type: 3}
-  SpawnInterval: 5
-  SpawnAmountMin: 1
-  SpawnAmountMax: 2
-  MaxMonstersAlive: 5
+  _defaultAttributes:
+  - _attribute: 26
+    _defaultValue: 4

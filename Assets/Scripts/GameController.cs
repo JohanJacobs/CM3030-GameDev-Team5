@@ -15,7 +15,8 @@ public class GameController : MonoBehaviour
 
         private readonly List<GameObject> _monsters = new List<GameObject>();
 
-        private float _toNextSpawn = 0;
+        private float _toNextSpawn;
+        private float _toNextDespawn;
 
         private GameController GameController => _gameController.TryGetTarget(out var instance) ? instance : null;
 
@@ -27,6 +28,12 @@ public class GameController : MonoBehaviour
 
         public void Update()
         {
+            Spawn();
+            Despawn();
+        }
+
+        private void Spawn()
+        {
             _toNextSpawn -= Time.deltaTime;
 
             if (_toNextSpawn > 0)
@@ -34,10 +41,6 @@ public class GameController : MonoBehaviour
 
             _toNextSpawn += _spawner.SpawnInterval;
 
-            Spawn();
-        }
-        private void Spawn()
-        {
             var maxSpawnAmount = Mathf.Max(_spawner.MaxMonstersAlive - _monsters.Count, 0);
             var amount = Mathf.Clamp(Random.Range(_spawner.SpawnAmountMin, _spawner.SpawnAmountMax + 1), 0, maxSpawnAmount);
 
@@ -47,7 +50,36 @@ public class GameController : MonoBehaviour
 
                 OnMonsterSpawn(monster);
             }
-            
+        }
+
+        // TODO: hacky, should be rewritten
+        private void Despawn()
+        {
+            _toNextDespawn -= Time.deltaTime;
+
+            if (_toNextDespawn > 0)
+                return;
+
+            _toNextDespawn += 1f;
+
+            var playerPosition = GameController._player.transform.position;
+            var sqrDespawnDistance = GameController.MonsterDespawnDistance * GameController.MonsterDespawnDistance;
+
+            for (var i = 0; i < _monsters.Count;)
+            {
+                var monsterGameObject = _monsters[i];
+
+                if (Vector3.SqrMagnitude(monsterGameObject.transform.position - playerPosition) > sqrDespawnDistance)
+                {
+                    _monsters.RemoveAt(i);
+
+                    Destroy(monsterGameObject);
+                }
+                else
+                {
+                    ++i;
+                }
+            }
         }
 
         private void OnMonsterSpawn(Creature monster)
@@ -93,7 +125,8 @@ public class GameController : MonoBehaviour
 
     public AudioManager audioManager;
 
-    public float SpawnDistance = 30f;
+    public float MonsterSpawnDistance = 20f;
+    public float MonsterDespawnDistance = 30f;
 
     public MonsterSpawner[] Spawns;
 
@@ -148,7 +181,7 @@ public class GameController : MonoBehaviour
 
         do
         {
-            point = playerPositionXZ + GetRandomPointOnUnitCircle(out angle) * SpawnDistance;
+            point = playerPositionXZ + GetRandomPointOnUnitCircle(out angle) * MonsterSpawnDistance;
 
             if (NavMesh.SamplePosition(point, out var hit, 1f, _navMeshWalkableAreaMask))
             {
