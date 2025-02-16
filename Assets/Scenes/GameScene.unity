@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44950086, g: 0.49649626, b: 0.5591468, a: 1}
+  m_IndirectSpecularColor: {r: 0.4495008, g: 0.49649626, b: 0.5591468, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &4
 LightmapSettings:
@@ -671,6 +671,9 @@ MonoBehaviour:
   SFXSource: {fileID: 1553191904}
   background: {fileID: 8300000, guid: d54770e507e38ac3f9d9fc7e54b815cd, type: 3}
   sfxexample: {fileID: 8300000, guid: cca9243a6a8e66fb59df621ede589224, type: 3}
+  shootingSound: {fileID: 8300000, guid: cca9243a6a8e66fb59df621ede589224, type: 3}
+  killedSkeletonSound: {fileID: 8300000, guid: ad942adeff5ba49c09a7a6084f53c139, type: 3}
+  grabExperienceSound: {fileID: 8300000, guid: fd0a6a64cbdc1aa29b770dac392a17e9, type: 3}
 --- !u!4 &1323193667
 Transform:
   m_ObjectHideFlags: 0
@@ -685,7 +688,7 @@ Transform:
   - {fileID: 1520601969}
   - {fileID: 1553191903}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1416758922
 GameObject:
@@ -1064,6 +1067,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92175bdbb59327d4e81d003348c504fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioManager: {fileID: 0}
   SpawnDistance: 20
   Spawns:
   - {fileID: 11400000, guid: 1888bf49ef907524dba05c17496b2dd6, type: 2}

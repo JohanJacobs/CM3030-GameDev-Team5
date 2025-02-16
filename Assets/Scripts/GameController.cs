@@ -91,6 +91,8 @@ public class GameController : MonoBehaviour
         }
     }
 
+    public AudioManager audioManager;
+
     public float SpawnDistance = 30f;
 
     public MonsterSpawner[] Spawns;
@@ -102,6 +104,9 @@ public class GameController : MonoBehaviour
     void Awake()
     {
         _navMeshWalkableAreaMask = (1 << NavMesh.GetAreaFromName("Walkable"));
+
+        // Set audioManager to external audioManager object with tag Audio
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     void Start()
@@ -227,6 +232,9 @@ public class GameController : MonoBehaviour
         Debug.Assert(pickup != null, "Pickup component is missing");
 
         pickup.Experience = experience;
+
+        // Play grab experience sound
+        audioManager.PlaySFX(audioManager.grabExperienceSound);
 
         return instance;
     }

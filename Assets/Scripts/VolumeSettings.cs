@@ -1,4 +1,19 @@
-﻿using UnityEngine;
+﻿/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+VolumeSettings.cs
+
+Class to manage volume settings for music and sound FX. Uses an Audio Mixer to independently control the volume. 
+
+*/
+
+using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 
@@ -17,6 +32,7 @@ public class VolumeSettings : MonoBehaviour
         SetMusicVolume();
         SetFXVolume();
     }
+
     public void SetMusicVolume()
     {
         isMuted = false;
