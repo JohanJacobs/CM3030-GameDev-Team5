@@ -27,10 +27,6 @@ public class PlayerController : MonoBehaviour
     private Vector3? _lookAtPointOnGround = null;
 
     private int _kills = 0;
-
-    public HighScoreManager HighScoreManager;
-
-
     void Awake()
     {
         CreateUI();
@@ -208,7 +204,8 @@ public class PlayerController : MonoBehaviour
 
     private void ShowWasted()
     {
-        _hud.ShowGameOver(HighScoreManager.GetHighestScore(),_kills);
+        
+        _hud.ShowGameOver(HighScoreManager.Instance.GetHighestScore(), _kills);
     }
 
     private void PlayHitAnimation()
@@ -291,6 +288,6 @@ public class PlayerController : MonoBehaviour
 
     private void UpdatePlayerScore()
     {
-        HighScoreManager.AddNewScore(_kills);
+        HighScoreManager.Instance.AddNewScore(_kills);
     }
 }
