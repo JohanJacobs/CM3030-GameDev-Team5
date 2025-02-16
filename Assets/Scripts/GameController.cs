@@ -7,6 +7,8 @@ using Random = UnityEngine.Random;
 public class GameController : MonoBehaviour
 {
 
+    public AudioManager audioManager;
+
     private class MonsterSpawnerContext
     {
 
@@ -122,8 +124,6 @@ public class GameController : MonoBehaviour
             return asc.GetAttributeValue(AttributeType.Experience);
         }
     }
-
-    public AudioManager audioManager;
 
     public float MonsterSpawnDistance = 20f;
     public float MonsterDespawnDistance = 30f;
@@ -265,9 +265,6 @@ public class GameController : MonoBehaviour
         Debug.Assert(pickup != null, "Pickup component is missing");
 
         pickup.Experience = experience;
-
-        // Play grab experience sound
-        audioManager.PlaySFX(audioManager.grabExperienceSound);
 
         return instance;
     }
