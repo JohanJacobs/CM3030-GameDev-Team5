@@ -36,6 +36,8 @@ public enum AttributeType
     GarlicAttackRange,
     GarlicAttackRate,
     GarlicAttackDamage,
+
+    AbsorptionRadius,
 }
 
 public static class AttributeTypeHelper
