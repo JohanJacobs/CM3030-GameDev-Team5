@@ -736,7 +736,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92175bdbb59327d4e81d003348c504fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpawnDistance: 20
+  MonsterSpawnDistance: 20
+  MonsterDespawnDistance: 25
   Spawns:
   - {fileID: 11400000, guid: 1888bf49ef907524dba05c17496b2dd6, type: 2}
   - {fileID: 11400000, guid: 555f33c7a68936b4eb64b2c8177b7df3, type: 2}
