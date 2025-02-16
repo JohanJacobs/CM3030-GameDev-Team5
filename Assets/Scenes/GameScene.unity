@@ -736,8 +736,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92175bdbb59327d4e81d003348c504fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MonsterSpawnDistance: 20
-  MonsterDespawnDistance: 25
+  MonsterSpawnDistance: 18
+  MonsterDespawnDistance: 24
   Spawns:
   - {fileID: 11400000, guid: 1888bf49ef907524dba05c17496b2dd6, type: 2}
   - {fileID: 11400000, guid: 555f33c7a68936b4eb64b2c8177b7df3, type: 2}
@@ -911,17 +911,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6552311690192007206, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
-        type: 3}
-      propertyPath: _grantedAbilities.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6552311690192007206, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
-        type: 3}
-      propertyPath: _grantedAbilities.Array.data[1]
-      value: 
-      objectReference: {fileID: 11400000, guid: 722cc5cd35cd5b942bd35b237e7cd958,
-        type: 2}
     - target: {fileID: 6552311690192007215, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
         type: 3}
       propertyPath: m_Name

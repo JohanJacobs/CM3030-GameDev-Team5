@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 using Random = UnityEngine.Random;
 using Vector2 = UnityEngine.Vector2;
 
@@ -15,9 +16,9 @@ public class WorldTileMap : MonoBehaviour
     private class Cell
     {
         public bool Active;
+        public bool Used;
         public Vector2Int Coordinates;
-        public Vector2Int LocalCoordinates;
-        public int LocalIndex;
+        public int Index;
         public WorldTile WorldTile;
         public NavMeshDataInstance NavMeshDataInstance;
         public Vector3 Position;
@@ -51,7 +52,7 @@ public class WorldTileMap : MonoBehaviour
 
         for (int i = 0; i < MaxTiles; ++i)
         {
-            _cells.Add(new Cell() { Active = false, WorldTile = null });
+            _cells.Add(new Cell() { Active = false, Index = -1, WorldTile = null });
         }
     }
 
@@ -128,47 +129,59 @@ public class WorldTileMap : MonoBehaviour
 
         foreach (var cell in _cells)
         {
-            if (cell.Active && !rect.Contains(cell.Coordinates))
+            cell.Used = false;
+
+            if (rect.Contains(cell.Coordinates))
+                continue;
+
+            if (cell.Active)
             {
                 DeactivateCell(cell);
             }
         }
 
-        for (int y = 0; y < MaxActiveAreaHeight; ++y)
+        for (int cellIndex = 0; cellIndex < MaxTiles; ++cellIndex)
         {
-            for (int x = 0; x < MaxActiveAreaWidth; ++x)
+            var x = cellIndex % MaxActiveAreaWidth;
+            var y = cellIndex / MaxActiveAreaWidth;
+
+            var coordinates = rect.min + new Vector2Int(x, y);
+
+            bool activate = rect.Contains(coordinates);
+
+            if (activate)
             {
-                var coordinates = rect.min + new Vector2Int(x, y);
-
-                bool shouldActivate =
-                    x < rect.width &&
-                    y < rect.height;
-
-                if (!shouldActivate)
-                    continue;
-
-                var activeCell = _cells.FirstOrDefault(cell => cell.Active && cell.Coordinates.Equals(coordinates));
+                var activeCell = _cells.Find(cell => cell.Active && cell.Coordinates.Equals(coordinates));
                 if (activeCell != null)
                 {
-                    activeCell.LocalCoordinates = new Vector2Int(x, y);
-                    activeCell.LocalIndex = y * MaxActiveAreaWidth + x;
+                    activeCell.Used = true;
+                    activeCell.Index = cellIndex;
 
                     continue;
                 }
+            }
 
-                var freeCell = _cells.FirstOrDefault(cell => !cell.Active);
-                if (freeCell == null)
-                    throw new Exception("No free cell");
-
+            var freeCell = _cells.Find(cell => !cell.Active && !cell.Used);
+            if (freeCell != null)
+            {
+                freeCell.Used = true;
+                freeCell.Index = cellIndex;
                 freeCell.Coordinates = coordinates;
-                freeCell.LocalCoordinates = new Vector2Int(x, y);
-                freeCell.LocalIndex = y * MaxActiveAreaWidth + x;
 
-                ActivateCell(freeCell);
+                if (activate)
+                {
+                    ActivateCell(freeCell);
+                }
+            }
+            else
+            {
+                throw new Exception("No free cell");
             }
         }
 
-        _cells.Sort((lhs, rhs) => lhs.LocalIndex - rhs.LocalIndex);
+        Debug.Assert(_cells.TrueForAll(cell => cell.Used));
+
+        _cells.Sort((lhs, rhs) => lhs.Index - rhs.Index);
 
         // NOTE: those pairs match cell indices in cells list
         AddNavMeshLink(0, 1);
@@ -221,7 +234,7 @@ public class WorldTileMap : MonoBehaviour
 
     private void AddNavMeshLink(int fromCellIndex, int toCellIndex)
     {
-        const float LinkMargin = 2f;
+        const float LinkMargin = 1f;
 
         var from = _cells[fromCellIndex];
         var to = _cells[toCellIndex];
@@ -235,24 +248,23 @@ public class WorldTileMap : MonoBehaviour
 
         var middle = Vector3.Lerp(from.Position, to.Position, 0.5f);
 
-        var start = middle - delta * LinkMargin;
-        var end = middle + delta * LinkMargin;
-
         var navMeshLinkData = new NavMeshLinkData()
         {
             agentTypeID = 0,
             area = 0,
             bidirectional = true,
-            costModifier = 0f,
-            endPosition = end,
-            startPosition = start,
+            costModifier = -1,
+            endPosition = delta * LinkMargin,
+            startPosition = -delta * LinkMargin,
             width = Mathf.Max(_tileSize.x, _tileSize.y),
         };
 
-        var navMeshLink = NavMesh.AddLink(navMeshLinkData);
+        var navMeshLink = NavMesh.AddLink(navMeshLinkData, middle, Quaternion.identity);
 
         if (navMeshLink.valid)
         {
+            navMeshLink.owner = this;
+
             _navMeshLinks.Add(navMeshLink);
         }
         else
