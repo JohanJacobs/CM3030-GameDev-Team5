@@ -34,7 +34,7 @@ public class GameMenu : MonoBehaviour
     {
         if (loadSceneMode == LoadSceneMode.Single) 
         {
-            // secene was reloaded
+            // secene was reloaded disable the menu
             SetMenuState(false);
         }
     }
