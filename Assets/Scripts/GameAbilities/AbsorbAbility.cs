@@ -1,9 +1,11 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [AbilityInstanceDataClass]
 public class AbsorbAbilityInstanceData
 {
-
+    //Dictionary of orbs and their individual speeds
+    public Dictionary<GameObject,float> OrbSpeeds = new Dictionary<GameObject,float>();
 }
 
 [CreateAssetMenu(menuName = "Abilities/Absorb")]
@@ -12,8 +14,8 @@ public class AbsorbAbility : Ability
     public AttributeSet AbilityAttributeSet;
     public LayerMask LayerMask;
 
-    [SerializeField] private float absorptionSpeed = 0f;
-    [SerializeField] private float maxAbsorptionSpeed = 13f;
+    [SerializeField] private float absorptionSpeed = 0.5f;
+    [SerializeField] private float maxAbsorptionSpeed = 14f;
     [SerializeField] private float absorptionAcceleration = 3f;
 
     public AbsorbAbility()
@@ -57,6 +59,7 @@ public class AbsorbAbility : Ability
     {
         var asc = abilityInstance.AbilitySystemComponent; 
         var ascAvatar = asc.GetComponent<Creature>(); //Player instance
+        var data = abilityInstance.Data as AbsorbAbilityInstanceData; //For orb tracking
 
         var colliders = Physics.OverlapSphere(asc.transform.position, range, LayerMask);
 
@@ -66,12 +69,19 @@ public class AbsorbAbility : Ability
             if (pickup == null)
                 continue;
 
-            //Non-linear movement no longer works. Need a data structure of some sorts
-            // absorptionSpeed += absorptionAcceleration * Time.deltaTime;
-            // //Set a cap on the max speed of the orb
-            // absorptionSpeed = Mathf.Min(absorptionSpeed, maxAbsorptionSpeed);
+            if (!data.OrbSpeeds.ContainsKey(pickup))
+            {
+                data.OrbSpeeds[pickup] = absorptionSpeed;
+            }
+            //Update speed for this particular orb
+            data.OrbSpeeds[pickup] += absorptionAcceleration * Time.deltaTime;
+            data.OrbSpeeds[pickup] = Mathf.Min(data.OrbSpeeds[pickup], maxAbsorptionSpeed);
+            //Move orb towards player
+            pickup.transform.position = Vector3.MoveTowards(pickup.transform.position, ascAvatar.transform.position, data.OrbSpeeds[pickup] * Time.deltaTime);
+        
 
-            pickup.transform.position = Vector3.MoveTowards(pickup.transform.position, ascAvatar.transform.position, absorptionSpeed * Time.deltaTime);
+            //LINEAR ACCELERATION
+            //pickup.transform.position = Vector3.MoveTowards(pickup.transform.position, ascAvatar.transform.position, absorptionSpeed * Time.deltaTime);
         }
     }
 }
