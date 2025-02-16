@@ -865,6 +865,7 @@ MonoBehaviour:
   notMuteSprite: {fileID: 21300000, guid: b5e095ff8cc1e154abda0ccf0c617fb9, type: 3}
   muteSprite: {fileID: 21300000, guid: 66622e06e56e8e34cb84d6927d687e5b, type: 3}
   volumeSettings: {fileID: 2674554628515919407}
+  image: {fileID: 9122840761013359034}
 --- !u!114 &9122840761013359034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -948,17 +949,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 0
 --- !u!1 &4203175911995107126
 GameObject:
   m_ObjectHideFlags: 0
@@ -1224,6 +1214,7 @@ MonoBehaviour:
   Menu: {fileID: 8399576054392484044}
   MiniUIPanel: {fileID: 5439067168234106162}
   startButtonText: {fileID: 3765874839171623265}
+  menuVisibleState: 1
 --- !u!114 &2674554628515919407
 MonoBehaviour:
   m_ObjectHideFlags: 0

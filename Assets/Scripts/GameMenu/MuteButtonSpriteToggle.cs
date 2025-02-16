@@ -14,13 +14,8 @@ public class MuteButtonSpriteToggle: MonoBehaviour
     [SerializeField] Sprite notMuteSprite;
     [SerializeField] Sprite muteSprite;
     [SerializeField] VolumeSettings volumeSettings;
-    Image image;    
-
-    private void Start()
-    {
-        image = GetComponent<Image>();
-        VolumeSettings_OnVolumeSettingsChanged_Delegate(volumeSettings);
-    }
+    [SerializeField] Image image;    
+        
     private void OnEnable()
     {
         volumeSettings.OnVolumeSettingsChanged += VolumeSettings_OnVolumeSettingsChanged_Delegate;
@@ -32,13 +27,7 @@ public class MuteButtonSpriteToggle: MonoBehaviour
         
     private void VolumeSettings_OnVolumeSettingsChanged_Delegate(VolumeSettings volumeSettings)
     {
-        if (volumeSettings.IsAudioMuted)
-        {
-            image.sprite = muteSprite;
-        }
-        else
-        {
-            image.sprite = notMuteSprite;
-        }
+        image.sprite = volumeSettings.IsAudioMuted ? muteSprite : notMuteSprite;
     }
+
 }

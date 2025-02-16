@@ -6,22 +6,42 @@ using UnityEngine.UIElements;
 using TMPro;
 using UnityEngine.UI;
 using UnityEditor;
+using UnityEngine.SceneManagement;
 public class GameMenu : MonoBehaviour
 {
     [SerializeField] GameObject Menu;
     [SerializeField] GameObject MiniUIPanel;    
     [SerializeField] Text startButtonText;
     
-    bool menuVisibleState;
+    
     bool switchStartButton=false;
     System.Action<bool> toggleHudVisibile;
+    public bool menuVisibleState = true;
 
+    
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+    }
 
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
+    }
+    // bit hacky but if you hit restart make sure the menu isn't displayed to avoid making this "dontDestroyOnLoad" 
+    // TODO: there should be a UI manager instead
+    private void SceneManager_sceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+    {
+        if (loadSceneMode == LoadSceneMode.Single) 
+        {
+            // secene was reloaded
+            SetMenuState(false);
+        }
+    }
 
     public void Start()
     {
-        
-        SetMenuState(true);
+        SetMenuState(menuVisibleState);
         switchStartButton= true;
     }
 
@@ -32,6 +52,7 @@ public class GameMenu : MonoBehaviour
             ToggleMenu();
         }
     }
+
     public void ToggleMenu()
     {
         SetMenuState(!menuVisibleState);
