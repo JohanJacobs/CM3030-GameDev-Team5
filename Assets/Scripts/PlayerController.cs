@@ -206,7 +206,7 @@ public class PlayerController : MonoBehaviour
 
     private void ShowWasted()
     {
-        _hud.ShowWasted();
+        _hud.ShowGameOver();
     }
 
     private void PlayHitAnimation()
