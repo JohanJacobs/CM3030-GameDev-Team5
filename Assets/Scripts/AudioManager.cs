@@ -7,6 +7,9 @@ public class AudioManager : MonoBehaviour
 
     public AudioClip background;
     public AudioClip sfxexample;
+    public AudioClip shootingSound;
+    public AudioClip killedSkeletonSound;
+    public AudioClip grabExperienceSound;
     public static AudioManager instance;
 
     private void Awake()

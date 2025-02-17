@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44950086, g: 0.49649626, b: 0.5591468, a: 1}
+  m_IndirectSpecularColor: {r: 0.4495008, g: 0.49649626, b: 0.5591468, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &4
 LightmapSettings:
@@ -406,6 +406,9 @@ MonoBehaviour:
   SFXSource: {fileID: 1553191904}
   background: {fileID: 8300000, guid: d54770e507e38ac3f9d9fc7e54b815cd, type: 3}
   sfxexample: {fileID: 8300000, guid: cca9243a6a8e66fb59df621ede589224, type: 3}
+  shootingSound: {fileID: 8300000, guid: cca9243a6a8e66fb59df621ede589224, type: 3}
+  killedSkeletonSound: {fileID: 8300000, guid: ad942adeff5ba49c09a7a6084f53c139, type: 3}
+  grabExperienceSound: {fileID: 8300000, guid: 1dd540ed2db5174379526897ef626abd, type: 3}
 --- !u!4 &1323193667
 Transform:
   m_ObjectHideFlags: 0
@@ -805,6 +808,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92175bdbb59327d4e81d003348c504fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioManager: {fileID: 0}
   MonsterSpawnDistance: 18
   MonsterDespawnDistance: 24
   Spawns:
