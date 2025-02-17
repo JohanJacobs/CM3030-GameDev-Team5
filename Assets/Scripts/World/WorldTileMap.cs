@@ -172,11 +172,11 @@ public class WorldTileMap : MonoBehaviour
                 {
                     ActivateCell(freeCell);
                 }
+
+                continue;
             }
-            else
-            {
-                throw new Exception("No free cell");
-            }
+
+            throw new Exception("No free cell");
         }
 
         Debug.Assert(_cells.TrueForAll(cell => cell.Used));

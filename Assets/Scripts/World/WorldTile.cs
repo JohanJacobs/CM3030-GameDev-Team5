@@ -3,9 +3,13 @@ using UnityEngine.AI;
 
 public class WorldTile : MonoBehaviour
 {
+    /// <summary>
+    /// Holds navigation mesh baked for this tile
+    /// </summary>
     public NavMeshData NavMeshData;
-    public bool FollowTransform = true;
-    public Vector2 Size = new Vector2(180, 180);
 
-    private NavMeshDataInstance _navMeshDataInstance;
+    /// <summary>
+    /// Tile size, XZ
+    /// </summary>
+    public Vector2 Size = new Vector2(180, 180);
 }
