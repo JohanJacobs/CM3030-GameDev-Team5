@@ -137,8 +137,31 @@ public class AbilitySystemComponent : MonoBehaviour
 
     #region Attribute Modifiers
 
+    /// <summary>
+    /// Applies given attribute modifier.
+    /// </summary>
+    /// <remarks>
+    /// Non-permanent modifiers will still apply if there's no such attribute.
+    /// Permanent modifiers are applied to attribute's base value directly, no handle is returned.
+    /// </remarks>
+    /// <param name="attributeModifier">Attribute modifier to apply</param>
+    /// <returns>Handle to attribute modifier instance, or <see langword="null" /></returns>
     public AttributeModifierHandle ApplyAttributeModifier(AttributeModifier attributeModifier)
     {
+        if (attributeModifier.Permanent)
+        {
+            if (attributeModifier.Type == NewAttributeModifierType.Override)
+            {
+                ApplyPermanentAttributeOverride(attributeModifier.Attribute, attributeModifier.Value);
+            }
+            else
+            {
+                ApplyPermanentAttributeModifier(attributeModifier.Attribute, ScalarModifier.MakeFromAttributeModifier(attributeModifier));
+            }
+
+            return null;
+        }
+
         var attributeModifierStack = _attributeModifiers[attributeModifier.Attribute];
 
         var attributeModifierInstance = attributeModifierStack.AddModifier(attributeModifier);
@@ -148,6 +171,16 @@ public class AbilitySystemComponent : MonoBehaviour
         return handle;
     }
 
+    /// <summary>
+    /// Applies scalar modifier to specified attribute.
+    /// </summary>
+    /// <remarks>
+    /// Non-permanent modifiers will still apply if there's no such attribute.
+    /// </remarks>
+    /// <param name="attribute">Attribute that this modifier is applied to</param>
+    /// <param name="scalarModifier">Scalar modifier</param>
+    /// <param name="post">Is it a post modifier?</param>
+    /// <returns>Handle to attribute modifier instance</returns>
     public AttributeModifierHandle ApplyAttributeModifier(AttributeType attribute, ScalarModifier scalarModifier, bool post)
     {
         var attributeModifierStack = _attributeModifiers[attribute];
@@ -159,6 +192,62 @@ public class AbilitySystemComponent : MonoBehaviour
         return handle;
     }
 
+    /// <summary>
+    /// Applies override to specified attribute.
+    /// </summary>
+    /// <remarks>
+    /// Non-permanent modifiers will still apply if there's no such attribute.
+    /// </remarks>
+    /// <param name="attribute">Attribute that this modifier is applied to</param>
+    /// <param name="scalarOverride">Override value</param>
+    /// <param name="post">Is it a post modifier?</param>
+    /// <returns>Handle to attribute modifier instance</returns>
+    public AttributeModifierHandle ApplyAttributeOverride(AttributeType attribute, float scalarOverride, bool post)
+    {
+        var attributeModifierStack = _attributeModifiers[attribute];
+
+        var attributeModifierInstance = attributeModifierStack.AddOverride(scalarOverride, post);
+
+        var handle = new AttributeModifierHandle(this, attributeModifierStack, attributeModifierInstance);
+
+        return handle;
+    }
+
+    /// <summary>
+    /// Applies permanent attribute modifier which directly modifies base value.
+    /// No effect if there's no such attribute.
+    /// </summary>
+    /// <param name="attribute"></param>
+    /// <param name="scalarModifier"></param>
+    public void ApplyPermanentAttributeModifier(AttributeType attribute, ScalarModifier scalarModifier)
+    {
+        var attributeValue = _attributeValues[attribute];
+        if (attributeValue == null)
+            return;
+
+        attributeValue.BaseValue = scalarModifier.Calculate(attributeValue.BaseValue);
+    }
+
+    /// <summary>
+    /// Applies permanent attribute override which directly replaces base value.
+    /// No effect if there's no such attribute.
+    /// </summary>
+    /// <param name="attribute">Attribute to apply override to</param>
+    /// <param name="scalarOverride">Override value</param>
+    public void ApplyPermanentAttributeOverride(AttributeType attribute, float scalarOverride)
+    {
+        var attributeValue = _attributeValues[attribute];
+        if (attributeValue == null)
+            return;
+
+        attributeValue.BaseValue = scalarOverride;
+    }
+
+    /// <summary>
+    /// Cancels attribute modifier instance by its handle. This effectively means that given modifier won't affect the attribute anymore.
+    /// </summary>
+    /// <param name="handle">Attribute modifier handle</param>
+    /// <exception cref="InvalidOperationException"></exception>
     public void CancelAttributeModifier(AttributeModifierHandle handle)
     {
         if (handle.AbilitySystemComponent != this)
@@ -178,15 +267,20 @@ public class AbilitySystemComponent : MonoBehaviour
         handle.Clear();
     }
 
+    /// <summary>
+    /// Resets attribute's base value to its current value and clears modifiers.
+    /// No effect if there's no such attribute.
+    /// </summary>
+    /// <param name="attribute">Attribute which modifiers should be collapsed</param>
     public void CollapseAttributeModifiers(AttributeType attribute)
     {
         var attributeValue = _attributeValues[attribute];
         if (attributeValue == null)
             return;
 
-        var attributeModifierStack = _attributeModifiers[attribute];
+        attributeValue.Reset(attributeValue.Value);
 
-        attributeValue.Reset(attributeModifierStack.Calculate(attributeValue.BaseValue));
+        var attributeModifierStack = _attributeModifiers[attribute];
 
         attributeModifierStack.Reset();
     }
