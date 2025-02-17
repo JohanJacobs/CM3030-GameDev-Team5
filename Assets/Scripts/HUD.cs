@@ -15,6 +15,9 @@ public class HUD : MonoBehaviour
     public Text LevelText;
     public GameObject GameOver;
 
+    public Text HighestScoreText;
+    public Text CurrentScoreText;
+
     public void UpdateHealth(float health, float maxHealth)
     {
         HealthSlider.value = health / maxHealth;
@@ -36,11 +39,17 @@ public class HUD : MonoBehaviour
         LevelText.text = Mathf.FloorToInt(level).ToString(CultureInfo.InvariantCulture);
     }
 
-    public void ShowGameOver()
+    public void ShowGameOver(int highestScore, int currentScore)
     {
+        UpdateScoreText(highestScore,currentScore);
         GameOver.SetActive(true);
     }
 
+    private void UpdateScoreText(int highestScore, int currentScore)
+    {
+        HighestScoreText.text = $"BEST: {highestScore.ToString(CultureInfo.InvariantCulture)}";
+        CurrentScoreText.text = $"CURRENT:{currentScore.ToString(CultureInfo.InvariantCulture)}";
+    }
     public void OnRestartClicked()
     {
         SceneManager.LoadScene("GameScene");

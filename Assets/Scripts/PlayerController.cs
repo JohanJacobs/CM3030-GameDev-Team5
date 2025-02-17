@@ -27,13 +27,11 @@ public class PlayerController : MonoBehaviour
     private Vector3? _lookAtPointOnGround = null;
 
     private int _kills = 0;
-
-
     void Awake()
     {
         CreateUI();
 
-        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();        
     }
 
     void Start()
@@ -206,7 +204,8 @@ public class PlayerController : MonoBehaviour
 
     private void ShowWasted()
     {
-        _hud.ShowGameOver();
+        
+        _hud.ShowGameOver(HighScoreManager.Instance.GetHighestScore(), _kills);
     }
 
     private void PlayHitAnimation()
@@ -238,8 +237,8 @@ public class PlayerController : MonoBehaviour
     private void HandlePlayerDeath(Creature creature)
     {
         PlayDeathAnimation();
-
         ShowWasted();
+        UpdatePlayerScore();
     }
 
     private void HandlePlayerDamageTaken()
@@ -286,4 +285,9 @@ public class PlayerController : MonoBehaviour
     }
     #endregion UI
 
+
+    private void UpdatePlayerScore()
+    {
+        HighScoreManager.Instance.AddNewScore(_kills);
+    }
 }
