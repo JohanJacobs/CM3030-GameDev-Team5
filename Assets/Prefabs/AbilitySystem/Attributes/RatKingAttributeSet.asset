@@ -16,7 +16,7 @@ MonoBehaviour:
   - _attribute: 0
     _defaultValue: 0
   - _attribute: 1
-    _defaultValue: 6
+    _defaultValue: 12
   - _attribute: 6
     _defaultValue: 3
   - _attribute: 7
@@ -26,10 +26,10 @@ MonoBehaviour:
   - _attribute: 9
     _defaultValue: 5
   - _attribute: 10
-    _defaultValue: 1.4
+    _defaultValue: 1.5
   - _attribute: 11
     _defaultValue: 1.2
   - _attribute: 19
-    _defaultValue: 0.2
+    _defaultValue: 0.5
   - _attribute: 15
     _defaultValue: 4
