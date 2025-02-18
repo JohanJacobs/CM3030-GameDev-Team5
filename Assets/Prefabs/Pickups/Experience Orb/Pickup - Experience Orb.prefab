@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e9fbdd126c73bb49a64eed2d134ae91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Effect: {fileID: 0}
   Experience: 0
 --- !u!23 &979771012913867282
 MeshRenderer:
@@ -146,7 +145,7 @@ PrefabInstance:
     - target: {fileID: 8395805053951077916, guid: 2ec4949677211ae4faef5b2980a9a1ca,
         type: 3}
       propertyPath: m_Name
-      value: ExperienceOrbPickup
+      value: Pickup - Experience Orb
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ec4949677211ae4faef5b2980a9a1ca, type: 3}

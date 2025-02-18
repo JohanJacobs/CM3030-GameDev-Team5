@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
 public class Monster : Creature
 {
@@ -14,12 +15,15 @@ public class Monster : Creature
     public float AttackRate => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRate);
     public float AttackRange => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRange);
 
+    private NavMeshAgent _navMeshAgent;
+
     private GameObject _target;
 
     private float _toNextAttack = 0f;
 
     void Start()
     {
+        _navMeshAgent = GetComponent<NavMeshAgent>();
         _target = GameObject.FindGameObjectWithTag("Player");
     }
 
@@ -31,7 +35,8 @@ public class Monster : Creature
         if (_target == null)
             return;
 
-        UpdateMovement();
+        UpdateNavMeshMovement();
+        // UpdateMovement();
         UpdateAttack();
         UpdateAttackCooldown();
     }
@@ -76,6 +81,15 @@ public class Monster : Creature
         motionDistance = Mathf.Min(motionDistance, Mathf.Max(targetDelta.magnitude - ApproachDistance, 0));
 
         transform.Translate(transform.forward * motionDistance, Space.World);
+    }
+
+    private void UpdateNavMeshMovement()
+    {
+        _navMeshAgent.speed = Speed;
+        _navMeshAgent.angularSpeed = TurnSpeed;
+        _navMeshAgent.stoppingDistance = ApproachDistance;
+
+        _navMeshAgent.SetDestination(_target.transform.position);
     }
 
     private void UpdateAttack()

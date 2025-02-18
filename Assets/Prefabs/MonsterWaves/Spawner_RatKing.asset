@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca0e5057a89c0294692491a39804bfda, type: 3}
   m_Name: Spawner_RatKing
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 3442926233687250592, guid: 8e416c25db0a2a8409f8c5de2a08df02, type: 3}
+  Prefab: {fileID: 1837103161426741387, guid: 8e416c25db0a2a8409f8c5de2a08df02, type: 3}
   SpawnInterval: 5
   SpawnAmountMin: 1
   SpawnAmountMax: 2
