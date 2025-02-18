@@ -217,8 +217,9 @@ public class PlayerController : MonoBehaviour
     private void PlayHitAnimation()
     {
         Animator.SetTrigger("IsHit");
-        // Play dead skeleton sound
-        audioManager.PlaySFX(audioManager.grabExperienceSound);
+
+        // Play player hit sound
+        audioManager.PlaySFX(audioManager.playerHitSound);
     }
 
     private void PlayDeathAnimation()
@@ -244,6 +245,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandlePlayerDeath(Creature creature)
     {
+        audioManager.PlaySFX(audioManager.playerDeadSound);
         PlayDeathAnimation();
         ShowWasted();
         UpdatePlayerScore();

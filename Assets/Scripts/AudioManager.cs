@@ -1,4 +1,20 @@
-﻿using UnityEngine;
+﻿/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+AudioManager.cs
+
+Class to manage music and sound effects through an audio manager object
+
+*/
+
+
+using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
@@ -10,6 +26,9 @@ public class AudioManager : MonoBehaviour
     public AudioClip shootingSound;
     public AudioClip killedSkeletonSound;
     public AudioClip grabExperienceSound;
+
+    public AudioClip playerHitSound;
+    public AudioClip playerDeadSound;
     public static AudioManager instance;
 
     private void Awake()

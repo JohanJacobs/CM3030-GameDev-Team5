@@ -109,7 +109,7 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
 
         var instance = Instantiate(prefab, position + positionOffset, Quaternion.identity);
 
-        instance.transform.parent = transform;
+
     }
 
     private GameObject SpawnExperienceOrbPickup(float experience, Vector3 position)
