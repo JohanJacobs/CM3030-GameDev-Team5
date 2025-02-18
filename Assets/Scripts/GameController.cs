@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
@@ -11,13 +11,19 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
 
     public MonsterSpawner[] Spawns;
 
+    public AudioManager audioManager;
+
     private readonly List<MonsterSpawnerInstance> _monsterSpawnerInstances = new List<MonsterSpawnerInstance>();
 
     private GameObject _player;
 
+
     void Awake()
     {
         _navMeshWalkableAreaMask = (1 << NavMesh.GetAreaFromName("Walkable"));
+
+        // Set audioManager to external audioManager object with tag Audio
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     void Start()
@@ -103,7 +109,7 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
 
         var instance = Instantiate(prefab, position + positionOffset, Quaternion.identity);
 
-        instance.transform.parent = transform;
+
     }
 
     private GameObject SpawnExperienceOrbPickup(float experience, Vector3 position)
