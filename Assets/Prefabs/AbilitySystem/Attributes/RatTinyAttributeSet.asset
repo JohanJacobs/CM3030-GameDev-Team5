@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4223be30eb280b4c915c26cfda437e9, type: 3}
+  m_Name: RatTinyAttributeSet
+  m_EditorClassIdentifier: 
+  _defaultAttributes:
+  - _attribute: 0
+    _defaultValue: 0
+  - _attribute: 1
+    _defaultValue: 3
+  - _attribute: 6
+    _defaultValue: 5
+  - _attribute: 7
+    _defaultValue: 500
+  - _attribute: 8
+    _defaultValue: 1
+  - _attribute: 9
+    _defaultValue: 1
+  - _attribute: 10
+    _defaultValue: 1.1
+  - _attribute: 11
+    _defaultValue: 1
+  - _attribute: 19
+    _defaultValue: 0
+  - _attribute: 15
+    _defaultValue: 1
