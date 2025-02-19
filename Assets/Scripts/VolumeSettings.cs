@@ -25,11 +25,11 @@ public class VolumeSettings : MonoBehaviour
     [SerializeField] private Slider MusicSlider;
     [SerializeField] private Slider FXSlider;
 
-    private static float currentFX = 1f;
-    private static float prevFX = 1f;
+    private static float currentFX = 0.4f;
+    private static float prevFX = 0.4f;
 
-    private static float currentMusic = 1f;
-    private static float prevMusic = 1f;
+    private static float currentMusic = 0.2f;
+    private static float prevMusic = 0.2f;
 
     private static bool isMuted = false;
     private static bool initialized = false;
@@ -85,7 +85,7 @@ public class VolumeSettings : MonoBehaviour
        
     private void Start()
     {
-        if (initialized)
+        //if (initialized)
         {
             FXSlider.value = currentFX;
             MusicSlider.value = currentMusic;
