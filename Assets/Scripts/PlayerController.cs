@@ -31,7 +31,9 @@ public class PlayerController : MonoBehaviour
     {
         CreateUI();
 
-        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();        
+        // Set audioManager to external audioManager object with tag Audio
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+
     }
 
     void Start()
@@ -155,6 +157,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        // Play shooting sound
         audioManager.PlaySFX(audioManager.sfxexample);
         _toNextShot += 1f / _player.FireRate;
 
@@ -200,6 +203,9 @@ public class PlayerController : MonoBehaviour
         ++_kills;
 
         _hud.UpdateKillCounter(_kills);
+
+        // Play dead skeleton sound
+        audioManager.PlaySFX(audioManager.killedSkeletonSound);
     }
 
     private void ShowWasted()
@@ -211,6 +217,9 @@ public class PlayerController : MonoBehaviour
     private void PlayHitAnimation()
     {
         Animator.SetTrigger("IsHit");
+
+        // Play player hit sound
+        audioManager.PlaySFX(audioManager.playerHitSound);
     }
 
     private void PlayDeathAnimation()
@@ -236,6 +245,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandlePlayerDeath(Creature creature)
     {
+        audioManager.PlaySFX(audioManager.playerDeadSound);
         PlayDeathAnimation();
         ShowWasted();
         UpdatePlayerScore();

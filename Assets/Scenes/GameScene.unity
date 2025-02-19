@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44950086, g: 0.49649626, b: 0.5591468, a: 1}
+  m_IndirectSpecularColor: {r: 0.4495008, g: 0.49649626, b: 0.5591468, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &4
 LightmapSettings:
@@ -383,6 +383,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1323193667}
   - component: {fileID: 1323193666}
+  - component: {fileID: 1323193668}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Audio
@@ -406,6 +407,11 @@ MonoBehaviour:
   SFXSource: {fileID: 1553191904}
   background: {fileID: 8300000, guid: d54770e507e38ac3f9d9fc7e54b815cd, type: 3}
   sfxexample: {fileID: 8300000, guid: cca9243a6a8e66fb59df621ede589224, type: 3}
+  shootingSound: {fileID: 8300000, guid: cca9243a6a8e66fb59df621ede589224, type: 3}
+  killedSkeletonSound: {fileID: 8300000, guid: 1c3c7b487467a9eefbd6dfe88f261fb4, type: 3}
+  grabExperienceSound: {fileID: 8300000, guid: fd0a6a64cbdc1aa29b770dac392a17e9, type: 3}
+  playerHitSound: {fileID: 8300000, guid: 1dd540ed2db5174379526897ef626abd, type: 3}
+  playerDeadSound: {fileID: 8300000, guid: 96831e25c38f24a43bbce642deadd5bc, type: 3}
 --- !u!4 &1323193667
 Transform:
   m_ObjectHideFlags: 0
@@ -422,6 +428,102 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1323193668
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1323193665}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 7be56b8c9012704f483ceb585e1bc5da, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!4 &1378169495 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8137914641364066124, guid: 8a89e5c795e035c4dad85b5f5d3141d1,
@@ -810,7 +912,8 @@ MonoBehaviour:
   Spawns:
   - {fileID: 11400000, guid: 1888bf49ef907524dba05c17496b2dd6, type: 2}
   - {fileID: 11400000, guid: 555f33c7a68936b4eb64b2c8177b7df3, type: 2}
-  - {fileID: 11400000, guid: bf82de43a02d7c048878dc7d4273d3a7, type: 2}
+  - {fileID: 11400000, guid: 555f33c7a68936b4eb64b2c8177b7df3, type: 2}
+  audioManager: {fileID: 0}
   _pickupSpawnRadius: 2
 --- !u!4 &1571807413
 Transform:
