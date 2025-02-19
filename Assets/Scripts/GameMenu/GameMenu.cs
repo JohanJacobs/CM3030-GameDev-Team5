@@ -81,11 +81,16 @@ public class GameMenu : MonoBehaviour
 
     public void QuitGame()
     {
+
+        //https://docs.unity3d.com/6000.0/Documentation/Manual/platform-dependent-compilation.html
+#if UNITY_EDITOR
         if (Application.isEditor)
         {
+
             EditorApplication.isPlaying = false;
         }
         else
+#endif
         {
             Application.Quit();
         }
