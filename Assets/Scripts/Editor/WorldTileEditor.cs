@@ -12,13 +12,12 @@ public class WorldTileEditor : Editor
 
     private SerializedProperty _propSize;
     private SerializedProperty _propNavMeshData;
-    private SerializedProperty _propFollowTransform;
+    
 
     public void OnEnable()
     {
         _propSize = serializedObject.FindProperty("Size");
-        _propNavMeshData = serializedObject.FindProperty("NavMeshData");
-        _propFollowTransform = serializedObject.FindProperty("FollowTransform");
+        _propNavMeshData = serializedObject.FindProperty("NavMeshData");    
     }
 
     public override void OnInspectorGUI()
@@ -28,8 +27,7 @@ public class WorldTileEditor : Editor
         GUI.enabled = false;
         EditorGUILayout.PropertyField(_propNavMeshData);
         GUI.enabled = true;
-        EditorGUILayout.PropertyField(_propSize);
-        EditorGUILayout.PropertyField(_propFollowTransform);
+        EditorGUILayout.PropertyField(_propSize);        
 
         EditorGUILayout.Space();
 
