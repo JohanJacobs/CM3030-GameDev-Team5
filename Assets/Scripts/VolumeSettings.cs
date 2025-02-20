@@ -25,15 +25,13 @@ public class VolumeSettings : MonoBehaviour
     [SerializeField] private Slider MusicSlider;
     [SerializeField] private Slider FXSlider;
 
-    private static float currentFX = 1f;
-    private static float prevFX = 1f;
+    private static float currentFX = 0.4f;
+    private static float prevFX = 0.4f;
 
-    private static float currentMusic = 1f;
-    private static float prevMusic = 1f;
+    private static float currentMusic = 0.2f;
+    private static float prevMusic = 0.2f;
 
     private static bool isMuted = false;
-    private static bool initialized = false;
-
 
     public delegate void VolumeSettingsChanged(VolumeSettings volumeSettings);
     public event VolumeSettingsChanged OnVolumeSettingsChanged;
@@ -85,16 +83,15 @@ public class VolumeSettings : MonoBehaviour
        
     private void Start()
     {
-        if (initialized)
         {
             FXSlider.value = currentFX;
             MusicSlider.value = currentMusic;
-            OnVolumeSettingsChanged?.Invoke(this);
+            //OnVolumeSettingsChanged?.Invoke(this);
         }
 
-        SetMixerVolume(currentFX,currentMusic);
+        //SetMixerVolume(currentFX,currentMusic);
 
-        initialized = true;
+        
     }
 
     private void SetMixerVolume(float fxVolume, float musicVolume)
@@ -107,34 +104,7 @@ public class VolumeSettings : MonoBehaviour
     private float CalculateVolume(float sliderValue)
     {
         return Mathf.Log10(sliderValue) * 20f;
-    }
-
-        
-    //public void SetMusicVolume()
-    //{
-    //    isMuted = false;
-    //    musicVolume = MusicSlider.value;
-    //    myMixer.SetFloat("Music", Mathf.Log10(musicVolume) *20f);
-    //}
-
-    //public void SetFXVolume()
-    //{
-    //    isMuted = false;
-    //    fxVolume = FXSlider.value;
-    //    myMixer.SetFloat("SFX", Mathf.Log10(fxVolume) *20f);
-    //}
-        
-    //public void SetAllVolume(bool isMuted)
-    //{
-    //    // verbose for readability, calculate the volume 
-    //    var fv = (!isMuted) ? Mathf.Log10(FXSlider.value) * 20f : -80;
-    //    var mv = (!isMuted) ? Mathf.Log10(MusicSlider.value) * 20f : -80f;
-
-    //    // set the mixers
-    //    myMixer.SetFloat("SFX", fv);
-    //    myMixer.SetFloat("Music", mv);
-    //}
-        
-
+    }         
+   
 }
 

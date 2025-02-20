@@ -408,9 +408,9 @@ MonoBehaviour:
   background: {fileID: 8300000, guid: d54770e507e38ac3f9d9fc7e54b815cd, type: 3}
   sfxexample: {fileID: 8300000, guid: cca9243a6a8e66fb59df621ede589224, type: 3}
   shootingSound: {fileID: 8300000, guid: cca9243a6a8e66fb59df621ede589224, type: 3}
-  killedSkeletonSound: {fileID: 8300000, guid: 1c3c7b487467a9eefbd6dfe88f261fb4, type: 3}
+  killedSkeletonSound: {fileID: 8300000, guid: 8fcfe577a0d671a4091c08695d8d7f1e, type: 3}
   grabExperienceSound: {fileID: 8300000, guid: fd0a6a64cbdc1aa29b770dac392a17e9, type: 3}
-  playerHitSound: {fileID: 8300000, guid: 1dd540ed2db5174379526897ef626abd, type: 3}
+  playerHitSound: {fileID: 8300000, guid: cd7b921ee0a7cb5429a978abb26cb750, type: 3}
   playerDeadSound: {fileID: 8300000, guid: 96831e25c38f24a43bbce642deadd5bc, type: 3}
 --- !u!4 &1323193667
 Transform:
