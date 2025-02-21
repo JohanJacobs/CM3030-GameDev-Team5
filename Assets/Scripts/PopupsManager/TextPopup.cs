@@ -11,9 +11,13 @@ public class TextPopup : MonoBehaviour
 
     private Player _player;
     
+    // dissapear and lifetime
     float _disspearSpeed = 1f;
     float _disappearTimer;
     Color _textColor;
+
+    // movement 
+    float _moveUpSpeed = 4f;
     public void Setup(string text, float timeToLive)
     {
         _disappearTimer = timeToLive;
@@ -35,6 +39,7 @@ public class TextPopup : MonoBehaviour
         {
             Dissapear();            
         }
+        MovePopup();
     }
     private void LateUpdate()
     {
@@ -49,6 +54,11 @@ public class TextPopup : MonoBehaviour
         // remove the popup if the color invisible
         if (_textColor.a < 0f)
             Destroy(gameObject);
+    }
+
+    private void MovePopup()
+    {
+        transform.position += new Vector3(0f, _moveUpSpeed * Time.deltaTime);
     }
 
     private void FaceTowardsCamera()
