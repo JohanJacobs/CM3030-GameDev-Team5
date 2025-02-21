@@ -6,8 +6,8 @@ public class TestingPopup : MonoBehaviour
 
     private void Start()
     {
-        Transform damagePopupTransform = Instantiate(pfDamagePopup, Vector3.zero, Quaternion.identity);
-        DamagePopup damagePopup = damagePopupTransform.GetComponent<DamagePopup>();
+        Transform damagePopupTransform = Instantiate(pfDamagePopup, Vector3.zero, Quaternion.identity);      
+        DamagePopup damagePopup = damagePopupTransform.GetComponentInChildren<DamagePopup>();
         damagePopup.Setup("+Attack Rate!!!!!");
     }
 }
