@@ -943,6 +943,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f783469fe2d54844697b15ccbfff0a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _popupTimeToLive: 1
   popupTemplate: {fileID: 4025351340081606498, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
     type: 3}
 --- !u!224 &1650560252 stripped
@@ -1229,47 +1230,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7042174423549984417, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
-        type: 3}
-      propertyPath: m_fontSize
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 7042174423549984417, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
-        type: 3}
-      propertyPath: m_fontAsset
-      value: 
-      objectReference: {fileID: 11400000, guid: a5c98e32c4068034b971f42ab01a95d7,
-        type: 2}
-    - target: {fileID: 7042174423549984417, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
-        type: 3}
-      propertyPath: m_fontSizeBase
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 7042174423549984417, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
-        type: 3}
-      propertyPath: m_sharedMaterial
-      value: 
-      objectReference: {fileID: 2180264, guid: a5c98e32c4068034b971f42ab01a95d7, type: 2}
-    - target: {fileID: 7042174423549984417, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
-        type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8825034303594429987, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
-        type: 3}
-      propertyPath: m_CastShadows
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8825034303594429987, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
-        type: 3}
-      propertyPath: m_ReceiveShadows
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8825034303594429987, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2180264, guid: a5c98e32c4068034b971f42ab01a95d7, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d7f95b2fc09d1d84f94d8ca92d6a4904, type: 3}
 --- !u!1001 &6552311689949787146

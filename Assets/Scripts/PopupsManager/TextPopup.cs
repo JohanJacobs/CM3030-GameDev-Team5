@@ -9,7 +9,7 @@ public class TextPopup : MonoBehaviour
     private TextMeshPro _textMesh;
     private Transform _mainCameraTransform;
 
-    float _disspearSpeed = 0.1f;
+    float _disspearSpeed = 1f;
     float _disappearTimer;
     Color _textColor;
     public void Setup(string text, float timeToLive)
