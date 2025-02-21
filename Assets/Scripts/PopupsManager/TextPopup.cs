@@ -9,6 +9,8 @@ public class TextPopup : MonoBehaviour
     private TextMeshPro _textMesh;
     private Transform _mainCameraTransform;
 
+    private Player _player;
+    
     float _disspearSpeed = 1f;
     float _disappearTimer;
     Color _textColor;
@@ -22,6 +24,7 @@ public class TextPopup : MonoBehaviour
         _textMesh = GetComponent<TextMeshPro>();
         _textColor = _textMesh.color;
         _mainCameraTransform = Camera.main.transform;
+        _player = FindObjectOfType<Player>();
 
     }
 
@@ -50,7 +53,14 @@ public class TextPopup : MonoBehaviour
 
     private void FaceTowardsCamera()
     {
-        transform.LookAt(_mainCameraTransform);
+        // direction from the player to the camera
+        var vec_from_player_to_screen = (_mainCameraTransform.position - _player.transform.position);
+        var dist = vec_from_player_to_screen.magnitude;
+        var norm_vec = vec_from_player_to_screen.normalized;
+
+        var text_look_point = transform.position + norm_vec * dist;
+            
+        transform.LookAt(text_look_point);
         transform.RotateAround(transform.position, transform.up, 180f);
     }
 }
