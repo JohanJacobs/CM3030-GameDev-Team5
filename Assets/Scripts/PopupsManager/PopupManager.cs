@@ -22,7 +22,7 @@ public class PopupManager : MonoBehaviour
     public void CreateNewPopup(Vector3 position, string popupText,Transform playerTrasnform, float timeToLive)
     {
         var go = Instantiate(popupTemplate,position, Quaternion.identity);
-        go.transform.parent = transform;
+        go.transform.SetParent(transform);
 
         var text_component = go.GetComponent<TextPopup>();
         text_component.Setup(popupText, playerTrasnform, timeToLive);

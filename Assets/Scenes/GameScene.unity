@@ -1125,11 +1125,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: TextPopUpTemplate
       objectReference: {fileID: 0}
-    - target: {fileID: 3324298793878354098, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4025351340081606498, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
         type: 3}
       propertyPath: m_Pivot.x
