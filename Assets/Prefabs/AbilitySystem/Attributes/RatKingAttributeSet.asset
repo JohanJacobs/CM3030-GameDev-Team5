@@ -30,6 +30,6 @@ MonoBehaviour:
   - _attribute: 11
     _defaultValue: 1.2
   - _attribute: 19
-    _defaultValue: 0.5
+    _defaultValue: 0.75
   - _attribute: 15
     _defaultValue: 4
