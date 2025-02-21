@@ -31,7 +31,7 @@ public class Pickup : MonoBehaviour
         return null;
     }
 
-    public event PickedUpDelegate PickedUp;
+    public static event PickedUpDelegate PickedUp;
 
     /// <summary>
     /// Handle picking up logic. Checks conditions and performs all the actions specific to this pickup.
