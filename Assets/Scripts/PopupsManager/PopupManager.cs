@@ -31,7 +31,18 @@ public class PopupManager : MonoBehaviour
     #region Pickup Callbacks
     private void Pickup_PickedUp(object sender, GameObject target)
     {
-        CreateNewPopup(target.transform.position, "PICKED UP!", target.transform, _popupTimeToLive);
+        if (sender.GetType().ToString() == "ExperienceOrbPickup")
+            CreateNewPopup(target.transform.position, "+1 XP", target.transform, _popupTimeToLive);
+
+        if (sender.GetType().ToString() == "PickupWithEffect")
+        {
+            var pwe = sender as PickupWithEffect;
+            foreach (var e in pwe.Effect.Modifiers)
+            {
+                CreateNewPopup(target.transform.position, $"+{e.Value} {e.Attribute.ToString()}", target.transform, _popupTimeToLive);
+            }
+
+        }
     }
 
     #endregion Pickup Callbacks

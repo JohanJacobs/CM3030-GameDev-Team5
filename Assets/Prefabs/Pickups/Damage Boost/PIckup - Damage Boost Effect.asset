@@ -13,12 +13,7 @@ MonoBehaviour:
   m_Name: PIckup - Damage Boost Effect
   m_EditorClassIdentifier: 
   Modifiers:
-  - Attribute: 0
-    Type: 0
-    Value: 0
-    Permanent: 0
-    Post: 0
-  - Attribute: 0
+  - Attribute: 9
     Type: 0
     Value: 0
     Permanent: 0
