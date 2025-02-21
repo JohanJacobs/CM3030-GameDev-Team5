@@ -34,11 +34,14 @@ public class TextPopup : MonoBehaviour
 
     private void Update()
     {
+        // udpate the Visual to slowly fade
         _disappearTimer-= Time.deltaTime;
         if (_disappearTimer < 0f)
         {
             Dissapear();            
         }
+
+        // move the popup in the positive y direction
         MovePopup();
     }
     private void LateUpdate()
@@ -58,6 +61,7 @@ public class TextPopup : MonoBehaviour
 
     private void MovePopup()
     {
+        // move the popup in the word
         transform.position += new Vector3(0f, _moveUpSpeed * Time.deltaTime);
     }
 
@@ -68,6 +72,7 @@ public class TextPopup : MonoBehaviour
         var dist = vec_from_player_to_screen.magnitude;
         var norm_vec = vec_from_player_to_screen.normalized;
 
+        // the point the pickup should be pointing to get the correct orientation
         var text_look_point = transform.position + norm_vec * dist;
             
         transform.LookAt(text_look_point);
