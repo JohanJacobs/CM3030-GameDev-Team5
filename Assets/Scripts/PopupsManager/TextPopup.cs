@@ -9,7 +9,7 @@ public class TextPopup : MonoBehaviour
     private TextMeshPro _textMesh;
     private Transform _mainCameraTransform;
 
-    private Player _player;
+    private Transform _player;
     
     // dissapear and lifetime
     float _disspearSpeed = 1f;
@@ -18,23 +18,22 @@ public class TextPopup : MonoBehaviour
 
     // movement 
     float _moveUpSpeed = 4f;
-    public void Setup(string text, float timeToLive)
+    public void Setup(string text, Transform playerTransform, float timeToLive)
     {
         _disappearTimer = timeToLive;
         _textMesh.SetText(text);
+        _player = playerTransform;
     }
     private void Awake()
     {
         _textMesh = GetComponent<TextMeshPro>();
         _textColor = _textMesh.color;
         _mainCameraTransform = Camera.main.transform;
-        _player = FindObjectOfType<Player>();
-
     }
 
     private void Update()
     {
-        // udpate the Visual to slowly fade
+        // update the Visual to slowly fade
         _disappearTimer-= Time.deltaTime;
         if (_disappearTimer < 0f)
         {
@@ -68,7 +67,7 @@ public class TextPopup : MonoBehaviour
     private void FaceTowardsCamera()
     {
         // direction from the player to the camera
-        var vec_from_player_to_screen = (_mainCameraTransform.position - _player.transform.position);
+        var vec_from_player_to_screen = (_mainCameraTransform.position - _player.position);
         var dist = vec_from_player_to_screen.magnitude;
         var norm_vec = vec_from_player_to_screen.normalized;
 

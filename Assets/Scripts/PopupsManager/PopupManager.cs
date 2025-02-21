@@ -19,19 +19,19 @@ public class PopupManager : MonoBehaviour
         Pickup.PickedUp -= Pickup_PickedUp;
     }
 
-    public void CreateNewPopup(Vector3 position, string popupText,float timeToLive)
+    public void CreateNewPopup(Vector3 position, string popupText,Transform playerTrasnform, float timeToLive)
     {
         var go = Instantiate(popupTemplate,position, Quaternion.identity);
         go.transform.parent = transform;
 
         var text_component = go.GetComponent<TextPopup>();
-        text_component.Setup(popupText, timeToLive);
+        text_component.Setup(popupText, playerTrasnform, timeToLive);
     }
 
     #region Pickup Callbacks
     private void Pickup_PickedUp(object sender, GameObject target)
     {
-        CreateNewPopup(target.transform.position, "PICKED UP!", _popupTimeToLive);
+        CreateNewPopup(target.transform.position, "PICKED UP!", target.transform, _popupTimeToLive);
     }
 
     #endregion Pickup Callbacks

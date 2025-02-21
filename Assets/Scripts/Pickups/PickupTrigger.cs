@@ -14,7 +14,7 @@ public class PickupTrigger : MonoBehaviour
 
     private Pickup _pickup;
     private Collider _collider;
-
+    
     private void Awake()
     {
         _pickup = GetComponentInParent<Pickup>();
