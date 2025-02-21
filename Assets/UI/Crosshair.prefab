@@ -70,7 +70,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5000
-  m_Sprite: {fileID: 7418660495453730253, guid: 449bde3d1675bf34c9c8d6adf165eb1d,
+  m_Sprite: {fileID: 2553929310788493778, guid: 1bae1b3f8c11477459b77c7bd5740ba1,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -126,7 +126,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee4edf60713ab6d4e87c80c12fa542da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  enemyColor: {r: 1, g: 0, b: 0, a: 1}
   worldLayer:
     serializedVersion: 2
     m_Bits: 1
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 512
   visual: {fileID: 7208663081521809756}

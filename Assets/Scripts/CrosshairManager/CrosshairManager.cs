@@ -1,25 +1,34 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 
 public class CrosshairManager : MonoBehaviour
 {
+    [SerializeField] Color defaultColor;
+    [SerializeField] Color enemyColor;
+
     [SerializeField] LayerMask worldLayer;
+    [SerializeField] LayerMask enemyLayer;
+    
     [SerializeField] Transform visual;
 
-    Camera camera;
+    SpriteRenderer _spriteRender;
+    Camera _camera;
 
     private void Awake()
     {
-        camera = Camera.main;
+        _camera = Camera.main;
+        _spriteRender = GetComponentInChildren<SpriteRenderer>();
     }
     public void LateUpdate()
     {        
-        if (GetMouseWorldPosition(out var world_position))
+        if (GetMouseWorldPosition(out var world_position, out var hitEnemy))
         {
-           EnableCrosshair();
-           SetCrosshairPosition(world_position);
+            EnableCrosshair();
+            SetCrosshairPosition(world_position);
+            SetCrosshairColor(hitEnemy);            
         }
         else
         {
@@ -27,28 +36,44 @@ public class CrosshairManager : MonoBehaviour
         }
     }
 
-    // calculate the world position of the mouse 
-    bool GetMouseWorldPosition(out Vector3 worldPosition)
+    // calculate the world position and determine if we hit an enemy
+    bool GetMouseWorldPosition(out Vector3 worldPosition, out bool hitEnemy)
     {
         worldPosition = Vector3.zero;
+        hitEnemy = false;
 
-        // get the screen coordinate that the mouse is at 
-        var mouse_screen_position = Input.mousePosition;
+        // keep track if we actually hit shows how the world point
+        bool foundWorldPoint = false;         
+
+        // find the location of the mouse in the world by raycasting into the world 
+        // through the camera
+        var mouse_screen_position = Input.mousePosition; // mouse screen coordinate
+        var ray = _camera.ScreenPointToRay(mouse_screen_position);
+        var hitAll = Physics.RaycastAll(ray, 50f, worldLayer | enemyLayer);
+
+        // hit nothing.
+        if (hitAll.Length == 0)
+            return false;
+
         
-        // do a raycast and find where it collides with the world
-        var ray = camera.ScreenPointToRay(mouse_screen_position);
-
-        if (Physics.Raycast(ray, out var hitInfo, 50f, worldLayer))
+        // check all the gameObjects we hit and update the state 
+        // based on the layer the object is in.
+        foreach (var target in hitAll)
         {
-            // hit an object, clamp the position to 0 y axis and return 
-            worldPosition = hitInfo.point;
-            // clamp the world position Y axis
-            worldPosition.y = worldPosition.y > 0.5f ? 0.5f : worldPosition.y;
-            return true;
+            if (enemyLayer.TestGameObjectLayer(target.collider.gameObject))
+            {
+                hitEnemy = true;                
+            }
+            else if (worldLayer.TestGameObjectLayer(target.collider.gameObject))
+            {
+                // save the point that we collide with in the world
+                worldPosition = target.point;
+                worldPosition.y = worldPosition.y > 0.5f ? 0.5f : worldPosition.y;
+                foundWorldPoint = true;                
+            }
         }
-
-        // did not hit anything so the aim might be outside the window
-        return false;
+        
+        return foundWorldPoint;
     }
 
     private void SetCrosshairPosition(Vector3 worldPosition)
@@ -72,6 +97,14 @@ public class CrosshairManager : MonoBehaviour
         // already Enabled so do nothing
         if (visual.gameObject.activeSelf)
             return;
+
         visual.gameObject.SetActive(true);
+    }
+
+    // Set the color of the crosshair 
+    // based on if we hit an enemy or not.
+    private void SetCrosshairColor(bool hitEnemy)
+    {
+        _spriteRender.color = hitEnemy?enemyColor:defaultColor;            
     }
 }
