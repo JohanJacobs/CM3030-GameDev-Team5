@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: PIckup - Move Speed Boost Effect
   m_EditorClassIdentifier: 
   Modifiers:
-  - Attribute: 0
-    Type: 0
-    Value: 0
+  - Attribute: 6
+    Type: 2
+    Value: 1.2
     Permanent: 0
     Post: 0
-  DurationPolicy: 1
+  DurationPolicy: 0
   CancellationPolicy: 1
   Duration: 5
   Period: 0
