@@ -15,8 +15,16 @@ MonoBehaviour:
   Modifiers: []
   DurationPolicy: 0
   CancellationPolicy: 1
-  Duration: 0
-  Period: 0
+  Duration:
+    Calculation: 0
+    AttributeProvider: 1
+    Attribute: 0
+    Value: 0
+  Period:
+    Calculation: 0
+    AttributeProvider: 1
+    Attribute: 0
+    Value: 0
   Tags: []
   BlockTags: []
   CancelTags: []

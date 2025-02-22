@@ -1,19 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!136 &8318226776667102415
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 684236058058681098}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &3794237158255692260
 GameObject:
   m_ObjectHideFlags: 0
@@ -89,6 +75,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a570f2cfa9529634c809ddaeaaeee986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  EquipmentAttachmentSlots: []
   _autoDestroyOnDeath: 1
   ApproachDistance: 1.25
   animator: {fileID: 5462196677822541826}
@@ -110,7 +97,7 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2
+  m_Height: 2.2
   m_BaseOffset: 0
   m_WalkableMask: 1
   m_ObstacleAvoidanceType: 2
@@ -444,12 +431,6 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: -4530715048712776831, guid: de8dd446dba8efa43bf4689164a7d911, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: de8dd446dba8efa43bf4689164a7d911, type: 3}
---- !u!1 &684236058058681098 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4881657638963427017, guid: de8dd446dba8efa43bf4689164a7d911,
-    type: 3}
-  m_PrefabInstance: {fileID: 5386803043627261379}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &159092449143796144 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5257092122880568435, guid: de8dd446dba8efa43bf4689164a7d911,

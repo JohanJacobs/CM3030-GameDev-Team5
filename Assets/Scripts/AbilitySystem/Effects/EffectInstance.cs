@@ -16,8 +16,8 @@ public class EffectInstance
     {
         get
         {
-            if (_hasDuration)
-                return Mathf.Clamp(_timeLeftToExpiration / Effect.Duration, 0f, 1f);
+            if (_duration > 0)
+                return Mathf.Clamp(_timeLeftToExpiration / _duration, 0f, 1f);
 
             return 1f;
         }
@@ -25,10 +25,10 @@ public class EffectInstance
 
     private readonly List<AttributeModifierHandle> _modifiers = new List<AttributeModifierHandle>();
 
-    private readonly bool _hasDuration;
-    private readonly bool _hasPeriod;
-
     private IEffectLogic _effectLogic;
+
+    private float _duration;
+    private float _period;
 
     private float _timeLeftToExpiration;
     private float _timeLeftToPeriodicApplication;
@@ -43,32 +43,35 @@ public class EffectInstance
 
         _effectLogic = effect;
 
+        bool wantsDuration;
+        bool wantsPeriod;
+
         switch (effect.DurationPolicy)
         {
             case EffectDurationPolicy.Instant:
-                _hasDuration = false;
-                _hasPeriod = false;
+                wantsDuration = false;
+                wantsPeriod = false;
                 break;
             case EffectDurationPolicy.Duration:
-                _hasDuration = effect.HasDuration;
-                _hasPeriod = effect.HasPeriod;
+                wantsDuration = true;
+                wantsPeriod = true;
                 break;
             case EffectDurationPolicy.Infinite:
-                _hasDuration = false;
-                _hasPeriod = effect.HasPeriod;
+                wantsDuration = false;
+                wantsPeriod = true;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
 
-        if (_hasDuration)
+        if (wantsDuration)
         {
-            _timeLeftToExpiration = effect.Duration;
+            UpdateDuration();
         }
 
-        if (_hasPeriod)
+        if (wantsPeriod)
         {
-            _timeLeftToPeriodicApplication = effect.Period;
+            UpdatePeriod(false);
         }
     }
 
@@ -119,7 +122,7 @@ public class EffectInstance
         if (!Active)
             return;
 
-        if (_hasPeriod)
+        if (_period > 0)
         {
             _timeLeftToPeriodicApplication -= deltaTime;
 
@@ -131,8 +134,10 @@ public class EffectInstance
 
         _effectLogic.UpdateEffect(this, deltaTime);
 
-        if (_hasDuration)
+        if (_duration > 0)
         {
+            // TODO: update duration magnitude?
+
             _timeLeftToExpiration -= deltaTime;
 
             if (!(_timeLeftToExpiration > 0f))
@@ -161,7 +166,9 @@ public class EffectInstance
 
     private void HandlePeriodicApplication()
     {
-        _timeLeftToPeriodicApplication += Effect.Period;
+        UpdatePeriod();
+
+        _timeLeftToPeriodicApplication += _period;
 
         ApplyIfPossible();
     }
@@ -179,6 +186,41 @@ public class EffectInstance
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void UpdateDuration(bool throwIfInvalid = true)
+    {
+        var duration = Effect.Duration.Calculate(Context);
+
+        if (duration > 0)
+        {
+            _duration = duration;
+            _timeLeftToExpiration = _duration;
+        }
+        else
+        {
+            _duration = 0;
+
+            if (throwIfInvalid)
+                throw new Exception("Evaluated effect duration is 0");
+        }
+    }
+
+    private void UpdatePeriod(bool throwIfInvalid = true)
+    {
+        var period = Effect.Period.Calculate(Context);
+        if (period > 0)
+        {
+            _period = period;
+            _timeLeftToPeriodicApplication = _period;
+        }
+        else
+        {
+            _period = 0;
+
+            if (throwIfInvalid)
+                throw new Exception("Evaluated effect period is 0");
         }
     }
 }

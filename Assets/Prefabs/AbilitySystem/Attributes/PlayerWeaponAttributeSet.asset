@@ -14,10 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _defaultAttributes:
   - _attribute: 8
-    _defaultValue: 4
+    _defaultValue: 0
   - _attribute: 9
-    _defaultValue: 12
+    _defaultValue: 0
   - _attribute: 11
-    _defaultValue: 1.6
+    _defaultValue: 1
   - _attribute: 10
-    _defaultValue: 24
+    _defaultValue: 0
+  - _attribute: 18
+    _defaultValue: 1

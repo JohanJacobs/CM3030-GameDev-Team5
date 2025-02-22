@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca0e5057a89c0294692491a39804bfda, type: 3}
   m_Name: Spawner_RatTiny
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 3794237158255692260, guid: 9926bcc1a6929a1419ad694210a7774c, type: 3}
+  Prefab: {fileID: 7754328594579278399, guid: 7e39884a333b33f41973909c832037aa, type: 3}
   SpawnInterval: 3
   SpawnAmountMin: 1
   SpawnAmountMax: 1

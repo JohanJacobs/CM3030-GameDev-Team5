@@ -1,5 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
+[RequireComponent(typeof(CharacterController), typeof(Player))]
 public class PlayerController : MonoBehaviour
 {
     AudioManager audioManager;
@@ -14,6 +19,7 @@ public class PlayerController : MonoBehaviour
     public GameObject HUD;
     public GameObject GameMenu;
 
+    public InputMappingContext DefaultInputMappingContext;
 
     private CharacterController _characterController;
     private Player _player;
@@ -21,32 +27,46 @@ public class PlayerController : MonoBehaviour
     private GameMenu _gameMenu;
 
     private AbilitySystemComponent _asc;
-
-    private float _toNextShot = 0;
-
-    private Vector3? _lookAtPointOnGround = null;
+    private InputComponent _inputComponent;
+    private EquipmentComponent _equipmentComponent;
 
     private int _kills = 0;
+
     void Awake()
-    {
-        CreateUI();
-
-        // Set audioManager to external audioManager object with tag Audio
-        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
-
-    }
-
-    void Start()
     {
         _characterController = GetComponent<CharacterController>();
         _player = GetComponent<Player>();
 
         _asc = GetComponent<AbilitySystemComponent>();
-        _asc.OnReady(OnAbilitySystemReady);
+        _asc.OnReady(OnAbilitySystemReady, 5);
+
+        _inputComponent = GetComponent<InputComponent>();
+
+        _inputComponent.InputActionPressed += OnInputActionPressed;
+        _inputComponent.InputActionReleased += OnInputActionReleased;
+
+        _equipmentComponent = GetComponent<EquipmentComponent>();
+
+        _equipmentComponent.ItemEquipped += OnItemEquipped;
+        _equipmentComponent.ItemUnequipped += OnItemUnequipped;
+
+        CreateUI();
+
+        // Set audioManager to external audioManager object with tag Audio
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
+
+    void Start()
+    {
+        if (DefaultInputMappingContext)
+        {
+            _inputComponent.AddInputMappingContext(DefaultInputMappingContext);
+        }
 
         _player.Kill += HandlePlayerKill;
         _player.Death += HandlePlayerDeath;
         _player.DamageTaken += HandlePlayerDamageTaken;
+        _player.CommittedAttack += HandlePlayerCommittedAttack;
     }
 
     private void OnAbilitySystemReady(AbilitySystemComponent asc)
@@ -61,8 +81,6 @@ public class PlayerController : MonoBehaviour
 
         UpdateAim();
         UpdateMovement();
-        UpdateShooting();
-        UpdateShootingCooldown();
     }
 
     void LateUpdate()
@@ -122,71 +140,31 @@ public class PlayerController : MonoBehaviour
 
         var mouseAimRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if (plane.Raycast(mouseAimRay, out var rayEnter))
-        {
-            var lookAtPointOnGround = mouseAimRay.GetPoint(rayEnter);
-            var lookAtPointOnGroundDelta = lookAtPointOnGround - transform.position;
-
-            lookAtPointOnGroundDelta.y = 0;
-
-            if (lookAtPointOnGroundDelta.sqrMagnitude > 0.01f)
-            {
-                transform.rotation = Quaternion.LookRotation(lookAtPointOnGroundDelta, Vector3.up);
-
-                _lookAtPointOnGround = lookAtPointOnGround;
-            }
-        }
-        else
-        {
-            _lookAtPointOnGround = null;
-        }
-    }
-
-    private void UpdateShooting()
-    {
-        if (_toNextShot > 0)
-            return;
-        if (!_lookAtPointOnGround.HasValue)
+        if (!plane.Raycast(mouseAimRay, out var rayEnter))
             return;
 
-        bool fireButtonPressed = Input.GetButton("Fire1");
+        var lookAtPointOnGround = mouseAimRay.GetPoint(rayEnter);
+        var lookAtPointOnGroundDelta = lookAtPointOnGround - transform.position;
 
-        if (!fireButtonPressed)
-        {
-            PlayShootAnimation(false);
+        lookAtPointOnGroundDelta.y = 0;
+
+        // less than 0.1 units away from player - ignore
+        if (lookAtPointOnGroundDelta.sqrMagnitude < 0.01f)
             return;
-        }
 
-        // Play shooting sound
-        audioManager.PlaySFX(audioManager.sfxexample);
-        _toNextShot += 1f / _player.FireRate;
+        transform.rotation = Quaternion.LookRotation(lookAtPointOnGroundDelta, Vector3.up);
 
-        var aimDirection = _lookAtPointOnGround.Value - transform.position;
-        var ray = new Ray(transform.position + MuzzleOffset, aimDirection);
+        var aimOrigin = transform.position + MuzzleOffset;
+        var aimTarget = lookAtPointOnGround;
+        var aimDirection = lookAtPointOnGround - aimOrigin;
 
-        RandomSpawnBulletTracerFX(ray.origin, ray.direction, 1f);
+        aimDirection.y = 0f;
+        aimDirection.Normalize();
 
-        if (Physics.Raycast(ray, out var hit, _player.FireRange, MonsterLayerMask))
-        {
-            var monster = hit.collider.GetComponentInParent<Monster>();
-
-            _player.DealDamage(monster, transform.position, Random.Range(_player.DamageMin, _player.DamageMax));
-        }
+        _player.UpdateAttackAim(aimOrigin, aimTarget, aimDirection);
     }
 
-    private void UpdateShootingCooldown()
-    {
-        if (_toNextShot > Time.deltaTime)
-        {
-            _toNextShot -= Time.deltaTime;
-        }
-        else
-        {
-            _toNextShot = 0;
-        }
-    }
-
-    private void RandomSpawnBulletTracerFX(Vector3 origin, Vector3 direction, float probability = 0.6f)
+    public void RandomSpawnBulletTracerFX(Vector3 origin, Vector3 direction, float probability = 0.6f)
     {
         if (Random.value > probability)
             return;
@@ -210,7 +188,6 @@ public class PlayerController : MonoBehaviour
 
     private void ShowWasted()
     {
-        
         _hud.ShowGameOver(HighScoreManager.Instance.GetHighestScore(), _kills);
     }
 
@@ -236,6 +213,10 @@ public class PlayerController : MonoBehaviour
     {
         Animator.SetFloat("ForwardMovement", movementInput.z);
         Animator.SetFloat("RightMovement", movementInput.x);
+
+        var walkSpeedMultiplier = Mathf.Max(_player.Speed / _player.WalkAnimationMoveSpeed, 0);
+
+        Animator.SetFloat("WalkSpeedMultiplier", walkSpeedMultiplier);
     }
 
     private void HandlePlayerKill(Creature creature, Creature victim)
@@ -254,6 +235,25 @@ public class PlayerController : MonoBehaviour
     private void HandlePlayerDamageTaken()
     {
         PlayHitAnimation();
+    }
+
+    private void HandlePlayerCommittedAttack(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage)
+    {
+        audioManager.PlaySFX(audioManager.sfxexample);
+
+        RandomSpawnBulletTracerFX(origin, direction, 1f);
+
+        // TODO: change IsShooting to trigger?
+        StartCoroutine(PlayShootAnimationForSeconds(.2f));
+    }
+
+    private IEnumerator PlayShootAnimationForSeconds(float seconds)
+    {
+        PlayShootAnimation(true);
+
+        yield return new WaitForSeconds(seconds);
+
+        PlayShootAnimation(false);
     }
 
     #region UI
@@ -295,9 +295,75 @@ public class PlayerController : MonoBehaviour
     }
     #endregion UI
 
-
     private void UpdatePlayerScore()
     {
         HighScoreManager.Instance.AddNewScore(_kills);
+    }
+
+    private void OnInputActionPressed(InputAction action)
+    {
+        _asc.OnInputActionPressed(action);
+    }
+
+    private void OnInputActionReleased(InputAction action)
+    {
+        _asc.OnInputActionReleased(action);
+    }
+
+    private void OnItemEquipped(Item item, EquipmentItem equipmentItem, EquipmentSlot equipmentSlot)
+    {
+        switch (item)
+        {
+            case WeaponItem weaponItem:
+                OnWeaponEquipped(weaponItem, equipmentItem, equipmentSlot);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(item));
+        }
+    }
+
+    private void OnItemUnequipped(Item item, EquipmentItem equipmentItem, EquipmentSlot equipmentSlot)
+    {
+        switch (item)
+        {
+            case WeaponItem weaponItem:
+                OnWeaponUnequipped(weaponItem, equipmentItem, equipmentSlot);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(item));
+        }
+    }
+
+    private void OnWeaponEquipped(WeaponItem item, EquipmentItem equipmentItem, EquipmentSlot equipmentSlot)
+    {
+        var abilityHandle = _asc.AddAbility(item.AttackAbility);
+        if (abilityHandle == null)
+            throw new Exception("Failed to add weapon attack ability");
+
+        var abilityInstance = abilityHandle.AbilityInstance;
+
+        // TODO: get rid of hardcoded input tags
+        switch (equipmentSlot)
+        {
+            case EquipmentSlot.MainHand:
+                abilityInstance.InputTag = "Input.PrimaryAbility";
+                break;
+            case EquipmentSlot.OffHand:
+                abilityInstance.InputTag = "Input.SecondaryAbility";
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(equipmentSlot), equipmentSlot, null);
+        }
+
+        var attackAbilityInstanceData = abilityInstance.GetData<AttackAbilityInstanceData>();
+
+        attackAbilityInstanceData.EquipmentItem = equipmentItem;
+        attackAbilityInstanceData.EquipmentSlot = equipmentSlot;
+        attackAbilityInstanceData.ProvidedByEquipment = true;
+    }
+
+    private void OnWeaponUnequipped(WeaponItem item, EquipmentItem equipmentItem, EquipmentSlot equipmentSlot)
+    {
+        _asc.RemoveAbility(item.AttackAbility);
     }
 }

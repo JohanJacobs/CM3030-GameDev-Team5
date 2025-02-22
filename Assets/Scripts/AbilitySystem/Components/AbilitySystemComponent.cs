@@ -7,6 +7,12 @@ public class AbilitySystemComponent : MonoBehaviour
 {
     public delegate void SelfDelegate(AbilitySystemComponent asc);
 
+    private struct ReadyCallback
+    {
+        public SelfDelegate Delegate;
+        public int Priority;
+    }
+
     private static readonly AttributeType[] AllAttributes = Enum.GetValues(typeof(AttributeType)).Cast<AttributeType>().ToArray();
 
     public IReadOnlyCollection<Tag> Tags => _tags;
@@ -15,6 +21,8 @@ public class AbilitySystemComponent : MonoBehaviour
     private AttributeSet[] _grantedAttributeSets;
     [SerializeField]
     private Ability[] _grantedAbilities;
+
+    private readonly List<ReadyCallback> _readyDelegates = new List<ReadyCallback>();
 
     private readonly List<AttributeSetInstance> _attributeSetInstances = new List<AttributeSetInstance>();
     private readonly EnumArray<AttributeValue, AttributeType> _attributeValues = new EnumArray<AttributeValue, AttributeType>();
@@ -28,17 +36,21 @@ public class AbilitySystemComponent : MonoBehaviour
 
     private bool _ready;
 
-    private event SelfDelegate Ready;
-
-    public void OnReady(SelfDelegate callback)
+    public void OnReady(SelfDelegate @delegate, int priority = 0)
     {
         if (_ready)
         {
-            callback.Invoke(this);
+            @delegate.Invoke(this);
         }
         else
         {
-            Ready += callback;
+            var callback = new ReadyCallback()
+            {
+                Delegate = @delegate,
+                Priority = priority,
+            };
+
+            _readyDelegates.Add(callback);
         }
     }
 
@@ -118,6 +130,15 @@ public class AbilitySystemComponent : MonoBehaviour
     public float GetAttributeValue(AttributeType attribute)
     {
         var attributeValue = _attributeValues[attribute];
+
+        return attributeValue?.Value ?? 0f;
+    }
+
+    public float GetAttributeValue(AttributeType attribute, out bool attributeExists)
+    {
+        var attributeValue = _attributeValues[attribute];
+
+        attributeExists = attributeValue != null;
 
         return attributeValue?.Value ?? 0f;
     }
@@ -401,17 +422,16 @@ public class AbilitySystemComponent : MonoBehaviour
         if (abilityInstance == null)
             return;
 
-        abilityInstance.Abort();
-        abilityInstance.Destroy();
+        RemoveAbilityImpl(abilityInstance);
+    }
 
-        _abilityInstances.Remove(abilityInstance);
+    public void RemoveAbility(Ability ability)
+    {
+        var abilityInstance = _abilityInstances.Find(ai => ai.Ability == ability);
+        if (abilityInstance == null)
+            return;
 
-        if (abilityInstance.Ability.HasGrantedTags)
-        {
-            RemoveTags(abilityInstance.Ability.GrantedTags);
-        }
-
-        abilityInstance.NotifyRemoved();
+        RemoveAbilityImpl(abilityInstance);
     }
 
     public void ActivateAbility(AbilityHandle handle)
@@ -433,6 +453,26 @@ public class AbilitySystemComponent : MonoBehaviour
             return;
 
         abilityInstance.Abort();
+    }
+
+    #endregion
+
+    #region Input
+
+    public void OnInputActionPressed(InputAction action)
+    {
+        foreach (var abilityInstance in _abilityInstances)
+        {
+            abilityInstance.NotifyInputActionPressed(action);
+        }
+    }
+
+    public void OnInputActionReleased(InputAction action)
+    {
+        foreach (var abilityInstance in _abilityInstances)
+        {
+            abilityInstance.NotifyInputActionReleased(action);
+        }
     }
 
     #endregion
@@ -460,9 +500,7 @@ public class AbilitySystemComponent : MonoBehaviour
             AddAbility(ability);
         }
 
-        _ready = true;
-
-        Ready?.Invoke(this);
+        DispatchReady();
     }
 
     private void Update()
@@ -542,7 +580,7 @@ public class AbilitySystemComponent : MonoBehaviour
                 break;
             case EffectDurationPolicy.Duration:
             case EffectDurationPolicy.Infinite:
-                if (!canApplyEffect && !effect.HasPeriod)
+                if (!canApplyEffect && !(effect.Period.Calculate(context) > 0))
                     return null;
                 break;
             default:
@@ -692,6 +730,32 @@ public class AbilitySystemComponent : MonoBehaviour
         Debug.Assert(abilityInstance == null || _abilityInstances.Contains(abilityInstance), "Invalid ability handle");
 
         return abilityInstance;
+    }
+
+    private void RemoveAbilityImpl(AbilityInstance abilityInstance)
+    {
+        abilityInstance.Abort();
+        abilityInstance.Destroy();
+
+        _abilityInstances.Remove(abilityInstance);
+
+        if (abilityInstance.Ability.HasGrantedTags)
+        {
+            RemoveTags(abilityInstance.Ability.GrantedTags);
+        }
+
+        abilityInstance.NotifyRemoved();
+    }
+
+    private void DispatchReady()
+    {
+        Debug.Assert(!_ready);
+
+        _ready = true;
+
+        _readyDelegates.Sort((lhs, rhs) => rhs.Priority - lhs.Priority);
+        _readyDelegates.ForEach(@delegate => @delegate.Delegate.Invoke(this));
+        _readyDelegates.Clear();
     }
 
     #endregion

@@ -1,13 +1,24 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
+[RequireComponent(typeof(AbilitySystemComponent), typeof(HealthComponent))]
 public class Creature : MonoBehaviour
 {
     public delegate void KillDelegate(Creature creature, Creature victim);
     public delegate void DeathDelegate(Creature creature);
     public delegate void SimpleDelegate();
+
+    public EquipmentAttachmentSlot[] EquipmentAttachmentSlots;
+
+    /// <summary>
+    /// This is, roughly, how fast creature will move if driven by animation (depends on animation clip FPS and number of frames).
+    /// Used to adjust animation speed based on actual move speed.
+    /// </summary>
+    public float WalkAnimationMoveSpeed = 2f;
 
     public bool IsDead => HealthComponent.IsDead;
     public bool IsAlive => HealthComponent.IsAlive;
@@ -88,7 +99,7 @@ public class Creature : MonoBehaviour
 
         if (_autoDestroyOnDeath)
         {
-            Destroy(gameObject, 0.2f);
+            Destroy(gameObject, 1.5f);
         }
     }
 
@@ -96,4 +107,18 @@ public class Creature : MonoBehaviour
     {
         Die();
     }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (EquipmentAttachmentSlots != null)
+        {
+            var distinctAttachmentSlotCount = EquipmentAttachmentSlots.Select(slot => slot.Slot).Distinct().Count();
+            if (distinctAttachmentSlotCount < EquipmentAttachmentSlots.Length)
+            {
+                Debug.LogWarning("Duplicate attachment slots");
+            }
+        }
+    }
+#endif
 }

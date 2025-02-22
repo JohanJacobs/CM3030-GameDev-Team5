@@ -30,8 +30,17 @@ MonoBehaviour:
     Post: 0
   DurationPolicy: 1
   CancellationPolicy: 1
-  Duration: 0.3
-  Period: 0
+  Duration:
+    Calculation: 0
+    AttributeProvider: 1
+    Attribute: 0
+    Value: 0.3
+  Period:
+    Calculation: 0
+    AttributeProvider: 1
+    Attribute: 0
+    Value: 0
   Tags: []
   BlockTags: []
+  CancelTags: []
   GrantedTags: []
