@@ -21,6 +21,8 @@ public class Monster : Creature
 
     private float _toNextAttack = 0f;
 
+    private Vector3 _knockBackForce = Vector3.zero;
+
     void Start()
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
@@ -29,16 +31,24 @@ public class Monster : Creature
 
     void Update()
     {
-        if (IsDead)
-            return;
+        var deltaTime = Time.deltaTime;
 
-        if (_target == null)
-            return;
+        {
+            UpdateKnockBackForce(deltaTime);
+        }
 
-        UpdateNavMeshMovement();
-        // UpdateMovement();
-        UpdateAttack();
-        UpdateAttackCooldown();
+        {
+            if (IsDead)
+                return;
+
+            if (_target == null)
+                return;
+
+            UpdateNavMeshMovement();
+            UpdateMovementAnimation();
+            UpdateAttack();
+            UpdateAttackCooldown(deltaTime);
+        }
     }
 
     protected override void OnDeath()
@@ -61,7 +71,10 @@ public class Monster : Creature
     {
         PlayHitAnimation();
 
-        KnockBack(origin, amount / MaxHealth);
+        // TODO: shouldn't be here
+        var knockBackMagnitude = AbilitySystemUtility.GetAttributeValueOrDefault(causer, AttributeType.KnockBack, 1);
+
+        KnockBack(origin, knockBackMagnitude * amount / MaxHealth);
     }
 
     private void KnockBack(Vector3 origin, float amount)
@@ -71,27 +84,14 @@ public class Monster : Creature
 
         var direction = transform.position - origin;
 
-        transform.Translate(direction.normalized * amount * (1f - KnockBackResistance), Space.World);
+        _knockBackForce += direction.normalized * amount * (1f - KnockBackResistance);
     }
 
-    private void UpdateMovement()
+    private void UpdateMovementAnimation()
     {
-        var myPosition = transform.position;
-        var targetPosition = _target.transform.position;
+        var walkSpeedMultiplier = Mathf.Max(Speed / WalkAnimationMoveSpeed, 0);
 
-        var targetDelta = targetPosition - myPosition;
-
-        targetDelta.y = 0;
-
-        var targetRotation = Quaternion.LookRotation(targetDelta.normalized, Vector3.up);
-
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, TurnSpeed * Time.deltaTime);
-
-        var motionDistance = Speed * Time.deltaTime;
-
-        motionDistance = Mathf.Min(motionDistance, Mathf.Max(targetDelta.magnitude - ApproachDistance, 0));
-
-        transform.Translate(transform.forward * motionDistance, Space.World);
+        animator.SetFloat("WalkSpeedMultiplier", walkSpeedMultiplier);
     }
 
     private void UpdateNavMeshMovement()
@@ -141,16 +141,37 @@ public class Monster : Creature
         return true;
     }
 
-    private void UpdateAttackCooldown()
+    private void UpdateAttackCooldown(float deltaTime)
     {
-        if (_toNextAttack > Time.deltaTime)
+        if (_toNextAttack > deltaTime)
         {
-            _toNextAttack -= Time.deltaTime;
+            _toNextAttack -= deltaTime;
         }
         else
         {
             _toNextAttack = 0;
         }
+    }
+
+    private void UpdateKnockBackForce(float deltaTime)
+    {
+        var motion = _knockBackForce * deltaTime;
+
+        motion.y = 0;
+
+        if (motion.sqrMagnitude > 0.0001f)
+        {
+            // TODO: ???
+            // _navMeshAgent.Move(motion);
+
+            transform.Translate(motion, Space.World);
+        }
+
+        // sort of "decay to 0 in 1 second"
+        if (_knockBackForce.sqrMagnitude > 0.0001f)
+            _knockBackForce = Vector3.Lerp(_knockBackForce, Vector3.zero, deltaTime);
+        else
+            _knockBackForce = Vector3.zero;
     }
 
     private void PlayHitAnimation()

@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 
-public class Player : Creature, IAttackAbilityAimProvider
+public class Player : Creature, IAttackAbilityAimProvider, IAttackAbilityDispatcher
 {
+    public delegate void AttackDelegate(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage);
+
+    public event AttackDelegate CommittedAttack;
+
     public float Speed => AbilitySystemComponent.GetAttributeValue(AttributeType.MoveSpeed);
     public float TurnSpeed => AbilitySystemComponent.GetAttributeValue(AttributeType.TurnSpeed);
     public float DamageMin => AbilitySystemComponent.GetAttributeValue(AttributeType.MinDamage);
@@ -41,5 +45,10 @@ public class Player : Creature, IAttackAbilityAimProvider
     public Vector3 GetAttackDirection()
     {
         return _attackDirection;
+    }
+
+    public void OnAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage)
+    {
+        CommittedAttack?.Invoke(abilityInstance, origin, direction, damage);
     }
 }

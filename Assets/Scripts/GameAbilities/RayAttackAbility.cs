@@ -13,27 +13,23 @@ public class RayAttackAbility : AttackAbility
         GetDefaultAttackOriginAndDirection(abilityInstance, out var origin, out var direction);
 
         var ray = new Ray(origin, direction);
+
         var range = Range.Calculate(abilityInstance);
+        var damageMin = DamageMin.Calculate(abilityInstance);
+        var damageMax = DamageMax.Calculate(abilityInstance);
+
+        var damage = Random.Range(damageMin, damageMax);
 
         if (Physics.Raycast(ray, out var hit, range, LayerMask))
         {
             var victim = hit.collider.GetComponentInParent<Creature>();
             if (victim)
             {
-                var damageMin = DamageMin.Calculate(abilityInstance);
-                var damageMax = DamageMax.Calculate(abilityInstance);
-
-                attacker.DealDamage(victim, origin, Random.Range(damageMin, damageMax));
+                attacker.DealDamage(victim, origin, damage);
             }
         }
 
-        // TEMP spawn tracer
-        var pc = attacker.GetComponent<PlayerController>();
-        if (pc)
-        {
-            pc.RandomSpawnBulletTracerFX(origin, direction, 1f);
-        }
-        // TEMP END
+        NotifyAttackCommitted(abilityInstance, origin, direction, damage);
 
         abilityInstance.End();
     }
