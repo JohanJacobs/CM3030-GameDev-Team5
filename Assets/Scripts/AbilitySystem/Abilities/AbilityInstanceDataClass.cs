@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-using AbilityInstanceDataClassRegistry = ClassRegistry<object, AbilityInstanceDataClassAttribute>;
+using AbilityInstanceDataClassRegistry = ClassRegistry<AbilityInstanceData, AbilityInstanceDataClassAttribute>;
 
 [Serializable]
 public struct AbilityInstanceDataClass
@@ -18,14 +18,14 @@ public struct AbilityInstanceDataClass
             throw new ArgumentOutOfRangeException(nameof(classType), "Invalid ability instance data class type");
     }
 
-    public object CreateInstance()
+    public AbilityInstanceData CreateInstance()
     {
         Debug.Assert(ClassType != null, $"Ability instance data class \"{ClassName}\" not found");
 
         if (ClassType == null)
             return null;
 
-        var instance = Activator.CreateInstance(ClassType);
+        var instance = Activator.CreateInstance(ClassType) as AbilityInstanceData;
 
         Debug.Assert(instance != null, $"Failed to create ability instance data object \"{ClassName}\"");
 

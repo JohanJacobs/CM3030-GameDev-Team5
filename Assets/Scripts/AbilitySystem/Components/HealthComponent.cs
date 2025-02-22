@@ -41,7 +41,7 @@ public class HealthComponent : MonoBehaviour
     {
         var asc = GetComponent<AbilitySystemComponent>();
 
-        asc.OnReady(OnAbilitySystemReady);
+        asc.OnReady(OnAbilitySystemReady, 10);
     }
 
     private void Start()

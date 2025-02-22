@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Audio
+  - Input.PrimaryAbility
+  - Input.SecondaryAbility
   layers:
   - Default
   - TransparentFX
@@ -17,7 +19,7 @@ TagManager:
   - Player
   - Monster
   - Pickup
-  - 
+  - Projectile
   - 
   - 
   - 

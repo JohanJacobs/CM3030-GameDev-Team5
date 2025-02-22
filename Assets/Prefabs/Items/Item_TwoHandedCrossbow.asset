@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8d41a45905025d49b51f99fa305dcbd, type: 3}
+  m_Name: Item_TwoHandedCrossbow
+  m_EditorClassIdentifier: 
+  DisplayName: Crossbow
+  EquipmentItem: {fileID: 5165996310063704418, guid: 4157752e9d3d8d74693399a89c7afe19,
+    type: 3}
+  AttackAbility: {fileID: 11400000, guid: 85787a2774f0c6d4aa74d0f5d7986806, type: 2}

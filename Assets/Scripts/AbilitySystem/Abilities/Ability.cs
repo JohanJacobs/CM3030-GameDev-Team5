@@ -1,18 +1,10 @@
-using System;
-using JetBrains.Annotations;
 using UnityEngine;
 
-[Serializable]
-public sealed class AbilityCostDefinition
+public enum AbilityInputPolicy
 {
-    public AttributeType Attribute;
-    public float Value;
-}
-
-[Serializable]
-public sealed class AbilityCooldownDefinition
-{
-    public float Value;
+    None,
+    TryActivateOnInputPressed,
+    TryActivateWhileInputPressed,
 }
 
 public abstract class Ability : ScriptableObject, IAbilityLogic
@@ -39,7 +31,12 @@ public abstract class Ability : ScriptableObject, IAbilityLogic
     /// </summary>
     public Tag[] GrantedTags;
 
-    public AbilityInstanceDataClass AbilityInstanceDataClass;
+    public AbilityInstanceDataClass AbilityInstanceDataClass = new AbilityInstanceDataClass(typeof(DefaultAbilityInstanceData));
+
+    public AbilityInputPolicy InputPolicy = AbilityInputPolicy.None;
+    public Tag InputTag;
+
+    public InputMappingContext InputMappingContext;
 
     public bool HasBlockTags => BlockTags != null && BlockTags.Length > 0;
     public bool HasCancelTags => CancelTags != null && CancelTags.Length > 0;
@@ -72,6 +69,14 @@ public abstract class Ability : ScriptableObject, IAbilityLogic
     }
 
     public virtual void UpdateAbility(AbilityInstance abilityInstance, float deltaTime)
+    {
+    }
+
+    public virtual void HandleAbilityInputActionPressed(AbilityInstance abilityInstance, InputAction action)
+    {
+    }
+
+    public virtual void HandleAbilityInputActionReleased(AbilityInstance abilityInstance, InputAction action)
     {
     }
 }

@@ -44,12 +44,23 @@ public class Monster : Creature
     protected override void OnDeath()
     {
         PlayDeathAnimation();
+
         _target = null;
+
+        _navMeshAgent.isStopped = true;
+        _navMeshAgent.enabled = false;
+
+        var myCollider = GetComponentInChildren<Collider>();
+        if (myCollider)
+        {
+            myCollider.enabled = false;
+        }
     }
 
     protected override void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
     {
         PlayHitAnimation();
+
         KnockBack(origin, amount / MaxHealth);
     }
 

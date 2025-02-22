@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f28dceacf5977804e801828b2503b6e3, type: 3}
+  m_Name: CrossbowAttackAbility
+  m_EditorClassIdentifier: 
+  ActivateOnGranted: 0
+  CostEffect: {fileID: 0}
+  CooldownEffect: {fileID: 11400000, guid: b5da784bcd1bc7245889283b76d8d0d2, type: 2}
+  Tags: []
+  BlockTags: []
+  CancelTags: []
+  GrantedTags: []
+  AbilityInstanceDataClass:
+    ClassName: AttackAbilityInstanceData
+  InputPolicy: 2
+  InputTag:
+    _string: Untagged
+  InputMappingContext: {fileID: 0}
+  DamageMin:
+    Calculation: 1
+    AttributeProvider: 1
+    Attribute: 8
+    Value: 4
+  DamageMax:
+    Calculation: 1
+    AttributeProvider: 1
+    Attribute: 9
+    Value: 12
+  Range:
+    Calculation: 1
+    AttributeProvider: 1
+    Attribute: 10
+    Value: 24
+  LayerMask:
+    serializedVersion: 2
+    m_Bits: 512
