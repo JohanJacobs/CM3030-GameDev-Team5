@@ -177,7 +177,7 @@ PrefabInstance:
     - target: {fileID: 2711995918765392425, guid: 7dc5c3c4d0fa269429c672f0ff90eea6,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2711995918765392425, guid: 7dc5c3c4d0fa269429c672f0ff90eea6,
         type: 3}
@@ -976,7 +976,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92175bdbb59327d4e81d003348c504fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MonsterSpawnDistance: 18
+  MonsterSpawnDistance: 10
   MonsterDespawnDistance: 24
   Spawns:
   - {fileID: 11400000, guid: 1888bf49ef907524dba05c17496b2dd6, type: 2}
@@ -996,7 +996,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1704015169
 GameObject:
@@ -1136,7 +1136,7 @@ PrefabInstance:
     - target: {fileID: 3568207176118243002, guid: 228e6cdaff721e54ab4e94ecff5cef77,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3568207176118243002, guid: 228e6cdaff721e54ab4e94ecff5cef77,
         type: 3}
