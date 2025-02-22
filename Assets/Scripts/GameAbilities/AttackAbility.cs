@@ -9,6 +9,11 @@ public interface IAttackAbilityAimProvider
     Vector3 GetAttackDirection();
 }
 
+public interface IAttackAbilityDispatcher
+{
+    void OnAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage);
+}
+
 [AbilityInstanceDataClass]
 public class AttackAbilityInstanceData : AbilityInstanceData
 {
@@ -80,6 +85,16 @@ public abstract class AttackAbility : Ability
 
         origin = attackOrigin;
         direction = attackDirection;
+    }
+
+    protected void NotifyAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage)
+    {
+        var owner = abilityInstance.Owner;
+
+        if (owner is IAttackAbilityDispatcher dispatcher)
+        {
+            dispatcher.OnAttackCommitted(abilityInstance, origin, direction, damage);
+        }
     }
 
     private EquipmentAttachmentSlot FindEquipmentAttachmentSlot(Creature creature, EquipmentSlot equipmentSlot)

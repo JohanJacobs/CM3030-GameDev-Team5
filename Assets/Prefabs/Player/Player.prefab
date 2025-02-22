@@ -127,6 +127,7 @@ MonoBehaviour:
     Socket: {fileID: 4968352177811348506}
   - Slot: 1
     Socket: {fileID: 3779801292361441600}
+  WalkAnimationMoveSpeed: 4
   _autoDestroyOnDeath: 0
 --- !u!114 &6552311690192007213
 MonoBehaviour:

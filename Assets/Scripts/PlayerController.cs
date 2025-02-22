@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -27,10 +29,6 @@ public class PlayerController : MonoBehaviour
     private AbilitySystemComponent _asc;
     private InputComponent _inputComponent;
     private EquipmentComponent _equipmentComponent;
-
-    private float _toNextShot = 0;
-
-    private Vector3? _lookAtPointOnGround = null;
 
     private int _kills = 0;
 
@@ -68,6 +66,7 @@ public class PlayerController : MonoBehaviour
         _player.Kill += HandlePlayerKill;
         _player.Death += HandlePlayerDeath;
         _player.DamageTaken += HandlePlayerDamageTaken;
+        _player.CommittedAttack += HandlePlayerCommittedAttack;
     }
 
     private void OnAbilitySystemReady(AbilitySystemComponent asc)
@@ -82,8 +81,6 @@ public class PlayerController : MonoBehaviour
 
         UpdateAim();
         UpdateMovement();
-        // UpdateShooting();
-        // UpdateShootingCooldown();
     }
 
     void LateUpdate()
@@ -143,78 +140,28 @@ public class PlayerController : MonoBehaviour
 
         var mouseAimRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if (plane.Raycast(mouseAimRay, out var rayEnter))
-        {
-            var lookAtPointOnGround = mouseAimRay.GetPoint(rayEnter);
-            var lookAtPointOnGroundDelta = lookAtPointOnGround - transform.position;
-
-            lookAtPointOnGroundDelta.y = 0;
-
-            if (lookAtPointOnGroundDelta.sqrMagnitude > 0.01f)
-            {
-                transform.rotation = Quaternion.LookRotation(lookAtPointOnGroundDelta, Vector3.up);
-
-                _lookAtPointOnGround = lookAtPointOnGround;
-
-                var aimOrigin = transform.position + MuzzleOffset;
-                var aimTarget = lookAtPointOnGround;
-                var aimDirection = lookAtPointOnGround - aimOrigin;
-
-                aimDirection.y = 0f;
-                aimDirection.Normalize();
-
-                _player.UpdateAttackAim(aimOrigin, aimTarget, aimDirection);
-            }
-        }
-        else
-        {
-            _lookAtPointOnGround = null;
-        }
-    }
-
-    private void UpdateShooting()
-    {
-        if (_toNextShot > 0)
-            return;
-        if (!_lookAtPointOnGround.HasValue)
+        if (!plane.Raycast(mouseAimRay, out var rayEnter))
             return;
 
-        bool fireButtonPressed = Input.GetButton("Fire1");
+        var lookAtPointOnGround = mouseAimRay.GetPoint(rayEnter);
+        var lookAtPointOnGroundDelta = lookAtPointOnGround - transform.position;
 
-        if (!fireButtonPressed)
-        {
-            PlayShootAnimation(false);
+        lookAtPointOnGroundDelta.y = 0;
+
+        // less than 0.1 units away from player - ignore
+        if (lookAtPointOnGroundDelta.sqrMagnitude < 0.01f)
             return;
-        }
 
-        // Play shooting sound
-        audioManager.PlaySFX(audioManager.sfxexample);
+        transform.rotation = Quaternion.LookRotation(lookAtPointOnGroundDelta, Vector3.up);
 
-        _toNextShot += 1f / _player.FireRate;
+        var aimOrigin = transform.position + MuzzleOffset;
+        var aimTarget = lookAtPointOnGround;
+        var aimDirection = lookAtPointOnGround - aimOrigin;
 
-        var aimDirection = _lookAtPointOnGround.Value - transform.position;
-        var ray = new Ray(transform.position + MuzzleOffset, aimDirection);
+        aimDirection.y = 0f;
+        aimDirection.Normalize();
 
-        RandomSpawnBulletTracerFX(ray.origin, ray.direction, 1f);
-
-        if (Physics.Raycast(ray, out var hit, _player.FireRange, MonsterLayerMask))
-        {
-            var monster = hit.collider.GetComponentInParent<Monster>();
-
-            _player.DealDamage(monster, transform.position, Random.Range(_player.DamageMin, _player.DamageMax));
-        }
-    }
-
-    private void UpdateShootingCooldown()
-    {
-        if (_toNextShot > Time.deltaTime)
-        {
-            _toNextShot -= Time.deltaTime;
-        }
-        else
-        {
-            _toNextShot = 0;
-        }
+        _player.UpdateAttackAim(aimOrigin, aimTarget, aimDirection);
     }
 
     public void RandomSpawnBulletTracerFX(Vector3 origin, Vector3 direction, float probability = 0.6f)
@@ -266,6 +213,10 @@ public class PlayerController : MonoBehaviour
     {
         Animator.SetFloat("ForwardMovement", movementInput.z);
         Animator.SetFloat("RightMovement", movementInput.x);
+
+        var walkSpeedMultiplier = Mathf.Max(_player.Speed / _player.WalkAnimationMoveSpeed, 0);
+
+        Animator.SetFloat("WalkSpeedMultiplier", walkSpeedMultiplier);
     }
 
     private void HandlePlayerKill(Creature creature, Creature victim)
@@ -284,6 +235,25 @@ public class PlayerController : MonoBehaviour
     private void HandlePlayerDamageTaken()
     {
         PlayHitAnimation();
+    }
+
+    private void HandlePlayerCommittedAttack(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage)
+    {
+        audioManager.PlaySFX(audioManager.sfxexample);
+
+        RandomSpawnBulletTracerFX(origin, direction, 1f);
+
+        // TODO: change IsShooting to trigger?
+        StartCoroutine(PlayShootAnimationForSeconds(.2f));
+    }
+
+    private IEnumerator PlayShootAnimationForSeconds(float seconds)
+    {
+        PlayShootAnimation(true);
+
+        yield return new WaitForSeconds(seconds);
+
+        PlayShootAnimation(false);
     }
 
     #region UI
