@@ -3,12 +3,13 @@ using TMPro;
 
 public class DamagePopup : MonoBehaviour
 {
-    private TextMeshPro textMesh;
+    private TextMeshProUGUI textMesh;
 
     private void Awake()
     {
-        textMesh = transform.GetComponent<TextMeshPro>();
-    }
+        textMesh = transform.GetComponent<TextMeshProUGUI>();
+        Debug.Log(textMesh);
+    } 
     
     public void Setup(string popupMsg)
     {
