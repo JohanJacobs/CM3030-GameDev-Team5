@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: Spawner_RatKing
   m_EditorClassIdentifier: 
   Prefab: {fileID: 1837103161426741387, guid: 8e416c25db0a2a8409f8c5de2a08df02, type: 3}
-  SpawnInterval: 5
+  SpawnInterval: 3
   SpawnAmountMin: 1
   SpawnAmountMax: 2
   MaxMonstersAlive: 5
+  SpawnDelay: 0
+  SpawnTime: 0
