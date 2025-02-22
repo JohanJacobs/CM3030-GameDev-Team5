@@ -939,10 +939,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1571807411}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac3e3336e62b3504e8b3ad3552582541, type: 3}
+  m_Script: {fileID: 11500000, guid: f783469fe2d54844697b15ccbfff0a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pfDamagePopup: {fileID: 4264193903533030808, guid: 4707f3ed5561e784b943add3877002d2,
+  _popupTimeToLive: 0.5
+  popupTemplate: {fileID: 4025351340081606498, guid: d7f95b2fc09d1d84f94d8ca92d6a4904,
     type: 3}
 --- !u!1 &1704015169
 GameObject:
