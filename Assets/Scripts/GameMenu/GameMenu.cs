@@ -57,11 +57,15 @@ public class GameMenu : MonoBehaviour
     {
         SetMenuState(!menuVisibleState);
 
+        // Rename the start button to continue after the player press play
         if (switchStartButton)
         {
             startButtonText.text = "Continue";
             switchStartButton = false;
         }
+
+        // Hide the curse when the menu is disabled, else show the cursor when the menu is visible.
+        UnityEngine.Cursor.visible = menuVisibleState;
     }
 
     private void SetMenuState(bool menuState)

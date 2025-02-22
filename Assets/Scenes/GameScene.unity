@@ -1166,6 +1166,51 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5972484957959273609, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: enemyColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5972484957959273609, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: enemyColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5972484957959273609, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: enemyColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5972484957959273609, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: enemyColor.r
+      value: 0.9339623
+      objectReference: {fileID: 0}
+    - target: {fileID: 5972484957959273609, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: defaultColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5972484957959273609, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: defaultColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5972484957959273609, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: defaultColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5972484957959273609, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: defaultColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5972484957959273609, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: enemyLayer.m_Bits
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 6552311690192007203, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
         type: 3}
       propertyPath: m_RootOrder
@@ -1225,6 +1270,17 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 8714256336304608182, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2553929310788493778, guid: 1bae1b3f8c11477459b77c7bd5740ba1,
+        type: 3}
+    - target: {fileID: 9212160647062214359, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9, type: 3}
