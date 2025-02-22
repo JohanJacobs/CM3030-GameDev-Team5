@@ -1,17 +1,12 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public enum EffectDurationPolicy
 {
     Instant,
     Duration,
     Infinite,
-}
-
-public enum EffectApplicationPolicy
-{
-    Instant,
-    Periodic,
 }
 
 public enum EffectCancellationPolicy
@@ -26,8 +21,9 @@ public class Effect : ScriptableObject, IEffectLogic
     public AttributeModifier[] Modifiers;
     public EffectDurationPolicy DurationPolicy = EffectDurationPolicy.Instant;
     public EffectCancellationPolicy CancellationPolicy = EffectCancellationPolicy.CancelAllModifiers;
-    public float Duration = 0f;
-    public float Period = 0f;
+
+    public Magnitude Duration;
+    public Magnitude Period;
 
     /// <summary>
     /// This effect's own tags, used to e.g. cancel all effects with tag.
@@ -49,8 +45,6 @@ public class Effect : ScriptableObject, IEffectLogic
     /// </remarks>
     public Tag[] GrantedTags;
 
-    public bool HasDuration => Duration > 0f;
-    public bool HasPeriod => Period > 0f;
     public bool HasBlockTags => BlockTags != null && BlockTags.Length > 0;
     public bool HasCancelTags => CancelTags != null && CancelTags.Length > 0;
     public bool HasGrantedTags => GrantedTags != null && GrantedTags.Length > 0;
@@ -80,17 +74,9 @@ public class Effect : ScriptableObject, IEffectLogic
     protected virtual bool IsValid()
     {
         // check if effect logic is well-defined
-        switch (DurationPolicy)
-        {
-            case EffectDurationPolicy.Instant:
-                // TODO: do periodic instant effects make sense?
-                return !HasPeriod;
-            case EffectDurationPolicy.Duration:
-                return HasDuration;
-            case EffectDurationPolicy.Infinite:
-                return true;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+
+        // TODO: formerly it was checking duration/period but these are context-dependent now
+
+        return true;
     }
 }

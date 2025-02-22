@@ -6,7 +6,9 @@ public class AbilityInstance
     public AbilitySystemComponent AbilitySystemComponent => _weakAbilitySystemComponent.TryGetTarget(out var asc) ? asc : null;
     public Ability Ability { get; }
     public bool Active => _active;
-    public object Data => _data;
+    public AbilityInstanceData Data => _data;
+    public Tag InputTag { get; set; }
+    public Creature Owner => AbilitySystemComponent?.GetComponent<Creature>();
 
     public float CooldownTimeRemainingFraction
     {
@@ -27,17 +29,21 @@ public class AbilityInstance
     private EffectHandle _costEffectHandle;
     private EffectHandle _cooldownEffectHandle;
 
-    private object _data;
+    private AbilityInstanceData _data;
 
     private bool _active;
+    private bool _inputPressed;
 
     public AbilityInstance(AbilitySystemComponent asc, Ability ability)
     {
         Ability = ability;
+        InputTag = ability.InputTag;
 
         _weakAbilitySystemComponent = new WeakReference<AbilitySystemComponent>(asc);
 
         _abilityLogic = ability;
+
+        _data = Ability.AbilityInstanceDataClass.CreateInstance();
     }
 
     public void NotifyAdded()
@@ -89,6 +95,14 @@ public class AbilityInstance
         return true;
     }
 
+    public T GetData<T>() where T : AbilityInstanceData
+    {
+        if (_data is T concreteData)
+            return concreteData;
+
+        throw new InvalidOperationException($"Ability instance data of type {typeof(T)} does not exist");
+    }
+
     private void Activate()
     {
         if (_active)
@@ -96,9 +110,16 @@ public class AbilityInstance
 
         _active = true;
 
-        _data = Ability.AbilityInstanceDataClass.CreateInstance();
-
         _abilityLogic.ActivateAbility(this);
+
+        if (Ability.InputMappingContext)
+        {
+            var inputComponent = AbilitySystemComponent.GetComponent<InputComponent>();
+            if (inputComponent)
+            {
+                inputComponent.AddInputMappingContext(Ability.InputMappingContext);
+            }
+        }
     }
 
     public void End()
@@ -110,7 +131,14 @@ public class AbilityInstance
 
         _abilityLogic.EndAbility(this);
 
-        _data = null;
+        if (Ability.InputMappingContext)
+        {
+            var inputComponent = AbilitySystemComponent.GetComponent<InputComponent>();
+            if (inputComponent)
+            {
+                inputComponent.RemoveInputMappingContext(Ability.InputMappingContext);
+            }
+        }
     }
 
     public void Abort()
@@ -118,6 +146,39 @@ public class AbilityInstance
         // TODO: implement abortion logic
 
         End();
+    }
+
+    public void NotifyInputActionPressed(InputAction action)
+    {
+        if (action.Tag == InputTag)
+        {
+            bool tryActivate = Ability.InputPolicy == AbilityInputPolicy.TryActivateOnInputPressed && !_inputPressed;
+
+            _inputPressed = true;
+
+            if (tryActivate)
+            {
+                TryActivate();
+            }
+        }
+
+        if (_active)
+        {
+            _abilityLogic.HandleAbilityInputActionPressed(this, action);
+        }
+    }
+
+    public void NotifyInputActionReleased(InputAction action)
+    {
+        if (action.Tag == InputTag)
+        {
+            _inputPressed = false;
+        }
+
+        if (_active)
+        {
+            _abilityLogic.HandleAbilityInputActionReleased(this, action);
+        }
     }
 
     private bool Commit()
@@ -147,10 +208,19 @@ public class AbilityInstance
 
     public void Update(float deltaTime)
     {
-        if (!_active)
-            return;
+        {
+            bool tryActivate = Ability.InputPolicy == AbilityInputPolicy.TryActivateWhileInputPressed && _inputPressed && !_active;
 
-        _abilityLogic.UpdateAbility(this, deltaTime);
+            if (tryActivate)
+            {
+                TryActivate();
+            }
+        }
+
+        if (_active)
+        {
+            _abilityLogic.UpdateAbility(this, deltaTime);
+        }
     }
 
     private bool CheckCost()
@@ -190,7 +260,7 @@ public class AbilityInstance
         if (Ability.CooldownEffect == null)
             return true;
 
-        if (_cooldownEffectHandle.Active)
+        if (_cooldownEffectHandle?.Active ?? false)
             return false;
 
         if (AbilitySystemComponent.HasActiveEffect(Ability.CooldownEffect))
