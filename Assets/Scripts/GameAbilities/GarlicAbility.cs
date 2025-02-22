@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [AbilityInstanceDataClass]
-public class GarlicAbilityInstanceData
+public class GarlicAbilityInstanceData : AbilityInstanceData
 {
     public float TimeToNextAttack;
 }
@@ -31,9 +31,7 @@ public class GarlicAbility : Ability
 
     public override void UpdateAbility(AbilityInstance abilityInstance, float deltaTime)
     {
-        var data = abilityInstance.Data as GarlicAbilityInstanceData;
-
-        Debug.Assert(data != null);
+        var data = abilityInstance.GetData<GarlicAbilityInstanceData>();
 
         data.TimeToNextAttack -= deltaTime;
 
@@ -57,6 +55,13 @@ public class GarlicAbility : Ability
         data.TimeToNextAttack += 1f / attackRate;
 
         Attack(abilityInstance, aoeRangeModifier.Calculate(attackRange), attackDamage);
+    }
+
+    public override void ActivateAbility(AbilityInstance abilityInstance)
+    {
+        var data = abilityInstance.GetData<GarlicAbilityInstanceData>();
+
+        data.TimeToNextAttack = 0;
     }
 
     private void Attack(AbilityInstance abilityInstance, float range, float damage)

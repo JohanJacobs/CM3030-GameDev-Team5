@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
+[RequireComponent(typeof(CharacterController), typeof(Player))]
 public class PlayerController : MonoBehaviour
 {
     AudioManager audioManager;
@@ -14,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public GameObject HUD;
     public GameObject GameMenu;
 
+    public InputMappingContext DefaultInputMappingContext;
 
     private CharacterController _characterController;
     private Player _player;
@@ -21,28 +25,45 @@ public class PlayerController : MonoBehaviour
     private GameMenu _gameMenu;
 
     private AbilitySystemComponent _asc;
+    private InputComponent _inputComponent;
+    private EquipmentComponent _equipmentComponent;
 
     private float _toNextShot = 0;
 
     private Vector3? _lookAtPointOnGround = null;
 
     private int _kills = 0;
+
     void Awake()
-    {
-        CreateUI();
-
-        // Set audioManager to external audioManager object with tag Audio
-        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
-
-    }
-
-    void Start()
     {
         _characterController = GetComponent<CharacterController>();
         _player = GetComponent<Player>();
 
         _asc = GetComponent<AbilitySystemComponent>();
-        _asc.OnReady(OnAbilitySystemReady);
+        _asc.OnReady(OnAbilitySystemReady, 5);
+
+        _inputComponent = GetComponent<InputComponent>();
+
+        _inputComponent.InputActionPressed += OnInputActionPressed;
+        _inputComponent.InputActionReleased += OnInputActionReleased;
+
+        _equipmentComponent = GetComponent<EquipmentComponent>();
+
+        _equipmentComponent.ItemEquipped += OnItemEquipped;
+        _equipmentComponent.ItemUnequipped += OnItemUnequipped;
+
+        CreateUI();
+
+        // Set audioManager to external audioManager object with tag Audio
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
+
+    void Start()
+    {
+        if (DefaultInputMappingContext)
+        {
+            _inputComponent.AddInputMappingContext(DefaultInputMappingContext);
+        }
 
         _player.Kill += HandlePlayerKill;
         _player.Death += HandlePlayerDeath;
@@ -61,8 +82,8 @@ public class PlayerController : MonoBehaviour
 
         UpdateAim();
         UpdateMovement();
-        UpdateShooting();
-        UpdateShootingCooldown();
+        // UpdateShooting();
+        // UpdateShootingCooldown();
     }
 
     void LateUpdate()
@@ -134,6 +155,15 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = Quaternion.LookRotation(lookAtPointOnGroundDelta, Vector3.up);
 
                 _lookAtPointOnGround = lookAtPointOnGround;
+
+                var aimOrigin = transform.position + MuzzleOffset;
+                var aimTarget = lookAtPointOnGround;
+                var aimDirection = lookAtPointOnGround - aimOrigin;
+
+                aimDirection.y = 0f;
+                aimDirection.Normalize();
+
+                _player.UpdateAttackAim(aimOrigin, aimTarget, aimDirection);
             }
         }
         else
@@ -159,6 +189,7 @@ public class PlayerController : MonoBehaviour
 
         // Play shooting sound
         audioManager.PlaySFX(audioManager.sfxexample);
+
         _toNextShot += 1f / _player.FireRate;
 
         var aimDirection = _lookAtPointOnGround.Value - transform.position;
@@ -186,7 +217,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void RandomSpawnBulletTracerFX(Vector3 origin, Vector3 direction, float probability = 0.6f)
+    public void RandomSpawnBulletTracerFX(Vector3 origin, Vector3 direction, float probability = 0.6f)
     {
         if (Random.value > probability)
             return;
@@ -210,7 +241,6 @@ public class PlayerController : MonoBehaviour
 
     private void ShowWasted()
     {
-        
         _hud.ShowGameOver(HighScoreManager.Instance.GetHighestScore(), _kills);
     }
 
@@ -295,9 +325,75 @@ public class PlayerController : MonoBehaviour
     }
     #endregion UI
 
-
     private void UpdatePlayerScore()
     {
         HighScoreManager.Instance.AddNewScore(_kills);
+    }
+
+    private void OnInputActionPressed(InputAction action)
+    {
+        _asc.OnInputActionPressed(action);
+    }
+
+    private void OnInputActionReleased(InputAction action)
+    {
+        _asc.OnInputActionReleased(action);
+    }
+
+    private void OnItemEquipped(Item item, EquipmentItem equipmentItem, EquipmentSlot equipmentSlot)
+    {
+        switch (item)
+        {
+            case WeaponItem weaponItem:
+                OnWeaponEquipped(weaponItem, equipmentItem, equipmentSlot);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(item));
+        }
+    }
+
+    private void OnItemUnequipped(Item item, EquipmentItem equipmentItem, EquipmentSlot equipmentSlot)
+    {
+        switch (item)
+        {
+            case WeaponItem weaponItem:
+                OnWeaponUnequipped(weaponItem, equipmentItem, equipmentSlot);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(item));
+        }
+    }
+
+    private void OnWeaponEquipped(WeaponItem item, EquipmentItem equipmentItem, EquipmentSlot equipmentSlot)
+    {
+        var abilityHandle = _asc.AddAbility(item.AttackAbility);
+        if (abilityHandle == null)
+            throw new Exception("Failed to add weapon attack ability");
+
+        var abilityInstance = abilityHandle.AbilityInstance;
+
+        // TODO: get rid of hardcoded input tags
+        switch (equipmentSlot)
+        {
+            case EquipmentSlot.MainHand:
+                abilityInstance.InputTag = "Input.PrimaryAbility";
+                break;
+            case EquipmentSlot.OffHand:
+                abilityInstance.InputTag = "Input.SecondaryAbility";
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(equipmentSlot), equipmentSlot, null);
+        }
+
+        var attackAbilityInstanceData = abilityInstance.GetData<AttackAbilityInstanceData>();
+
+        attackAbilityInstanceData.EquipmentItem = equipmentItem;
+        attackAbilityInstanceData.EquipmentSlot = equipmentSlot;
+        attackAbilityInstanceData.ProvidedByEquipment = true;
+    }
+
+    private void OnWeaponUnequipped(WeaponItem item, EquipmentItem equipmentItem, EquipmentSlot equipmentSlot)
+    {
+        _asc.RemoveAbility(item.AttackAbility);
     }
 }

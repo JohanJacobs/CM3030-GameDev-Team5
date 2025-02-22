@@ -15,6 +15,10 @@ public interface IAbilityLogic
     void EndAbility(AbilityInstance abilityInstance);
 
     void UpdateAbility(AbilityInstance abilityInstance, float deltaTime);
+
+    void HandleAbilityInputActionPressed(AbilityInstance abilityInstance, InputAction action);
+
+    void HandleAbilityInputActionReleased(AbilityInstance abilityInstance, InputAction action);
 }
 
 public abstract class AbilityLogic : IAbilityLogic
@@ -46,6 +50,14 @@ public abstract class AbilityLogic : IAbilityLogic
     }
 
     public virtual void UpdateAbility(AbilityInstance abilityInstance, float deltaTime)
+    {
+    }
+
+    public void HandleAbilityInputActionPressed(AbilityInstance abilityInstance, InputAction action)
+    {
+    }
+
+    public void HandleAbilityInputActionReleased(AbilityInstance abilityInstance, InputAction action)
     {
     }
 }

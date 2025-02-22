@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61001364c98383a418444f337a1a05a2, type: 3}
+  m_Name: TestCrossbowAttackAbility
+  m_EditorClassIdentifier: 
+  ActivateOnGranted: 0
+  CostEffect: {fileID: 0}
+  CooldownEffect: {fileID: 11400000, guid: c17ab17db13c2be409cb957e56e979ed, type: 2}
+  Tags: []
+  BlockTags: []
+  CancelTags: []
+  GrantedTags: []
+  AbilityInstanceDataClass:
+    ClassName: DefaultAbilityInstanceData
+  InputPolicy: 2
+  InputTag:
+    _string: Input.SecondaryAbility
+  InputMappingContext: {fileID: 0}
+  Projectile: {fileID: 7555594608446399897, guid: 3567032df972d3541b0d500441c621a2,
+    type: 3}
