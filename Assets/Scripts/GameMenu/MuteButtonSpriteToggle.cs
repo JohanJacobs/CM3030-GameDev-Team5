@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using static VolumeSettings;
@@ -29,5 +30,4 @@ public class MuteButtonSpriteToggle: MonoBehaviour
     {
         image.sprite = volumeSettings.IsAudioMuted ? muteSprite : notMuteSprite;
     }
-
 }
