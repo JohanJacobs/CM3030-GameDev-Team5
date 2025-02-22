@@ -26,8 +26,7 @@ public class AbilityTextOrientation : MonoBehaviour
     {
         var vector_from_player_to_camera = _cameraTransform.position - _playerTransform.position;
 
-        var look_at_position = transform.position + vector_from_player_to_camera;
-        transform.LookAt(look_at_position);
-        transform.RotateAround(transform.position, transform.up, 180f);
+        var look_at_position = transform.position - vector_from_player_to_camera;
+        transform.LookAt(look_at_position);        
     }
 }
