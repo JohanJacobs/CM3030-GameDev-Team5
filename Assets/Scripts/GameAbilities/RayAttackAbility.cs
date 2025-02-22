@@ -1,5 +1,17 @@
-using UnityEngine;
+/*
 
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+RayAttackAbility.cs
+
+*/
+
+using UnityEngine;
 [CreateAssetMenu(menuName = "Abilities/Ray Attack")]
 public class RayAttackAbility : AttackAbility
 {

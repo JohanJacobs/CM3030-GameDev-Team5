@@ -1,3 +1,16 @@
+/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+AbilitySystemUtility.cs
+
+*/
+
 using UnityEngine;
 
 public static class AbilitySystemUtility

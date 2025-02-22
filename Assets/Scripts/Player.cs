@@ -1,4 +1,18 @@
-﻿using UnityEngine;
+﻿/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+Player.cs
+
+Class Player is used to manage some player attack related abilities
+
+*/
+using UnityEngine;
 
 public class Player : Creature, IAttackAbilityAimProvider, IAttackAbilityDispatcher
 {

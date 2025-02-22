@@ -1,3 +1,16 @@
+/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+MagnitudePropertyDrawer.cs
+
+*/
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

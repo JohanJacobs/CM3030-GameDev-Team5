@@ -1,3 +1,18 @@
+/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+GameController.cs
+
+Class GameController deals with minion and loot spawning and some audio effects
+
+*/
+
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;

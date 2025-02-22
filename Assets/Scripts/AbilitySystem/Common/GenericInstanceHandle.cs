@@ -1,3 +1,16 @@
+/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+GenericInstanceHandle.cs
+
+*/
+
 using System;
 
 public abstract class GenericInstanceHandle<T> where T: class

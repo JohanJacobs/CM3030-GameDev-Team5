@@ -1,4 +1,20 @@
-﻿using System;
+﻿/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+PlayerController.cs
+
+Class PlayerController is used to manage attributes and player actions such as movement, aiming, firing, being hit, dying and others
+
+
+*/
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

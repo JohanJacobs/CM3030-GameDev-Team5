@@ -1,4 +1,19 @@
-﻿using UnityEngine;
+﻿/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+Monster.cs
+
+Class Monster used to manage Monster properties and methods.
+
+*/
+
+using UnityEngine;
 using UnityEngine.AI;
 
 public class Monster : Creature

@@ -1,4 +1,16 @@
 using UnityEngine;
+/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+GarlicAbility.cs
+
+*/
 
 [AbilityInstanceDataClass]
 public class GarlicAbilityInstanceData : AbilityInstanceData

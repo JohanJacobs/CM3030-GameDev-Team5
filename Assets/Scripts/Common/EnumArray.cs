@@ -1,3 +1,16 @@
+/*
+
+University of London
+BsC Computer Science Course
+Games Design
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+EnumArray.cs
+
+*/
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
