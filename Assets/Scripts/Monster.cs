@@ -192,14 +192,18 @@ public class Monster : Creature
 
     private void PlayDeathAnimation()
     {
-        _animator.SetBool("IsDead", true);
+        // select one of the random 3 death animations
+        var max_death_animmation = 3;
+        var death_animation = Random.Range(0, max_death_animmation);
+        
+        // set the animation
+        _animator.SetInteger("IsDead", death_animation);
     }
 
     private void PlayAttackAnimation()
     {
         _animator.SetTrigger("IsAttacking");
     }
-
 
     // Determine if we are still playing the spawn animation and change the state when it is done.
     private void UpdateSpawnState()
