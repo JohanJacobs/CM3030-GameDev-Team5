@@ -5,7 +5,7 @@ public class Monster : Creature
 {
     public float ApproachDistance = 0.3f;
 
-    public Animator animator;
+    public Animator _animator;
 
     public float Speed => AbilitySystemComponent.GetAttributeValue(AttributeType.MoveSpeed);
     public float TurnSpeed => AbilitySystemComponent.GetAttributeValue(AttributeType.TurnSpeed);
@@ -23,14 +23,25 @@ public class Monster : Creature
 
     private Vector3 _knockBackForce = Vector3.zero;
 
+
+    private bool _isSpawning = true; // Required to stop the navmesh movement when spawning.
+    private string _spawnAnimationClipName = "Spawn_Ground_Skeletons";
+
     void Start()
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _target = GameObject.FindGameObjectWithTag("Player");
+        _animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
     {
+        if (_isSpawning)
+        {
+            UpdateSpawnState();
+            return;
+        }
+
         var deltaTime = Time.deltaTime;
 
         {
@@ -91,7 +102,7 @@ public class Monster : Creature
     {
         var walkSpeedMultiplier = Mathf.Max(Speed / WalkAnimationMoveSpeed, 0);
 
-        animator.SetFloat("WalkSpeedMultiplier", walkSpeedMultiplier);
+        _animator.SetFloat("WalkSpeedMultiplier", walkSpeedMultiplier);
     }
 
     private void UpdateNavMeshMovement()
@@ -176,16 +187,45 @@ public class Monster : Creature
 
     private void PlayHitAnimation()
     {
-        animator.SetTrigger("IsHit");
+        _animator.SetTrigger("IsHit");
     }
 
     private void PlayDeathAnimation()
     {
-        animator.SetBool("IsDead", true);
+        _animator.SetBool("IsDead", true);
     }
 
     private void PlayAttackAnimation()
     {
-        animator.SetTrigger("IsAttacking");
+        _animator.SetTrigger("IsAttacking");
+    }
+
+
+    // Determine if we are still playing the spawn animation and change the state when it is done.
+    private void UpdateSpawnState()
+    {
+        // nothign to do if the spawning is already done
+        if (!_isSpawning)
+            return;
+
+        // if the animator is missing then disable the spawn animation wait
+        if (_animator == null)
+        {            
+            _isSpawning = false;
+            return;
+        }
+
+        /*
+            Get the Current animation clip that is playing and determine if it is the spawning animation to 
+            update _isSpawning state
+            https://docs.unity3d.com/2019.4/Documentation/ScriptReference/Animator.GetCurrentAnimatorClipInfo.html
+        */
+        AnimatorClipInfo[] clipInfo = _animator.GetCurrentAnimatorClipInfo(0);
+        if (clipInfo.Length > 0)
+        {
+            var activeClipName = clipInfo[0].clip.name; 
+            _isSpawning = (activeClipName == _spawnAnimationClipName); 
+        }
+
     }
 }
