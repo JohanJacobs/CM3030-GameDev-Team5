@@ -73,9 +73,8 @@ public class TextPopup : MonoBehaviour
         var norm_vec = vec_from_player_to_screen.normalized;
 
         // the point the pickup should be pointing to get the correct orientation
-        var text_look_point = transform.position + norm_vec * dist;
-            
+        var text_look_point = transform.position - norm_vec * dist;
+        
         transform.LookAt(text_look_point);
-        transform.RotateAround(transform.position, transform.up, 180f);
     }
 }
