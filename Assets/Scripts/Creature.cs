@@ -14,6 +14,12 @@ public class Creature : MonoBehaviour
 
     public EquipmentAttachmentSlot[] EquipmentAttachmentSlots;
 
+    /// <summary>
+    /// This is, roughly, how fast creature will move if driven by animation (depends on animation clip FPS and number of frames).
+    /// Used to adjust animation speed based on actual move speed.
+    /// </summary>
+    public float WalkAnimationMoveSpeed = 2f;
+
     public bool IsDead => HealthComponent.IsDead;
     public bool IsAlive => HealthComponent.IsAlive;
     public float Health => HealthComponent.Health;

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Spawner_RatTiny
   m_EditorClassIdentifier: 
   Prefab: {fileID: 7754328594579278399, guid: 7e39884a333b33f41973909c832037aa, type: 3}
-  SpawnInterval: 3
+  SpawnInterval: 0.5
   SpawnAmountMin: 1
   SpawnAmountMax: 1
   MaxMonstersAlive: 5
