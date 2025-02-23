@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9031933728866938606}
   - component: {fileID: 9031933728866938609}
   m_Layer: 0
-  m_Name: ArrowHitParticleEffect
+  m_Name: HitParticleEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -975,8 +975,8 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 3
-        scalar: 40
-        minScalar: 15
+        scalar: 60
+        minScalar: 23
         maxCurve:
           serializedVersion: 2
           m_Curve:

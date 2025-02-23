@@ -16,3 +16,5 @@ MonoBehaviour:
     type: 3}
   PickupSpawnConfiguration: {fileID: 11400000, guid: 6ff65fc43e000004d983952f0c649f64,
     type: 2}
+  hitParticleEffect: {fileID: 9031933728866938608, guid: 4b4d7a23fc2da3b4c99cfda2dff1ecba,
+    type: 3}

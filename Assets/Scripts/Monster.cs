@@ -15,7 +15,6 @@ public class Monster : Creature
     public float AttackRate => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRate);
     public float AttackRange => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRange);
     
-    public GameObject arrowHitParticleEffect;
 
     private NavMeshAgent _navMeshAgent;
 
@@ -73,9 +72,9 @@ public class Monster : Creature
     {
         PlayHitAnimation();
 
-        if(arrowHitParticleEffect != null)
+        if(GameData.Instance.hitParticleEffect != null)
         {
-            GameObject particleEffectInstance = (GameObject)Instantiate(arrowHitParticleEffect, transform.position, Quaternion.identity);
+            GameObject particleEffectInstance = Instantiate(GameData.Instance.hitParticleEffect, transform.position, Quaternion.identity);
             Destroy(particleEffectInstance, 2f);
         }
 
