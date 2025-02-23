@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 1652849414618631578}
   - component: {fileID: 8944181027364234105}
   - component: {fileID: 1800627569477579043}
-  - component: {fileID: 7721195215448160160}
   m_Layer: 0
   m_Name: AbilityDescription
   m_TagString: Untagged
@@ -29,15 +28,15 @@ RectTransform:
   m_GameObject: {fileID: 1409578826802933554}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3220404180454290509}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 1.5}
-  m_SizeDelta: {x: 20, y: 5}
+  m_AnchoredPosition: {x: 0, y: 2}
+  m_SizeDelta: {x: 6, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &1652849414618631578
 MeshRenderer:
@@ -105,9 +104,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Ability Name:
+  m_text: '<uppercase>Ability</uppercase>
 
-    This abilitiy does someting special!'
+    <size=60%>This abilitiy does someting
+    special!</size>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e97aa742c15338348a51833b39b6af5b, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: e97aa742c15338348a51833b39b6af5b, type: 2}
@@ -134,8 +134,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 1
-  m_fontSizeBase: 1
+  m_fontSize: 0.5
+  m_fontSizeBase: 0.5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -158,7 +158,7 @@ MonoBehaviour:
   m_enableKerning: 1
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
-  m_isRichText: 0
+  m_isRichText: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -179,18 +179,6 @@ MonoBehaviour:
   _SortingLayer: 0
   _SortingLayerID: 0
   _SortingOrder: 0
---- !u!114 &7721195215448160160
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1409578826802933554}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd82e17f996b31049a10efe157220b27, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4819070449222524740
 GameObject:
   m_ObjectHideFlags: 0
