@@ -1,9 +1,8 @@
-
 /*
 
 University of London
 BsC Computer Science Course
-Games Design
+Games Development
 Final Assignment - Streets of Fire Game
 
 Group 5 
@@ -12,6 +11,7 @@ AbilityInstanceDataClassPropertyDrawer.cs
 
 
 */
+
 using System;
 using System.Linq;
 using UnityEditor;

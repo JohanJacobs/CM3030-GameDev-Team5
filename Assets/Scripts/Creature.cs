@@ -2,12 +2,14 @@
 
 University of London
 BsC Computer Science Course
-Games Design
+Games Development
 Final Assignment - Streets of Fire Game
 
 Group 5 
 
-creature.cs
+Please refer to the README file for detailled information
+
+Creature.cs
 
 Class Creature manages a number of creature attributes such as health, state and abilities
 
