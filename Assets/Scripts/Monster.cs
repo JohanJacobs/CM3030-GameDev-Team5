@@ -14,6 +14,8 @@ public class Monster : Creature
     public float DamageMax => AbilitySystemComponent.GetAttributeValue(AttributeType.MaxDamage);
     public float AttackRate => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRate);
     public float AttackRange => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRange);
+    
+    public GameObject arrowHitParticleEffect;
 
     private NavMeshAgent _navMeshAgent;
 
@@ -70,6 +72,12 @@ public class Monster : Creature
     protected override void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
     {
         PlayHitAnimation();
+
+        if(arrowHitParticleEffect != null)
+        {
+            GameObject particleEffectInstance = (GameObject)Instantiate(arrowHitParticleEffect, transform.position, Quaternion.identity);
+            Destroy(particleEffectInstance, 2f);
+        }
 
         // TODO: shouldn't be here
         var knockBackMagnitude = AbilitySystemUtility.GetAttributeValueOrDefault(causer, AttributeType.KnockBack, 1);
