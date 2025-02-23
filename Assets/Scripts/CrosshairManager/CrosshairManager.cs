@@ -11,7 +11,7 @@ public class CrosshairManager : MonoBehaviour
 
     [SerializeField] LayerMask worldLayer;
     [SerializeField] LayerMask enemyLayer;
-    
+
     [SerializeField] Transform visual;
 
     SpriteRenderer _spriteRender;
@@ -22,13 +22,14 @@ public class CrosshairManager : MonoBehaviour
         _camera = Camera.main;
         _spriteRender = GetComponentInChildren<SpriteRenderer>();
     }
+
     public void LateUpdate()
-    {        
+    {
         if (GetMouseWorldPosition(out var world_position, out var hitEnemy))
         {
             EnableCrosshair();
             SetCrosshairPosition(world_position);
-            SetCrosshairColor(hitEnemy);            
+            SetCrosshairColor(hitEnemy);
         }
         else
         {
@@ -43,7 +44,7 @@ public class CrosshairManager : MonoBehaviour
         hitEnemy = false;
 
         // keep track if we actually hit shows how the world point
-        bool foundWorldPoint = false;         
+        bool foundWorldPoint = false;
 
         // find the location of the mouse in the world by raycasting into the world 
         // through the camera
@@ -55,24 +56,24 @@ public class CrosshairManager : MonoBehaviour
         if (hitAll.Length == 0)
             return false;
 
-        
+
         // check all the gameObjects we hit and update the state 
         // based on the layer the object is in.
         foreach (var target in hitAll)
         {
             if (enemyLayer.TestGameObjectLayer(target.collider.gameObject))
             {
-                hitEnemy = true;                
+                hitEnemy = true;
             }
             else if (worldLayer.TestGameObjectLayer(target.collider.gameObject))
             {
                 // save the point that we collide with in the world
                 worldPosition = target.point;
                 worldPosition.y = worldPosition.y > 0.5f ? 0.5f : worldPosition.y;
-                foundWorldPoint = true;                
+                foundWorldPoint = true;
             }
         }
-        
+
         return foundWorldPoint;
     }
 
@@ -105,6 +106,6 @@ public class CrosshairManager : MonoBehaviour
     // based on if we hit an enemy or not.
     private void SetCrosshairColor(bool hitEnemy)
     {
-        _spriteRender.color = hitEnemy?enemyColor:defaultColor;            
+        _spriteRender.color = hitEnemy ? enemyColor : defaultColor;
     }
 }
