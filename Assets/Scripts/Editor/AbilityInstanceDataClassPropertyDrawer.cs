@@ -7,6 +7,8 @@ Final Assignment - Streets of Fire Game
 
 Group 5 
 
+Please refer to the README file for detailled information
+
 AbilityInstanceDataClassPropertyDrawer.cs
 
 
