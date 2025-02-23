@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: Spawner_Rat
   m_EditorClassIdentifier: 
   Prefab: {fileID: 3794237158255692260, guid: d28ab01b54ed6ed4eb816bcd7dc6deea, type: 3}
-  SpawnInterval: 2.5
+  SpawnInterval: 1
   SpawnAmountMin: 3
   SpawnAmountMax: 6
   MaxMonstersAlive: 20
+  SpawnDelay: 0
+  SpawnTime: 0
