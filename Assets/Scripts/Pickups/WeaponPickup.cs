@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class WeaponPickup : Pickup
 {
+    // cache reference for easier access
+    private static AudioManager audioManager => AudioManager.Instance;
+
     public WeaponItem WeaponItem;
 
     protected override bool HandlePickUpImpl(GameObject target)
@@ -14,6 +17,7 @@ public class WeaponPickup : Pickup
         {
             // auto equip
             equipmentComponent.EquipItem(WeaponItem);
+            audioManager.PlaySFX(audioManager.grabExperienceSound);
             return true;
         }
 
