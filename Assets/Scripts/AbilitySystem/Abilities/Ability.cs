@@ -38,6 +38,9 @@ public abstract class Ability : ScriptableObject, IAbilityLogic
 
     public InputMappingContext InputMappingContext;
 
+    public string DisplayName;
+    public string Description;
+
     public bool HasBlockTags => BlockTags != null && BlockTags.Length > 0;
     public bool HasCancelTags => CancelTags != null && CancelTags.Length > 0;
     public bool HasGrantedTags => GrantedTags != null && GrantedTags.Length > 0;

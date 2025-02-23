@@ -18,3 +18,5 @@ MonoBehaviour:
     type: 2}
   hitParticleEffect: {fileID: 9031933728866938608, guid: 4b4d7a23fc2da3b4c99cfda2dff1ecba,
     type: 3}
+  PlayerPrefab: {fileID: 6552311690192007200, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
+    type: 3}
