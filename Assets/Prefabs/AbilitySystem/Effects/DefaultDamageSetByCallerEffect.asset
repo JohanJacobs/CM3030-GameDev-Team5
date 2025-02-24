@@ -9,22 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1a0424d10eb23f4d9a6cf77471b5f67, type: 3}
-  m_Name: PIckup - Move Speed Boost Effect
+  m_Script: {fileID: 11500000, guid: f757c0ad6b51734449ca6dea493a0a78, type: 3}
+  m_Name: DefaultDamageSetByCallerEffect
   m_EditorClassIdentifier: 
-  Modifiers:
-  - Attribute: 6
-    Type: 2
-    Value: 1.2
-    Permanent: 0
-    Post: 0
-  DurationPolicy: 1
+  Modifiers: []
+  DurationPolicy: 0
   CancellationPolicy: 1
   Duration:
     Calculation: 0
     AttributeProvider: 1
     Attribute: 0
-    Value: 5
+    Value: 0
   Period:
     Calculation: 0
     AttributeProvider: 1
@@ -34,3 +29,10 @@ MonoBehaviour:
   BlockTags: []
   CancelTags: []
   GrantedTags: []
+  AmountCalculation: 1
+  OriginCalculation: 0
+  Amount:
+    Calculation: 0
+    AttributeProvider: 1
+    Attribute: 0
+    Value: 0

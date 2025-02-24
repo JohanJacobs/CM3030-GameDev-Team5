@@ -18,7 +18,7 @@ MonoBehaviour:
   Duration:
     Calculation: 5
     AttributeProvider: 1
-    Attribute: 22
+    Attribute: 23
     Value: 0.8
   Period:
     Calculation: 0

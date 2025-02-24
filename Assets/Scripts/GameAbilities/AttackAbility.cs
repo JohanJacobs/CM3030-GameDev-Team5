@@ -24,6 +24,8 @@ public class AttackAbilityInstanceData : AbilityInstanceData
 
 public abstract class AttackAbility : Ability
 {
+    public DamageEffect DamageEffect;
+
     public Magnitude DamageMin;
     public Magnitude DamageMax;
     public Magnitude Range;

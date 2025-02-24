@@ -1,3 +1,4 @@
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Abilities/Ray Attack")]
@@ -12,7 +13,8 @@ public class RayAttackAbility : AttackAbility
 
         GetDefaultAttackOriginAndDirection(abilityInstance, out var origin, out var direction);
 
-        var ray = new Ray(origin, direction);
+        // HACK: ray comes from attacker center with slight vertical offset
+        var ray = new Ray(attacker.transform.position + Vector3.up * 0.5f, direction);
 
         var range = Range.Calculate(abilityInstance);
         var damageMin = DamageMin.Calculate(abilityInstance);
@@ -22,10 +24,22 @@ public class RayAttackAbility : AttackAbility
 
         if (Physics.Raycast(ray, out var hit, range, LayerMask))
         {
+            // HACK: update direction for visuals
+            // {
+            //     direction = hit.point - origin;
+            //
+            //     direction.y = 0;
+            //     direction.Normalize();
+            // }
+
             var victim = hit.collider.GetComponentInParent<Creature>();
             if (victim)
             {
-                attacker.DealDamage(victim, origin, damage);
+                var effectContext = asc.CreateEffectContext(victim.AbilitySystemComponent, abilityInstance);
+
+                effectContext.SetValue(DamageEffect.AmountSetByCaller, damage);
+
+                asc.ApplyEffectWithContext(DamageEffect, effectContext);
             }
         }
 
