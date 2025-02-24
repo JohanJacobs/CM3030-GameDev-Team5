@@ -22,7 +22,7 @@ public class Projectile : MonoBehaviour
     public LayerMask LayerMask;
     public float Lifespan = 10;
     public bool DestroyOnHit = true;
-
+    
     public GameObject Owner
     {
         get => _owner;

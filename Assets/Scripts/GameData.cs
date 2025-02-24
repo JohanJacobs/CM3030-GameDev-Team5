@@ -26,7 +26,11 @@ public class GameData : ScriptableObject
         {
             if (_instance == null)
             {
-                _instance = Resources.Load<GameData>("DefaultGameData");
+                var prefab = Resources.Load<GameData>("DefaultGameData");
+
+                _instance = Instantiate(prefab);
+
+                DontDestroyOnLoad(_instance);
             }
 
             return _instance;
@@ -35,6 +39,8 @@ public class GameData : ScriptableObject
 
     public GameObject ExperienceOrbPickupPrefab;
     public PickupSpawnConfiguration PickupSpawnConfiguration;
+    public GameObject hitParticleEffect;
+    public Player PlayerPrefab;
 
     private static GameData _instance;
 }
