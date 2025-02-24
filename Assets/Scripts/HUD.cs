@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using TMPro;
+using System;
 
 
 public class HUD : MonoBehaviour
@@ -17,6 +18,8 @@ public class HUD : MonoBehaviour
 
     public Text HighestScoreText;
     public Text CurrentScoreText;
+
+    public Text CurrentTimerText;
 
     public void UpdateHealth(float health, float maxHealth)
     {
@@ -54,4 +57,15 @@ public class HUD : MonoBehaviour
     {
         SceneManager.LoadScene("GameScene");
     }
+
+    #region TimerDisplay
+    public void SetTimerValue(float timeLeftInSeconds)
+    {
+        if (CurrentTimerText == null)
+            return;
+
+        var timeSpan = TimeSpan.FromSeconds(timeLeftInSeconds); //https://learn.microsoft.com/en-us/dotnet/api/system.timespan.tostring?view=net-9.0&redirectedfrom=MSDN#System_TimeSpan_ToString_System_String_
+        CurrentTimerText.text = timeSpan.ToString(@"mm\:ss");
+    }
+    #endregion TimerDisplay
 }

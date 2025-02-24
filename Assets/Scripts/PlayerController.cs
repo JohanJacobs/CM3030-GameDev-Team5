@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(CharacterController), typeof(Player))]
 public class PlayerController : MonoBehaviour
-{
+{    
     AudioManager audioManager;
 
     public Animator Animator;
@@ -24,8 +25,10 @@ public class PlayerController : MonoBehaviour
     private CharacterController _characterController;
     private Player _player;
     private HUD _hud;
-    private GameMenu _gameMenu;
+    public HUD GetHud() => _hud;
 
+    private GameMenu _gameMenu;
+    
     private AbilitySystemComponent _asc;
     private InputComponent _inputComponent;
     private EquipmentComponent _equipmentComponent;
@@ -228,8 +231,7 @@ public class PlayerController : MonoBehaviour
     {
         audioManager.PlaySFX(audioManager.playerDeadSound);
         PlayDeathAnimation();
-        ShowWasted();
-        UpdatePlayerScore();
+        RestartPlayer();
     }
 
     private void HandlePlayerDamageTaken()
@@ -366,4 +368,12 @@ public class PlayerController : MonoBehaviour
     {
         _asc.RemoveAbility(item.AttackAbility);
     }
+
+    #region GameTimerRElatedFunctions
+    public void RestartPlayer()
+    {
+        ShowWasted();
+        UpdatePlayerScore();
+    }
+    #endregion
 }

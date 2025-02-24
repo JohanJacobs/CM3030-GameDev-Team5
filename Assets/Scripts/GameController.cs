@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
 
     private GameObject _player;
 
+    private GameTimer _gameTimer;
 
     void Awake()
     {
@@ -34,6 +35,13 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
             .Select(monsterSpawner => new MonsterSpawnerInstance(monsterSpawner, this));
 
         _monsterSpawnerInstances.AddRange(monsterSpawnerInstances);
+
+        // Setup the game timer 
+        if (_player.TryGetComponent<PlayerController>(out var pc))
+        {
+            int game_time_in_minutes = 1;
+            _gameTimer = new GameTimer(game_time_in_minutes * 60, pc.GetHud(), () => { pc.RestartPlayer(); });
+        }
     }
 
     void Update()
@@ -41,10 +49,14 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
         if (_player == null)
             return;
 
+        _gameTimer.Update(Time.deltaTime);
+
         foreach (var monsterSpawnerInstance in _monsterSpawnerInstances)
         {
             monsterSpawnerInstance.Update();
         }
+
+
     }
 
     #region Monster Spawn
