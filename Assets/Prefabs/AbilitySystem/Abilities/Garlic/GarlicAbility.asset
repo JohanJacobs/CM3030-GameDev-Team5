@@ -23,13 +23,24 @@ MonoBehaviour:
     ClassName: GarlicAbilityInstanceData
   InputPolicy: 0
   InputTag:
-    _string: 
+    _string: Untagged
   InputMappingContext: {fileID: 0}
   DisplayName: Garlic
   Description: Stuns and damages nearby monsters
-  TargetEffect: {fileID: 11400000, guid: 92f98b1da81f8a14ea7ef155be329e3b, type: 2}
-  AbilityAttributeSet: {fileID: 11400000, guid: f6274323e166a1541a4ce344c12f8cba,
-    type: 2}
   LayerMask:
     serializedVersion: 2
     m_Bits: 512
+  Range:
+    Calculation: 5
+    AttributeProvider: 1
+    Attribute: 20
+    Value: 3.5
+  Rate:
+    Calculation: 5
+    AttributeProvider: 1
+    Attribute: 22
+    Value: 1.5
+  TargetEffect: {fileID: 11400000, guid: 92f98b1da81f8a14ea7ef155be329e3b, type: 2}
+  TargetEffects:
+  - {fileID: 11400000, guid: 92f98b1da81f8a14ea7ef155be329e3b, type: 2}
+  - {fileID: 11400000, guid: 6095c62a8e36dea4ba96443b4e7a98f2, type: 2}

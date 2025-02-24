@@ -10,6 +10,7 @@ public class EffectInstance
     public bool Canceled => _canceled;
     public bool Active => !Expired && !Canceled;
     public bool Inactive => !Active;
+    public bool SelfTargeted => Context.Target == Context.Source;
     public float TimeRemaining => _timeLeftToExpiration;
 
     public float TimeRemainingFraction
@@ -145,6 +146,19 @@ public class EffectInstance
                 HandleExpiration();
             }
         }
+    }
+
+    public T GetEffect<T>() where T : Effect
+    {
+        if (Effect is T concreteEffect)
+            return concreteEffect;
+
+        throw new InvalidOperationException($"Requested invalid effect type {typeof(T)}");
+    }
+
+    public float CalculateMagnitude(Magnitude magnitude)
+    {
+        return magnitude.Calculate(Context);
     }
 
     private void CancelAllModifiers()

@@ -1,6 +1,7 @@
 public sealed class EffectHandle : GenericInstanceHandle<EffectInstance>
 {
     public EffectInstance EffectInstance => Instance;
+    public EffectContext EffectContext => Instance?.Context;
 
     /// <summary>
     /// Will be <see langword="true" /> if this handle points to an active effect instance, <see langword="false" /> otherwise

@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class AbilityInstance
 {
-    public AbilitySystemComponent AbilitySystemComponent => _weakAbilitySystemComponent.TryGetTarget(out var asc) ? asc : null;
-    public Ability Ability { get; }
+    public AbilitySystemComponent AbilitySystemComponent { get; private set; }
+    public Creature Owner { get; private set; }
+    public Ability Ability { get; private set; }
+    public Tag InputTag { get; set; }
     public bool Active => _active;
     public AbilityInstanceData Data => _data;
-    public Tag InputTag { get; set; }
-    public Creature Owner => AbilitySystemComponent?.GetComponent<Creature>();
 
     public float CooldownTimeRemainingFraction
     {
@@ -22,8 +22,6 @@ public class AbilityInstance
         }
     }
 
-    private readonly WeakReference<AbilitySystemComponent> _weakAbilitySystemComponent;
-
     private IAbilityLogic _abilityLogic;
 
     private EffectHandle _costEffectHandle;
@@ -36,14 +34,14 @@ public class AbilityInstance
 
     public AbilityInstance(AbilitySystemComponent asc, Ability ability)
     {
+        AbilitySystemComponent = asc;
+        Owner = asc.GetComponent<Creature>();
         Ability = ability;
         InputTag = ability.InputTag;
 
-        _weakAbilitySystemComponent = new WeakReference<AbilitySystemComponent>(asc);
-
         _abilityLogic = ability;
 
-        _data = Ability.AbilityInstanceDataClass.CreateInstance();
+        _data = ability.AbilityInstanceDataClass.CreateInstance();
     }
 
     public void NotifyAdded()
@@ -59,6 +57,10 @@ public class AbilityInstance
     public void Destroy()
     {
         Debug.Assert(!Active, "Destroying active ability instance probably points to logic error");
+
+        AbilitySystemComponent = null;
+        Owner = null;
+        Ability = null;
 
         // NOTE: might be required to break cross-reference chain
         _abilityLogic = null;
@@ -100,7 +102,20 @@ public class AbilityInstance
         if (_data is T concreteData)
             return concreteData;
 
-        throw new InvalidOperationException($"Ability instance data of type {typeof(T)} does not exist");
+        throw new InvalidOperationException($"Requested invalid ability instance data type {typeof(T)}");
+    }
+
+    public T GetAbility<T>() where T : Ability
+    {
+        if (Ability is T concreteAbility)
+            return concreteAbility;
+
+        throw new InvalidOperationException($"Requested invalid ability type {typeof(T)}");
+    }
+
+    public float CalculateMagnitude(Magnitude magnitude)
+    {
+        return magnitude.Calculate(this);
     }
 
     private void Activate()

@@ -6,6 +6,7 @@ using UnityEngine;
 public class AbilitySystemComponent : MonoBehaviour
 {
     public delegate void SelfDelegate(AbilitySystemComponent asc);
+    public delegate void AttributeValueMutatorDelegate(AbilitySystemComponent asc, AttributeType attribute, ref float value);
 
     private struct ReadyCallback
     {
@@ -16,6 +17,8 @@ public class AbilitySystemComponent : MonoBehaviour
     private static readonly AttributeType[] AllAttributes = Enum.GetValues(typeof(AttributeType)).Cast<AttributeType>().ToArray();
 
     public IReadOnlyCollection<Tag> Tags => _tags;
+
+    public Creature Owner { get; private set; }
 
     [SerializeField]
     private AttributeSet[] _grantedAttributeSets;
@@ -34,7 +37,15 @@ public class AbilitySystemComponent : MonoBehaviour
 
     private readonly TagContainer _tags = new TagContainer();
 
+    // these two store number of delegates subscribed to respective event
+    // should generally reduce runtime processing cost in case attribute changes frequently but nothing wants to know of these changes
+    private readonly EnumArray<int, AttributeType> _preAttributeModificationDelegateCount = new EnumArray<int, AttributeType>();
+    private readonly EnumArray<int, AttributeType> _postAttributeModificationDelegateCount = new EnumArray<int, AttributeType>();
+
     private bool _ready;
+
+    private event AttributeValueMutatorDelegate PreAttributeModification;
+    private event AttributeValueMutatorDelegate PostAttributeModification;
 
     public void OnReady(SelfDelegate @delegate, int priority = 0)
     {
@@ -51,6 +62,72 @@ public class AbilitySystemComponent : MonoBehaviour
             };
 
             _readyDelegates.Add(callback);
+        }
+    }
+
+    /// <summary>
+    /// Registers delegate to be called before attribute modifier stack is applied. Passed value is attribute's base value.
+    /// Doesn't trigger on direct value changes.
+    /// </summary>
+    /// <remarks>
+    /// Only related to modifier stack so it doesn't trigger on direct value changes. Careful with add/remove pairs.
+    /// Note also that it's possible to have several callbacks for same attribute.
+    /// </remarks>
+    /// <param name="attribute"></param>
+    /// <param name="delegate"></param>
+    public void RegisterPreAttributeModificationCallback(AttributeType attribute, AttributeValueMutatorDelegate @delegate)
+    {
+        PreAttributeModification += @delegate;
+
+        ref var count = ref _preAttributeModificationDelegateCount[attribute];
+
+        {
+            ++count;
+        }
+    }
+
+    public void UnregisterPreAttributeModificationCallback(AttributeType attribute, AttributeValueMutatorDelegate @delegate)
+    {
+        PreAttributeModification -= @delegate;
+
+        ref var count = ref _preAttributeModificationDelegateCount[attribute];
+
+        if (count > 0)
+        {
+            --count;
+        }
+    }
+
+    /// <summary>
+    /// Registers delegate to be called after attribute modifier stack is applied but before storing actual attribute value.
+    /// Passed value is attribute's base value with applied modifier stack.
+    /// </summary>
+    /// <remarks>
+    /// Only related to modifier stack so it doesn't trigger on direct value changes. Careful with add/remove pairs.
+    /// Note also that it's possible to have several callbacks for same attribute.
+    /// </remarks>
+    /// <param name="attribute"></param>
+    /// <param name="delegate"></param>
+    public void RegisterPostAttributeModificationCallback(AttributeType attribute, AttributeValueMutatorDelegate @delegate)
+    {
+        PostAttributeModification += @delegate;
+
+        ref var count = ref _postAttributeModificationDelegateCount[attribute];
+
+        {
+            ++count;
+        }
+    }
+
+    public void UnregisterPostAttributeModificationCallback(AttributeType attribute, AttributeValueMutatorDelegate @delegate)
+    {
+        PostAttributeModification -= @delegate;
+
+        ref var count = ref _postAttributeModificationDelegateCount[attribute];
+
+        if (count > 0)
+        {
+            --count;
         }
     }
 
@@ -114,10 +191,8 @@ public class AbilitySystemComponent : MonoBehaviour
     public void SetAttributeBaseValue(AttributeType attribute, float value)
     {
         var attributeValue = _attributeValues[attribute];
-        if (attributeValue == null)
-            return;
 
-        attributeValue.BaseValue = value;
+        attributeValue?.HACK_SetBaseValue(value);
     }
 
     public float GetAttributeBaseValue(AttributeType attribute)
@@ -125,6 +200,13 @@ public class AbilitySystemComponent : MonoBehaviour
         var attributeValue = _attributeValues[attribute];
 
         return attributeValue?.BaseValue ?? 0f;
+    }
+
+    public void SetAttributeValue(AttributeType attribute, float value)
+    {
+        var attributeValue = _attributeValues[attribute];
+
+        attributeValue?.HACK_SetCurrentValue(value);
     }
 
     public float GetAttributeValue(AttributeType attribute)
@@ -243,10 +325,8 @@ public class AbilitySystemComponent : MonoBehaviour
     public void ApplyPermanentAttributeModifier(AttributeType attribute, ScalarModifier scalarModifier)
     {
         var attributeValue = _attributeValues[attribute];
-        if (attributeValue == null)
-            return;
 
-        attributeValue.BaseValue = scalarModifier.Calculate(attributeValue.BaseValue);
+        attributeValue?.HACK_SetBaseValue(scalarModifier.Calculate(attributeValue.BaseValue));
     }
 
     /// <summary>
@@ -258,10 +338,8 @@ public class AbilitySystemComponent : MonoBehaviour
     public void ApplyPermanentAttributeOverride(AttributeType attribute, float scalarOverride)
     {
         var attributeValue = _attributeValues[attribute];
-        if (attributeValue == null)
-            return;
 
-        attributeValue.BaseValue = scalarOverride;
+        attributeValue?.HACK_SetBaseValue(scalarOverride);
     }
 
     /// <summary>
@@ -329,11 +407,29 @@ public class AbilitySystemComponent : MonoBehaviour
         return context.Target.ApplyEffect(effect, context);
     }
 
+    public EffectHandle ApplyEffectToSelf(Effect effect, AbilityInstance abilityInstance)
+    {
+        effect.Validate();
+
+        var context = new EffectContext(this, this, abilityInstance);
+
+        return context.Target.ApplyEffect(effect, context);
+    }
+
     public EffectHandle ApplyEffectToTarget(Effect effect, AbilitySystemComponent target)
     {
         effect.Validate();
 
         var context = new EffectContext(this, target);
+
+        return context.Target.ApplyEffect(effect, context);
+    }
+
+    public EffectHandle ApplyEffectToTarget(Effect effect, AbilitySystemComponent target, AbilityInstance abilityInstance)
+    {
+        effect.Validate();
+
+        var context = new EffectContext(this, target, abilityInstance);
 
         return context.Target.ApplyEffect(effect, context);
     }
@@ -479,6 +575,11 @@ public class AbilitySystemComponent : MonoBehaviour
 
     #region Unity Messages
 
+    private void Awake()
+    {
+        Owner = GetComponent<Creature>();
+    }
+
     private void Start()
     {
         foreach (var attribute in AllAttributes)
@@ -536,6 +637,8 @@ public class AbilitySystemComponent : MonoBehaviour
         _effectInstances.Clear();
         _abilityInstances.Clear();
         _tags.Clear();
+
+        Owner = null;
     }
 
     #endregion
@@ -565,7 +668,23 @@ public class AbilitySystemComponent : MonoBehaviour
 
     private void UpdateAttributeValue(AttributeValue attributeValue, AttributeModifierStack attributeModifierStack)
     {
-        attributeValue.Value = attributeModifierStack.Calculate(attributeValue.BaseValue);
+        var attribute = attributeValue.Attribute;
+
+        float value = attributeValue.BaseValue;
+
+        if (!attribute.IsMetaAttribute() && _preAttributeModificationDelegateCount[attribute] > 0)
+        {
+            PreAttributeModification?.Invoke(this, attribute, ref value);
+        }
+
+        value = attributeModifierStack.Calculate(attributeValue.BaseValue);
+
+        if (!attribute.IsMetaAttribute() && _postAttributeModificationDelegateCount[attribute] > 0)
+        {
+            PostAttributeModification?.Invoke(this, attribute, ref value);
+        }
+
+        attributeValue.HACK_SetCurrentValue(value);
     }
 
     private EffectHandle ApplyEffect(Effect effect, EffectContext context)
@@ -759,40 +878,4 @@ public class AbilitySystemComponent : MonoBehaviour
     }
 
     #endregion
-}
-
-public static class AbilitySystemHelper
-{
-    private static void AddAttributeValue(this AbilitySystemComponent self, AttributeType attribute, float amount)
-    {
-        var attributeValue = self.GetAttributeValueObject(attribute);
-        if (attributeValue == null)
-            return;
-
-        attributeValue.Value += amount;
-    }
-
-    public static void AddExperience(this AbilitySystemComponent self, float amount)
-    {
-        Debug.Assert(!(amount < 0), "Experience amount must be non-negative");
-
-        if (amount > 0)
-            self.AddAttributeValue(AttributeType.Experience, amount);
-    }
-
-    public static void AddDamage(this AbilitySystemComponent self, float amount)
-    {
-        Debug.Assert(!(amount < 0), "Damage amount must be non-negative");
-
-        if (amount > 0)
-            self.AddAttributeValue(AttributeType.Damage, amount);
-    }
-
-    public static void AddHealing(this AbilitySystemComponent self, float amount)
-    {
-        Debug.Assert(!(amount < 0), "Healing amount must be non-negative");
-
-        if (amount > 0)
-            self.AddAttributeValue(AttributeType.Healing, amount);
-    }
 }

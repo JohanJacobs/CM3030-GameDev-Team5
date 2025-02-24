@@ -29,15 +29,10 @@ public enum AttributeType
     KnockBack,
     KnockBackResistance,
 
-    AreaOfEffectBonus,
-    AreaOfEffectBonusFraction,
-    AreaOfEffectMultiplier,
-
-    GarlicAttackRange,
-    GarlicAttackRate,
-    GarlicAttackDamage,
-
-    AbsorptionRadius,
+    RangeScale,
+    DamageScale,
+    HealingScale,
+    CooldownScale,
 }
 
 public static class AttributeTypeHelper
@@ -55,6 +50,20 @@ public static class AttributeTypeHelper
             case AttributeType.Experience:
             case AttributeType.Damage:
             case AttributeType.Healing:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public static bool IsScaleAttribute(this AttributeType self)
+    {
+        switch (self)
+        {
+            case AttributeType.RangeScale:
+            case AttributeType.DamageScale:
+            case AttributeType.HealingScale:
+            case AttributeType.CooldownScale:
                 return true;
             default:
                 return false;

@@ -17,3 +17,11 @@ MonoBehaviour:
     _defaultValue: 0
   - _attribute: 17
     _defaultValue: 0
+  - _attribute: 20
+    _defaultValue: 1
+  - _attribute: 21
+    _defaultValue: 1
+  - _attribute: 22
+    _defaultValue: 1
+  - _attribute: 23
+    _defaultValue: 1

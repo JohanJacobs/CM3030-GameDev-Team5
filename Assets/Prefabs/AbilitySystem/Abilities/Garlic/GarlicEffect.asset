@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1a0424d10eb23f4d9a6cf77471b5f67, type: 3}
+  m_Script: {fileID: 11500000, guid: 290b9ef0ad6d80f46bc474a481ab0ebe, type: 3}
   m_Name: GarlicEffect
   m_EditorClassIdentifier: 
   Modifiers:
@@ -44,3 +44,8 @@ MonoBehaviour:
   BlockTags: []
   CancelTags: []
   GrantedTags: []
+  KnockBackMagnitude:
+    Calculation: 5
+    AttributeProvider: 0
+    Attribute: 18
+    Value: 1.5

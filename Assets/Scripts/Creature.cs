@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.UI.Image;
 
 [RequireComponent(typeof(AbilitySystemComponent), typeof(HealthComponent))]
 public class Creature : MonoBehaviour
@@ -66,6 +67,23 @@ public class Creature : MonoBehaviour
 
         victim.TakeDamage(GetDamageCauser(), origin, amount);
 
+        if (victim.IsDead)
+        {
+            OnKill(victim);
+
+            Kill?.Invoke(this, victim);
+        }
+    }
+
+    public void NotifyDamageTaken(Creature causer, Vector3 origin, float amount)
+    {
+        OnDamageTaken(causer.gameObject, origin, amount);
+
+        DamageTaken?.Invoke();
+    }
+
+    public void NotifyDamageDealt(Creature victim)
+    {
         if (victim.IsDead)
         {
             OnKill(victim);

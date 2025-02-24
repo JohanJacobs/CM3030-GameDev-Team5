@@ -16,9 +16,9 @@ MonoBehaviour:
   DurationPolicy: 1
   CancellationPolicy: 1
   Duration:
-    Calculation: 6
+    Calculation: 5
     AttributeProvider: 1
-    Attribute: 11
+    Attribute: 22
     Value: 0.8
   Period:
     Calculation: 0

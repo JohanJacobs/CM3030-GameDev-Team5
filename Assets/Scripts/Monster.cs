@@ -14,7 +14,6 @@ public class Monster : Creature
     public float DamageMax => AbilitySystemComponent.GetAttributeValue(AttributeType.MaxDamage);
     public float AttackRate => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRate);
     public float AttackRange => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRange);
-    
 
     private NavMeshAgent _navMeshAgent;
 
@@ -23,6 +22,16 @@ public class Monster : Creature
     private float _toNextAttack = 0f;
 
     private Vector3 _knockBackForce = Vector3.zero;
+
+    public void KnockBack(Vector3 origin, float amount)
+    {
+        if (!(KnockBackResistance < 1))
+            return;
+
+        var direction = transform.position - origin;
+
+        _knockBackForce += direction.normalized * amount * (1f - KnockBackResistance);
+    }
 
     void Start()
     {
@@ -79,19 +88,9 @@ public class Monster : Creature
         }
 
         // TODO: shouldn't be here
-        var knockBackMagnitude = AbilitySystemUtility.GetAttributeValueOrDefault(causer, AttributeType.KnockBack, 1);
-
-        KnockBack(origin, knockBackMagnitude * amount / MaxHealth);
-    }
-
-    private void KnockBack(Vector3 origin, float amount)
-    {
-        if (!(KnockBackResistance < 1))
-            return;
-
-        var direction = transform.position - origin;
-
-        _knockBackForce += direction.normalized * amount * (1f - KnockBackResistance);
+        // var knockBackMagnitude = AbilitySystemUtility.GetAttributeValueOrDefault(causer, AttributeType.KnockBack, 1);
+        //
+        // KnockBack(origin, knockBackMagnitude * amount / MaxHealth);
     }
 
     private void UpdateMovementAnimation()

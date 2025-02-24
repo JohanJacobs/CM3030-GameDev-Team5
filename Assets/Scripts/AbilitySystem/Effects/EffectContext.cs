@@ -1,13 +1,23 @@
 using System;
 
-public class EffectContext
+public sealed class EffectContext
 {
     public AbilitySystemComponent Source => _weakSource.TryGetTarget(out var asc) ? asc : null;
     public AbilitySystemComponent Target => _weakTarget.TryGetTarget(out var asc) ? asc : null;
-    public AbilityInstance Ability { get; }
+
+    public AbilityInstance AbilityInstance
+    {
+        get
+        {
+            if (_weakAbilityInstance == null)
+                return null;
+            return _weakAbilityInstance.TryGetTarget(out var abilityInstance) ? abilityInstance : null;
+        }
+    }
 
     private readonly WeakReference<AbilitySystemComponent> _weakSource;
     private readonly WeakReference<AbilitySystemComponent> _weakTarget;
+    private readonly WeakReference<AbilityInstance> _weakAbilityInstance;
 
     public EffectContext(AbilitySystemComponent source, AbilitySystemComponent target)
     {
@@ -15,9 +25,9 @@ public class EffectContext
         _weakTarget = new WeakReference<AbilitySystemComponent>(target);
     }
 
-    public EffectContext(AbilitySystemComponent source, AbilitySystemComponent target, AbilityInstance ability)
+    public EffectContext(AbilitySystemComponent source, AbilitySystemComponent target, AbilityInstance abilityInstance)
         : this(source, target)
     {
-        Ability = ability;
+        _weakAbilityInstance = new WeakReference<AbilityInstance>(abilityInstance);
     }
 }
