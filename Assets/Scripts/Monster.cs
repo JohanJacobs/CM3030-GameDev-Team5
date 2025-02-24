@@ -24,23 +24,22 @@ public class Monster : Creature
     private Vector3 _knockBackForce = Vector3.zero;
 
 
-    private bool _isSpawning = true; // Required to stop the navmesh movement when spawning.
-    private string _spawnAnimationClipName = "Spawn_Ground_Skeletons";
+    private bool _isSpawning = true; // Required to stop the navmesh movement when spawning.    
+    private Collider _collider; 
 
     void Start()
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _target = GameObject.FindGameObjectWithTag("Player");
         _animator = GetComponentInChildren<Animator>();
+        _collider = GetComponentInChildren<Collider>();
+        _collider.enabled = false;
     }
 
     void Update()
     {
-        if (_isSpawning)
-        {
-            UpdateSpawnState();
+        if (_isSpawning) 
             return;
-        }
 
         var deltaTime = Time.deltaTime;
 
@@ -205,31 +204,15 @@ public class Monster : Creature
         _animator.SetTrigger("IsAttacking");
     }
 
-    // Determine if we are still playing the spawn animation and change the state when it is done.
-    private void UpdateSpawnState()
+    // Callback function for when the SpawnComplete Animation event is triggered
+    public void SpawnAimationCompleted()
     {
-        // nothign to do if the spawning is already done
-        if (!_isSpawning)
-            return;
+        _isSpawning = false;
 
-        // if the animator is missing then disable the spawn animation wait
-        if (_animator == null)
-        {            
-            _isSpawning = false;
-            return;
-        }
-
-        /*
-            Get the Current animation clip that is playing and determine if it is the spawning animation to 
-            update _isSpawning state
-            https://docs.unity3d.com/2019.4/Documentation/ScriptReference/Animator.GetCurrentAnimatorClipInfo.html
-        */
-        AnimatorClipInfo[] clipInfo = _animator.GetCurrentAnimatorClipInfo(0);
-        if (clipInfo.Length > 0)
+        // enable movement and the colliders for the monster.        
+        if (_collider)
         {
-            var activeClipName = clipInfo[0].clip.name; 
-            _isSpawning = (activeClipName == _spawnAnimationClipName); 
+            _collider.enabled = true;
         }
-
     }
 }
