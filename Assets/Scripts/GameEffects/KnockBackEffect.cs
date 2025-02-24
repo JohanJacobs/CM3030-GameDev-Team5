@@ -1,26 +1,60 @@
+using System;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Effects/Knock Back")]
 public class KnockBackEffect : Effect
 {
-    public Magnitude KnockBackMagnitude;
+    public static readonly Tag AmountSetByCaller = new Tag("KnockBackEffect.Amount");
+    public static readonly Tag OriginSetByCaller = new Tag("KnockBackEffect.Origin");
+
+    public EffectAmountCalculation AmountCalculation = EffectAmountCalculation.Magnitude;
+    public EffectOriginCalculation OriginCalculation = EffectOriginCalculation.Source;
+    public Magnitude Amount;
 
     public override void ApplyEffect(EffectInstance effectInstance)
     {
-        // direction will be zero if it targets self
-        if (effectInstance.SelfTargeted)
+        var effectContext = effectInstance.Context;
+
+        if (effectContext.Target.Owner.IsDead)
             return;
 
-        var asc = effectInstance.Context.Target;
-        if (asc == null)
-            return;
+        float amount;
 
-        var monster = asc.Owner as Monster;
+        switch (AmountCalculation)
+        {
+            case EffectAmountCalculation.Magnitude:
+                amount = effectInstance.CalculateMagnitude(Amount);
+                break;
+            case EffectAmountCalculation.SetByCaller:
+                effectContext.GetValue(AmountSetByCaller, out amount);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        Vector3 origin;
+
+        switch (OriginCalculation)
+        {
+            case EffectOriginCalculation.Source:
+                origin = effectContext.Source.transform.position;
+                break;
+            case EffectOriginCalculation.Target:
+                origin = effectContext.Target.transform.position;
+                break;
+            case EffectOriginCalculation.SetByCaller:
+                effectContext.GetValue(OriginSetByCaller, out origin);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        var monster = effectContext.Target.Owner as Monster;
         if (monster == null)
             return;
 
-        var effect = effectInstance.GetEffect<KnockBackEffect>();
+        // TODO: check if amount is positive?
 
-        monster.KnockBack(effectInstance.Context.Source.transform.position, effectInstance.CalculateMagnitude(effect.KnockBackMagnitude));
+        monster.KnockBack(origin, amount);
     }
 }

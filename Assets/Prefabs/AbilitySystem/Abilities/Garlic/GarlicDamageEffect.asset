@@ -29,10 +29,10 @@ MonoBehaviour:
   BlockTags: []
   CancelTags: []
   GrantedTags: []
-  DamageCalculation: 0
-  DamageMagnitude:
+  AmountCalculation: 0
+  OriginCalculation: 0
+  Amount:
     Calculation: 5
     AttributeProvider: 0
     Attribute: 21
     Value: 0.5
-  DamageSetByCaller: 0

@@ -1,18 +1,13 @@
 using System;
 using UnityEngine;
 
-public enum HealCalculation
-{
-    Magnitude,
-    SetByCaller,
-}
-
 [CreateAssetMenu(menuName = "Effects/Heal")]
 public class HealEffect : Effect
 {
-    public HealCalculation HealCalculation = HealCalculation.Magnitude;
-    public Magnitude HealMagnitude;
-    public float HealSetByCaller;
+    public static readonly Tag AmountSetByCaller = new Tag("HealEffect.Amount");
+
+    public EffectAmountCalculation AmountCalculation = EffectAmountCalculation.Magnitude;
+    public Magnitude Amount;
 
     public override void ApplyEffect(EffectInstance effectInstance)
     {
@@ -23,13 +18,13 @@ public class HealEffect : Effect
 
         float amount;
 
-        switch (HealCalculation)
+        switch (AmountCalculation)
         {
-            case HealCalculation.Magnitude:
-                amount = HealMagnitude.Calculate(effectContext);
+            case EffectAmountCalculation.Magnitude:
+                amount = effectInstance.CalculateMagnitude(Amount);
                 break;
-            case HealCalculation.SetByCaller:
-                amount = HealSetByCaller;
+            case EffectAmountCalculation.SetByCaller:
+                effectContext.GetValue(AmountSetByCaller, out amount);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

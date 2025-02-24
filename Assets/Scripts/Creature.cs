@@ -82,7 +82,7 @@ public class Creature : MonoBehaviour
         DamageTaken?.Invoke();
     }
 
-    public void NotifyDamageDealt(Creature victim)
+    public void NotifyDamageDealt(Creature victim, Vector3 origin, float amount)
     {
         if (victim.IsDead)
         {

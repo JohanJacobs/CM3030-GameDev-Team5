@@ -44,7 +44,9 @@ MonoBehaviour:
   BlockTags: []
   CancelTags: []
   GrantedTags: []
-  KnockBackMagnitude:
+  AmountCalculation: 0
+  OriginCalculation: 0
+  Amount:
     Calculation: 5
     AttributeProvider: 0
     Attribute: 18

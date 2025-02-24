@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public sealed class EffectContext
 {
@@ -19,6 +20,8 @@ public sealed class EffectContext
     private readonly WeakReference<AbilitySystemComponent> _weakTarget;
     private readonly WeakReference<AbilityInstance> _weakAbilityInstance;
 
+    private readonly Dictionary<Tag, object> _setByCallerValues = new Dictionary<Tag, object>();
+
     public EffectContext(AbilitySystemComponent source, AbilitySystemComponent target)
     {
         _weakSource = new WeakReference<AbilitySystemComponent>(source);
@@ -29,5 +32,25 @@ public sealed class EffectContext
         : this(source, target)
     {
         _weakAbilityInstance = new WeakReference<AbilityInstance>(abilityInstance);
+    }
+
+    public void SetValue<T>(in Tag tag, T value)
+    {
+        _setByCallerValues[tag] = value;
+    }
+
+    public bool GetValue<T>(in Tag tag, out T value)
+    {
+        if (_setByCallerValues.TryGetValue(tag, out var obj))
+        {
+            if (obj is T concreteValue)
+            {
+                value = concreteValue;
+                return true;
+            }
+        }
+
+        value = default;
+        return false;
     }
 }

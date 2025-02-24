@@ -1,18 +1,15 @@
 using System;
 using UnityEngine;
 
-public enum DamageCalculation
-{
-    Magnitude,
-    SetByCaller,
-}
-
 [CreateAssetMenu(menuName = "Effects/Damage")]
 public class DamageEffect : Effect
 {
-    public DamageCalculation DamageCalculation = DamageCalculation.Magnitude;
-    public Magnitude DamageMagnitude;
-    public float DamageSetByCaller;
+    public static readonly Tag AmountSetByCaller = new Tag("DamageEffect.Amount");
+    public static readonly Tag OriginSetByCaller = new Tag("DamageEffect.Origin");
+
+    public EffectAmountCalculation AmountCalculation = EffectAmountCalculation.Magnitude;
+    public EffectOriginCalculation OriginCalculation = EffectOriginCalculation.Source;
+    public Magnitude Amount;
 
     public override void ApplyEffect(EffectInstance effectInstance)
     {
@@ -23,24 +20,40 @@ public class DamageEffect : Effect
 
         float amount;
 
-        switch (DamageCalculation)
+        switch (AmountCalculation)
         {
-            case DamageCalculation.Magnitude:
-                amount = DamageMagnitude.Calculate(effectContext);
+            case EffectAmountCalculation.Magnitude:
+                amount = effectInstance.CalculateMagnitude(Amount);
                 break;
-            case DamageCalculation.SetByCaller:
-                amount = DamageSetByCaller;
+            case EffectAmountCalculation.SetByCaller:
+                effectContext.GetValue(AmountSetByCaller, out amount);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
 
         // TODO: check if amount is positive?
-        // TODO: damage effect origin could be e.g. projectile, not source owner
 
         effectContext.Target.AddDamage(amount);
 
-        effectContext.Source.Owner.NotifyDamageDealt(effectContext.Target.Owner);
-        effectContext.Target.Owner.NotifyDamageTaken(effectContext.Source.Owner, effectContext.Source.transform.position, amount);
+        Vector3 origin;
+
+        switch (OriginCalculation)
+        {
+            case EffectOriginCalculation.Source:
+                origin = effectContext.Source.transform.position;
+                break;
+            case EffectOriginCalculation.Target:
+                origin = effectContext.Target.transform.position;
+                break;
+            case EffectOriginCalculation.SetByCaller:
+                effectContext.GetValue(OriginSetByCaller, out origin);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        effectContext.Source.Owner.NotifyDamageDealt(effectContext.Target.Owner, origin, amount);
+        effectContext.Target.Owner.NotifyDamageTaken(effectContext.Source.Owner, origin, amount);
     }
 }

@@ -7,6 +7,7 @@ public class AbilitySystemComponent : MonoBehaviour
 {
     public delegate void SelfDelegate(AbilitySystemComponent asc);
     public delegate void AttributeValueMutatorDelegate(AbilitySystemComponent asc, AttributeType attribute, ref float value);
+    public delegate void EffectContextDelegate(AbilitySystemComponent asc, Effect effect, EffectContext effectContext);
 
     private struct ReadyCallback
     {
@@ -386,6 +387,41 @@ public class AbilitySystemComponent : MonoBehaviour
 
     #endregion
 
+    #region Effect Context
+
+    public EffectContext CreateEffectContext()
+    {
+        return new EffectContext(this, this);
+    }
+
+    public EffectContext CreateEffectContext(AbilityInstance abilityInstance)
+    {
+        if (abilityInstance == null)
+            throw new ArgumentNullException(nameof(abilityInstance));
+
+        return new EffectContext(this, this, abilityInstance);
+    }
+
+    public EffectContext CreateEffectContext(AbilitySystemComponent target)
+    {
+        if (target == null)
+            throw new ArgumentNullException(nameof(target));
+
+        return new EffectContext(this, target);
+    }
+
+    public EffectContext CreateEffectContext(AbilitySystemComponent target, AbilityInstance abilityInstance)
+    {
+        if (target == null)
+            throw new ArgumentNullException(nameof(target));
+        if (abilityInstance == null)
+            throw new ArgumentNullException(nameof(abilityInstance));
+
+        return new EffectContext(this, target, abilityInstance);
+    }
+
+    #endregion
+
     #region Effects
 
     public bool CanApplyEffect(Effect effect)
@@ -402,7 +438,7 @@ public class AbilitySystemComponent : MonoBehaviour
     {
         effect.Validate();
 
-        var context = new EffectContext(this, this);
+        var context = CreateEffectContext();
 
         return context.Target.ApplyEffect(effect, context);
     }
@@ -411,7 +447,7 @@ public class AbilitySystemComponent : MonoBehaviour
     {
         effect.Validate();
 
-        var context = new EffectContext(this, this, abilityInstance);
+        var context = CreateEffectContext(abilityInstance);
 
         return context.Target.ApplyEffect(effect, context);
     }
@@ -420,7 +456,7 @@ public class AbilitySystemComponent : MonoBehaviour
     {
         effect.Validate();
 
-        var context = new EffectContext(this, target);
+        var context = CreateEffectContext(target);
 
         return context.Target.ApplyEffect(effect, context);
     }
@@ -429,7 +465,20 @@ public class AbilitySystemComponent : MonoBehaviour
     {
         effect.Validate();
 
-        var context = new EffectContext(this, target, abilityInstance);
+        var context = CreateEffectContext(target, abilityInstance);
+
+        return context.Target.ApplyEffect(effect, context);
+    }
+
+    public EffectHandle ApplyEffectWithContext(Effect effect, EffectContext context)
+    {
+        if (context == null)
+            throw new ArgumentNullException(nameof(context));
+
+        effect.Validate();
+
+        if (context.Source != this)
+            throw new InvalidOperationException("Invalid effect context source");
 
         return context.Target.ApplyEffect(effect, context);
     }
