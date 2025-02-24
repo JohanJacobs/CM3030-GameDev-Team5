@@ -32,6 +32,8 @@ public class Monster : Creature
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _target = GameObject.FindGameObjectWithTag("Player");
         _animator = GetComponentInChildren<Animator>();
+
+        // disable collider to ensure we cant shoot a spawning monster.
         _collider = GetComponentInChildren<Collider>();
         _collider.enabled = false;
     }
