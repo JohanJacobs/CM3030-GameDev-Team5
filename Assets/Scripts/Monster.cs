@@ -1,11 +1,28 @@
-﻿using UnityEngine;
+﻿/*
+
+University of London
+BsC Computer Science Course
+Games Development
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+Please refer to the README file for detailled information
+
+Monster.cs
+
+Class Monster used to manage Monster properties and methods.
+
+*/
+
+using UnityEngine;
 using UnityEngine.AI;
 
 public class Monster : Creature
 {
     public float ApproachDistance = 0.3f;
 
-    public Animator animator;
+    public Animator _animator;
 
     public float Speed => AbilitySystemComponent.GetAttributeValue(AttributeType.MoveSpeed);
     public float TurnSpeed => AbilitySystemComponent.GetAttributeValue(AttributeType.TurnSpeed);
@@ -23,6 +40,9 @@ public class Monster : Creature
 
     private Vector3 _knockBackForce = Vector3.zero;
 
+    private bool _isSpawning = true; // Required to stop the navmesh movement when spawning.    
+    private Collider _collider; 
+
     public void KnockBack(Vector3 origin, float amount)
     {
         if (!(KnockBackResistance < 1))
@@ -37,10 +57,18 @@ public class Monster : Creature
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _target = GameObject.FindGameObjectWithTag("Player");
+        _animator = GetComponentInChildren<Animator>();
+
+        // disable collider to ensure we cant shoot a spawning monster.
+        _collider = GetComponentInChildren<Collider>();
+        _collider.enabled = false;
     }
 
     void Update()
     {
+        if (_isSpawning) 
+            return;
+
         var deltaTime = Time.deltaTime;
 
         {
@@ -70,11 +98,7 @@ public class Monster : Creature
         _navMeshAgent.isStopped = true;
         _navMeshAgent.enabled = false;
 
-        var myCollider = GetComponentInChildren<Collider>();
-        if (myCollider)
-        {
-            myCollider.enabled = false;
-        }
+        _collider.enabled = false;
     }
 
     protected override void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
@@ -97,7 +121,7 @@ public class Monster : Creature
     {
         var walkSpeedMultiplier = Mathf.Max(Speed / WalkAnimationMoveSpeed, 0);
 
-        animator.SetFloat("WalkSpeedMultiplier", walkSpeedMultiplier);
+        _animator.SetFloat("WalkSpeedMultiplier", walkSpeedMultiplier);
     }
 
     private void UpdateNavMeshMovement()
@@ -182,16 +206,33 @@ public class Monster : Creature
 
     private void PlayHitAnimation()
     {
-        animator.SetTrigger("IsHit");
+        _animator.SetTrigger("IsHit");
     }
 
     private void PlayDeathAnimation()
     {
-        animator.SetBool("IsDead", true);
+        // select one of the random 3 death animations
+        var max_death_animmation = 3;
+        var death_animation = Random.Range(0, max_death_animmation);
+        
+        // set the animation
+        _animator.SetInteger("IsDead", death_animation);
     }
 
     private void PlayAttackAnimation()
     {
-        animator.SetTrigger("IsAttacking");
+        _animator.SetTrigger("IsAttacking");
+    }
+
+    // Callback function for when the SpawnComplete Animation event is triggered
+    public void SpawnAimationCompleted()
+    {
+        _isSpawning = false;
+
+        // enable movement and the colliders for the monster.        
+        if (_collider)
+        {
+            _collider.enabled = true;
+        }
     }
 }

@@ -1,5 +1,31 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &4898025824602360139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684236058058681098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c91b6ebdf8164414eab9366180276838, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpawnCompleteAnimationEventCallback:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3794237158255692187}
+        m_MethodName: SpawnAimationCompleted
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3794237158255692260
 GameObject:
   m_ObjectHideFlags: 0
@@ -434,6 +460,12 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: -4530715048712776831, guid: de8dd446dba8efa43bf4689164a7d911, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: de8dd446dba8efa43bf4689164a7d911, type: 3}
+--- !u!1 &684236058058681098 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4881657638963427017, guid: de8dd446dba8efa43bf4689164a7d911,
+    type: 3}
+  m_PrefabInstance: {fileID: 5386803043627261379}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &159092449143796144 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5257092122880568435, guid: de8dd446dba8efa43bf4689164a7d911,
