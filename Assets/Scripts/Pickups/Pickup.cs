@@ -17,6 +17,7 @@ using UnityEngine;
 
 public class Pickup : MonoBehaviour
 {
+
     public delegate void PickedUpDelegate(Pickup pickup, GameObject pickedUpBy);
 
     public static GameObject GetPickupGameObject(Component context)
