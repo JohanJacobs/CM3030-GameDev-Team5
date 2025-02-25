@@ -25,7 +25,9 @@ public class GameTimer
         _hud = hud;
         _timerRanOutCallbackFN = gameEndCallbackFN;
 
-        _timerStopped = false;        
+        _timerStopped = false;
+
+        UpdateHudDisplay();
     }
 
     public void Update()
