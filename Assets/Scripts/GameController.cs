@@ -6,30 +6,28 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour, IMonsterSpawnHandler
 {
+    public Tag PlayerStartTag = "PlayerStart";
+
     public float MonsterSpawnDistance = 20f;
     public float MonsterDespawnDistance = 30f;
 
     public MonsterSpawner[] Spawns;
 
-    public AudioManager audioManager;
-
     private readonly List<MonsterSpawnerInstance> _monsterSpawnerInstances = new List<MonsterSpawnerInstance>();
 
     private GameObject _player;
-
     private GameTimer _gameTimer;
 
     void Awake()
     {
         _navMeshWalkableAreaMask = (1 << NavMesh.GetAreaFromName("Walkable"));
-
-        // Set audioManager to external audioManager object with tag Audio
-        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     void Start()
     {
-        _player = GameObject.FindGameObjectWithTag("Player");
+        AudioManager.Instance.Initialize();
+
+        SpawnPlayer();
 
         var monsterSpawnerInstances = Spawns
             .Select(monsterSpawner => new MonsterSpawnerInstance(monsterSpawner, this));
@@ -88,7 +86,6 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
             {
                 return hit.position;
             }
-
         } while (++attempt < 5);
 
         Debug.LogAssertion("Failed to generate monster spawn point");
@@ -99,9 +96,8 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
     #endregion
 
     #region Pickups Spawn
-    [Header("Pickup spawn")]
 
-    [SerializeField]
+    [Header("Pickup spawn")] [SerializeField]
     private float _pickupSpawnRadius = 2f;
 
     private void SpawnPickups(Vector3 position)
@@ -120,8 +116,6 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
         var positionOffset = new Vector3(Random.Range(-spawnRadius, spawnRadius), 0f, Random.Range(-spawnRadius, spawnRadius));
 
         var instance = Instantiate(prefab, position + positionOffset, Quaternion.identity);
-
-
     }
 
     private GameObject SpawnExperienceOrbPickup(float experience, Vector3 position)
@@ -180,5 +174,40 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
     }
 
     #endregion
-}
 
+    private Transform PickPlayerStart()
+    {
+        var playerStarts = GameObject.FindGameObjectsWithTag((string)PlayerStartTag);
+
+        if (playerStarts == null || playerStarts.Length == 0)
+            return null;
+
+        var playerStartIndex = Random.Range(0, playerStarts.Length);
+
+        return playerStarts[playerStartIndex].transform;
+    }
+
+    private void SpawnPlayer()
+    {
+        Vector3 position;
+        Quaternion rotation;
+
+        var playerStart = PickPlayerStart();
+        if (playerStart == null)
+        {
+            Debug.LogWarning("No player starts");
+
+            position = Vector3.zero;
+            rotation = Quaternion.identity;
+        }
+        else
+        {
+            position = playerStart.position;
+            rotation = playerStart.rotation;
+        }
+
+        var player = Instantiate(GameData.Instance.PlayerPrefab, position, rotation);
+
+        _player = player.gameObject;
+    }
+}

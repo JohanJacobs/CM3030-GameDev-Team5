@@ -5,7 +5,7 @@ public class Monster : Creature
 {
     public float ApproachDistance = 0.3f;
 
-    public Animator animator;
+    public Animator _animator;
 
     public float Speed => AbilitySystemComponent.GetAttributeValue(AttributeType.MoveSpeed);
     public float TurnSpeed => AbilitySystemComponent.GetAttributeValue(AttributeType.TurnSpeed);
@@ -14,6 +14,7 @@ public class Monster : Creature
     public float DamageMax => AbilitySystemComponent.GetAttributeValue(AttributeType.MaxDamage);
     public float AttackRate => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRate);
     public float AttackRange => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRange);
+    
 
     private NavMeshAgent _navMeshAgent;
 
@@ -23,14 +24,26 @@ public class Monster : Creature
 
     private Vector3 _knockBackForce = Vector3.zero;
 
+
+    private bool _isSpawning = true; // Required to stop the navmesh movement when spawning.    
+    private Collider _collider; 
+
     void Start()
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _target = GameObject.FindGameObjectWithTag("Player");
+        _animator = GetComponentInChildren<Animator>();
+
+        // disable collider to ensure we cant shoot a spawning monster.
+        _collider = GetComponentInChildren<Collider>();
+        _collider.enabled = false;
     }
 
     void Update()
     {
+        if (_isSpawning) 
+            return;
+
         var deltaTime = Time.deltaTime;
 
         {
@@ -71,6 +84,12 @@ public class Monster : Creature
     {
         PlayHitAnimation();
 
+        if(GameData.Instance.hitParticleEffect != null)
+        {
+            GameObject particleEffectInstance = Instantiate(GameData.Instance.hitParticleEffect, transform.position, Quaternion.identity);
+            Destroy(particleEffectInstance, 2f);
+        }
+
         // TODO: shouldn't be here
         var knockBackMagnitude = AbilitySystemUtility.GetAttributeValueOrDefault(causer, AttributeType.KnockBack, 1);
 
@@ -91,7 +110,7 @@ public class Monster : Creature
     {
         var walkSpeedMultiplier = Mathf.Max(Speed / WalkAnimationMoveSpeed, 0);
 
-        animator.SetFloat("WalkSpeedMultiplier", walkSpeedMultiplier);
+        _animator.SetFloat("WalkSpeedMultiplier", walkSpeedMultiplier);
     }
 
     private void UpdateNavMeshMovement()
@@ -176,16 +195,33 @@ public class Monster : Creature
 
     private void PlayHitAnimation()
     {
-        animator.SetTrigger("IsHit");
+        _animator.SetTrigger("IsHit");
     }
 
     private void PlayDeathAnimation()
     {
-        animator.SetBool("IsDead", true);
+        // select one of the random 3 death animations
+        var max_death_animmation = 3;
+        var death_animation = Random.Range(0, max_death_animmation);
+        
+        // set the animation
+        _animator.SetInteger("IsDead", death_animation);
     }
 
     private void PlayAttackAnimation()
     {
-        animator.SetTrigger("IsAttacking");
+        _animator.SetTrigger("IsAttacking");
+    }
+
+    // Callback function for when the SpawnComplete Animation event is triggered
+    public void SpawnAimationCompleted()
+    {
+        _isSpawning = false;
+
+        // enable movement and the colliders for the monster.        
+        if (_collider)
+        {
+            _collider.enabled = true;
+        }
     }
 }

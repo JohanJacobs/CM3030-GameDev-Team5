@@ -18,8 +18,15 @@ MonoBehaviour:
   Tags: []
   BlockTags: []
   CancelTags: []
+  GrantedTags: []
   AbilityInstanceDataClass:
     ClassName: GarlicAbilityInstanceData
+  InputPolicy: 0
+  InputTag:
+    _string: 
+  InputMappingContext: {fileID: 0}
+  DisplayName: Garlic
+  Description: Stuns and damages nearby monsters
   TargetEffect: {fileID: 11400000, guid: 92f98b1da81f8a14ea7ef155be329e3b, type: 2}
   AbilityAttributeSet: {fileID: 11400000, guid: f6274323e166a1541a4ce344c12f8cba,
     type: 2}
