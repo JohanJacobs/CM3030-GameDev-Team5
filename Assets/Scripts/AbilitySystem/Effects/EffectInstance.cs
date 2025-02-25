@@ -67,7 +67,7 @@ public class EffectInstance
 
         if (wantsDuration)
         {
-            UpdateDuration();
+            UpdateDuration(false);
         }
 
         if (wantsPeriod)
@@ -76,7 +76,7 @@ public class EffectInstance
         }
     }
 
-    public void Destroy()
+    public virtual void Destroy()
     {
         Debug.Assert(!Active, "Destroying active effect instance probably points to logic error");
 
@@ -209,7 +209,8 @@ public class EffectInstance
 
         if (duration > 0)
         {
-            _duration = duration;
+            // NOTE: some small duration is required to let the system do its job
+            _duration = Mathf.Max(duration, 0.05f);
             _timeLeftToExpiration = _duration;
         }
         else

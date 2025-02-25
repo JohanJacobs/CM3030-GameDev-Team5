@@ -25,7 +25,6 @@ public class GarlicAbility : Ability
         Value = 0.1f,
     };
 
-    public Effect TargetEffect;
     public Effect[] TargetEffects;
 
     public GarlicAbility()

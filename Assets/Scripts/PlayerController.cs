@@ -337,14 +337,13 @@ public class PlayerController : MonoBehaviour
 
         var abilityInstance = abilityHandle.AbilityInstance;
 
-        // TODO: get rid of hardcoded input tags
         switch (equipmentSlot)
         {
             case EquipmentSlot.MainHand:
-                abilityInstance.InputTag = "Input.PrimaryAbility";
+                abilityInstance.InputTag = GameData.Instance.InputData.MainHandAbilityInputTag;
                 break;
             case EquipmentSlot.OffHand:
-                abilityInstance.InputTag = "Input.SecondaryAbility";
+                abilityInstance.InputTag = GameData.Instance.InputData.OffHandAbilityInputTag;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(equipmentSlot), equipmentSlot, null);

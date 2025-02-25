@@ -8,6 +8,8 @@ TagManager:
   - Input.PrimaryAbility
   - Input.SecondaryAbility
   - PlayerStart
+  - Condition.Dead
+  - Condition.Stunned
   layers:
   - Default
   - TransparentFX

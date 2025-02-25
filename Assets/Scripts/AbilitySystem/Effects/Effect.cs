@@ -71,6 +71,11 @@ public class Effect : ScriptableObject, IEffectLogic
     {
     }
 
+    public virtual EffectInstance CreateEffectInstance(Effect effect, EffectContext context)
+    {
+        return new EffectInstance(effect, context);
+    }
+
     protected virtual bool IsValid()
     {
         // check if effect logic is well-defined

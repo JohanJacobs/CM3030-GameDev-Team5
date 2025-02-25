@@ -31,9 +31,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   Range:
-    Calculation: 1
+    Calculation: 5
     AttributeProvider: 1
-    Attribute: 10
+    Attribute: 20
     Value: 4
   absorptionSpeed: 0.5
   maxAbsorptionSpeed: 14

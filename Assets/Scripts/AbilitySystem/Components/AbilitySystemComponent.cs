@@ -495,7 +495,7 @@ public class AbilitySystemComponent : MonoBehaviour
         // TODO: get rid of Contains call
         if (_effectInstances.Contains(effectInstance))
         {
-            RemoveEffectInstance(effectInstance);
+            RemoveEffectInstanceImpl(effectInstance);
         }
 
         handle.Clear();
@@ -627,6 +627,7 @@ public class AbilitySystemComponent : MonoBehaviour
     private void Awake()
     {
         Owner = GetComponent<Creature>();
+        Owner.Death += OnOwnerDeath;
     }
 
     private void Start()
@@ -739,6 +740,8 @@ public class AbilitySystemComponent : MonoBehaviour
     private EffectHandle ApplyEffect(Effect effect, EffectContext context)
     {
         bool canApplyEffect = CanApplyEffect(effect);
+        bool hasDuration;
+        bool hasPeriod;
 
         switch (effect.DurationPolicy)
         {
@@ -747,8 +750,16 @@ public class AbilitySystemComponent : MonoBehaviour
                     return null;
                 break;
             case EffectDurationPolicy.Duration:
+                hasDuration = effect.Duration.Calculate(context) > 0;
+                if (!hasDuration)
+                    return null;
+                hasPeriod = effect.Period.Calculate(context) > 0;
+                if (!canApplyEffect && !hasPeriod)
+                    return null;
+                break;
             case EffectDurationPolicy.Infinite:
-                if (!canApplyEffect && !(effect.Period.Calculate(context) > 0))
+                hasPeriod = effect.Period.Calculate(context) > 0;
+                if (!canApplyEffect && !hasPeriod)
                     return null;
                 break;
             default:
@@ -761,7 +772,7 @@ public class AbilitySystemComponent : MonoBehaviour
             HandleTagsAdded(effect.GrantedTags);
         }
 
-        var effectInstance = new EffectInstance(effect, context);
+        var effectInstance = effect.CreateEffectInstance(effect, context);
 
         if (effect.Instant)
         {
@@ -788,10 +799,9 @@ public class AbilitySystemComponent : MonoBehaviour
         return handle;
     }
 
-    private void RemoveEffectInstance(EffectInstance effectInstance)
+    private void RemoveEffectInstanceImpl(EffectInstance effectInstance)
     {
         effectInstance.Cancel();
-        effectInstance.Destroy();
 
         _effectInstances.Remove(effectInstance);
 
@@ -799,14 +809,15 @@ public class AbilitySystemComponent : MonoBehaviour
         {
             RemoveTags(effectInstance.Effect.GrantedTags);
         }
+
+        effectInstance.Destroy();
     }
 
-    private void RemoveEffectInstance(EffectInstance effectInstance, int index)
+    private void RemoveEffectInstanceImpl(EffectInstance effectInstance, int index)
     {
         Debug.Assert(_effectInstances[index] == effectInstance);
 
         effectInstance.Cancel();
-        effectInstance.Destroy();
 
         _effectInstances.RemoveAt(index);
 
@@ -814,6 +825,8 @@ public class AbilitySystemComponent : MonoBehaviour
         {
             RemoveTags(effectInstance.Effect.GrantedTags);
         }
+
+        effectInstance.Destroy();
     }
 
     private void HandleTagsAdded(IEnumerable<Tag> tags)
@@ -834,7 +847,7 @@ public class AbilitySystemComponent : MonoBehaviour
 
         foreach (var effectInstance in effectsToCancel)
         {
-            RemoveEffectInstance(effectInstance);
+            RemoveEffectInstanceImpl(effectInstance);
         }
     }
 
@@ -872,7 +885,7 @@ public class AbilitySystemComponent : MonoBehaviour
 
             if (effectInstance.Inactive)
             {
-                RemoveEffectInstance(effectInstance, i);
+                RemoveEffectInstanceImpl(effectInstance, i);
             }
             else
             {
@@ -903,7 +916,6 @@ public class AbilitySystemComponent : MonoBehaviour
     private void RemoveAbilityImpl(AbilityInstance abilityInstance)
     {
         abilityInstance.Abort();
-        abilityInstance.Destroy();
 
         _abilityInstances.Remove(abilityInstance);
 
@@ -913,6 +925,24 @@ public class AbilitySystemComponent : MonoBehaviour
         }
 
         abilityInstance.NotifyRemoved();
+        abilityInstance.Destroy();
+    }
+
+    private void RemoveAbilityImpl(AbilityInstance abilityInstance, int index)
+    {
+        Debug.Assert(_abilityInstances[index] == abilityInstance);
+
+        abilityInstance.Abort();
+
+        _abilityInstances.RemoveAt(index);
+
+        if (abilityInstance.Ability.HasGrantedTags)
+        {
+            RemoveTags(abilityInstance.Ability.GrantedTags);
+        }
+
+        abilityInstance.NotifyRemoved();
+        abilityInstance.Destroy();
     }
 
     private void DispatchReady()
@@ -924,6 +954,21 @@ public class AbilitySystemComponent : MonoBehaviour
         _readyDelegates.Sort((lhs, rhs) => rhs.Priority - lhs.Priority);
         _readyDelegates.ForEach(@delegate => @delegate.Delegate.Invoke(this));
         _readyDelegates.Clear();
+    }
+
+    private void OnOwnerDeath(Creature creature)
+    {
+        AddTags(new []{ GameData.Instance.Tags.ConditionDead });
+
+        foreach (var effectInstance in _effectInstances.ToArray())
+        {
+            RemoveEffectInstanceImpl(effectInstance);
+        }
+
+        foreach (var abilityInstance in _abilityInstances.ToArray())
+        {
+            RemoveAbilityImpl(abilityInstance);
+        }
     }
 
     #endregion

@@ -33,6 +33,7 @@ public enum AttributeType
     DamageScale,
     HealingScale,
     CooldownScale,
+    DurationScale,
 }
 
 public static class AttributeTypeHelper
@@ -64,6 +65,7 @@ public static class AttributeTypeHelper
             case AttributeType.DamageScale:
             case AttributeType.HealingScale:
             case AttributeType.CooldownScale:
+            case AttributeType.DurationScale:
                 return true;
             default:
                 return false;
