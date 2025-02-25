@@ -105,7 +105,9 @@ MonoBehaviour:
   WalkAnimationMoveSpeed: 2
   _autoDestroyOnDeath: 1
   ApproachDistance: 1.25
-  _animator: {fileID: 5462196677822541826}
+  animator: {fileID: 5462196677822541826}
+  arrowHitParticleEffect: {fileID: 9031933728866938608, guid: 4b4d7a23fc2da3b4c99cfda2dff1ecba,
+    type: 3}
 --- !u!195 &3860321904171740409
 NavMeshAgent:
   m_ObjectHideFlags: 0

@@ -7,13 +7,12 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(CharacterController), typeof(Player))]
 public class PlayerController : MonoBehaviour
 {
-    AudioManager audioManager;
+    // cache reference for easier access
+    private static AudioManager audioManager => AudioManager.Instance;
 
     public Animator Animator;
 
     public Vector3 MuzzleOffset = new Vector3(0, 0.25f, 0);
-
-    public LayerMask MonsterLayerMask;
 
     public GameObject BulletTracerFX;
     public GameObject HUD;
@@ -35,25 +34,21 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         _characterController = GetComponent<CharacterController>();
+
         _player = GetComponent<Player>();
 
         _asc = GetComponent<AbilitySystemComponent>();
         _asc.OnReady(OnAbilitySystemReady, 5);
 
         _inputComponent = GetComponent<InputComponent>();
-
         _inputComponent.InputActionPressed += OnInputActionPressed;
         _inputComponent.InputActionReleased += OnInputActionReleased;
 
         _equipmentComponent = GetComponent<EquipmentComponent>();
-
         _equipmentComponent.ItemEquipped += OnItemEquipped;
         _equipmentComponent.ItemUnequipped += OnItemUnequipped;
 
         CreateUI();
-
-        // Set audioManager to external audioManager object with tag Audio
-        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     void Start()

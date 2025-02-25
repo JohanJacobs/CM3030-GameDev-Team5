@@ -3,7 +3,12 @@ guid: 8ada5b8e2861bfb4bb867e6848ec9d61
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - Animator: {instanceID: 0}
+  - BulletTracerFX: {instanceID: 0}
+  - HUD: {instanceID: 0}
+  - TextPopupObj: {instanceID: 0}
+  - GameMenu: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

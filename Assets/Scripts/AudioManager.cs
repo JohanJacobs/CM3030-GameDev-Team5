@@ -5,7 +5,7 @@ BsC Computer Science Course
 Games Design
 Final Assignment - Streets of Fire Game
 
-Group 5 
+Group 5
 
 AudioManager.cs
 
@@ -18,6 +18,23 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
+    public static AudioManager Instance
+    {
+        get
+        {
+            if (!_instance)
+            {
+                var prefab = Resources.Load<AudioManager>("DefaultAudioManager");
+
+                _instance = Instantiate(prefab);
+
+                DontDestroyOnLoad(_instance.gameObject);
+            }
+
+            return _instance;
+        }
+    }
+
     [SerializeField] AudioSource musicSource;
     [SerializeField] AudioSource SFXSource;
 
@@ -29,25 +46,10 @@ public class AudioManager : MonoBehaviour
 
     public AudioClip playerHitSound;
     public AudioClip playerDeadSound;
-    public static AudioManager instance;
 
-    private void Awake()
+    public void Initialize()
     {
-        if (instance==null) 
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    private void Start() 
-    {
-        musicSource.clip = background;
-        musicSource.Play();
+        // NOTE: keep it as it's used instantiate AudioManager in time
     }
 
     public void PlaySFX(AudioClip clip)
@@ -58,4 +60,11 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        musicSource.clip = background;
+        musicSource.Play();
+    }
+
+    private static AudioManager _instance;
 }
