@@ -31,7 +31,25 @@ public class Pickup : MonoBehaviour
         return null;
     }
 
+    public static Pickup GetPickupComponent(Component context)
+    {
+        switch (context)
+        {
+            case Pickup pickup:
+                return pickup;
+
+            // TODO: more shortcuts?
+        }
+
+        var go = GetPickupGameObject(context);
+        if (go)
+            return go.GetComponent<Pickup>();
+
+        return null;
+    }
+
     public event PickedUpDelegate PickedUp;
+    public static event PickedUpDelegate GlobalPickedUp; 
 
     /// <summary>
     /// Handle picking up logic. Checks conditions and performs all the actions specific to this pickup.
@@ -43,7 +61,7 @@ public class Pickup : MonoBehaviour
         if (HandlePickUpImpl(target))
         {
             PickedUp?.Invoke(this, target);
-
+            GlobalPickedUp?.Invoke(this, target);
             Destroy(gameObject);
 
             return true;

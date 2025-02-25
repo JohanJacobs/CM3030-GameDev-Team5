@@ -21,6 +21,12 @@ MonoBehaviour:
   GrantedTags: []
   AbilityInstanceDataClass:
     ClassName: AbsorbAbilityInstanceData
+  InputPolicy: 0
+  InputTag:
+    _string: 
+  InputMappingContext: {fileID: 0}
+  DisplayName: Absorb
+  Description: Attracts nearby pickups
   AbilityAttributeSet: {fileID: 11400000, guid: 7874c5e152a9bbc448c95e4ef5dc4f28,
     type: 2}
   LayerMask:
