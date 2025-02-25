@@ -42,7 +42,7 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
         if (_player == null)
             return;
 
-        _gameTimer.Update(Time.deltaTime);
+        _gameTimer.Update();
 
         foreach (var monsterSpawnerInstance in _monsterSpawnerInstances)
         {

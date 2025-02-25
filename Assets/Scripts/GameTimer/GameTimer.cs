@@ -7,49 +7,52 @@ using UnityEngine;
 // when the value reaches zero, then the gameEndCallbackFN action is executed
 public class GameTimer
 {
-    float _maxTimer;
-    float _currentTimer;
-    float _cumulator;
+    float _sessionEndAt;
+    float _sessionStartAt;
+
+    float _nextVisualUpdateTime;
+    
     bool _timerStopped;
 
     HUD _hud;
     Action _timerRanOutCallbackFN;
     public GameTimer(float sessionLengthInSeconds, HUD hud, Action gameEndCallbackFN)
     {
-        _currentTimer = sessionLengthInSeconds;
+        _sessionStartAt = Time.time;
+        _sessionEndAt = Time.time + sessionLengthInSeconds;
+        _nextVisualUpdateTime = Time.time + 1f;
+
         _hud = hud;
         _timerRanOutCallbackFN = gameEndCallbackFN;
-        _timerStopped = false;
-        _cumulator = 0f; 
+
+        _timerStopped = false;        
     }
 
-    public void Update(float deltaTime)
-    {
+    public void Update()
+    {        
         if (_timerStopped)        
             return;
-
-        // accumulate 1 second of time then update the timer and display
-        _cumulator += deltaTime;
-
-        if (_cumulator > 1f)
+                
+        if (Time.time >= _nextVisualUpdateTime)
         {
             UpdateGameTime();
             UpdateHudDisplay();
-            _cumulator -= 1f;
+
+            _nextVisualUpdateTime += 1f; // wait for 1 second to udpate visuals
         }
     }
 
     private void UpdateGameTime()
-    {
-        _currentTimer -= _cumulator;
-        if (_currentTimer <= _maxTimer)
+    {        
+        if (Time.time >=_sessionEndAt)
         {
             _timerRanOutCallbackFN();
             _timerStopped = true;
         }
     }
     private void UpdateHudDisplay()
-    {        
-        _hud.SetTimerValue(_currentTimer);
+    {
+
+        _hud.SetTimerValue(_sessionEndAt - Time.time);
     }
 }

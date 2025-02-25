@@ -82,13 +82,16 @@ public class HUD : MonoBehaviour
 
         var timeSpan = TimeSpan.FromSeconds(timeLeftInSeconds); //https://learn.microsoft.com/en-us/dotnet/api/system.timespan.tostring?view=net-9.0&redirectedfrom=MSDN#System_TimeSpan_ToString_System_String_
         currentTimerText.text = timeSpan.ToString(@"mm\:ss");
-        
+
+        if (timeLeftInSeconds < 60)
+        {
+            StartCoroutine(PulseGameTimerSize());
+        }
+
         if (timeLeftInSeconds <= 30f)
         {
             currentTimerText.color = new Color(0.7f, 0.1f, 0.2f);
             currentTimerText.fontStyle = FontStyle.Bold;
-            StartCoroutine(PulseGameTimerSize());
-
         }
     }
     IEnumerator PulseGameTimerSize()
