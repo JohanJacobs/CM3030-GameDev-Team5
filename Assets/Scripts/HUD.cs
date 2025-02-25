@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 using TMPro;
 using System;
+using System.Collections;
 
 
 public class HUD : MonoBehaviour
@@ -16,11 +17,11 @@ public class HUD : MonoBehaviour
     public Text LevelText;
     public GameObject GameOver;
 
-    public Text HighestScoreText;
-    public Text CurrentScoreText;
-
-    public Text CurrentTimerText;
-
+    [SerializeField] private Text highestScoreText;
+    [SerializeField] private Text currentScoreText;
+    [SerializeField] private Text newHighScoreText;
+    [SerializeField] private Text currentTimerText;
+    
     public void UpdateHealth(float health, float maxHealth)
     {
         HealthSlider.value = health / maxHealth;
@@ -50,8 +51,23 @@ public class HUD : MonoBehaviour
 
     private void UpdateScoreText(int highestScore, int currentScore)
     {
-        HighestScoreText.text = $"BEST: {highestScore.ToString(CultureInfo.InvariantCulture)}";
-        CurrentScoreText.text = $"CURRENT:{currentScore.ToString(CultureInfo.InvariantCulture)}";
+        // Update the text displayed in the UI
+        highestScoreText.text = $"BEST:\n {highestScore.ToString(CultureInfo.InvariantCulture)}";
+        currentScoreText.text = $"CURRENT:\n {currentScore.ToString(CultureInfo.InvariantCulture)}";
+
+        // Update text color to green if the new score is higher, else keep the same color
+        if (currentScore > highestScore)
+        {
+            currentScoreText.color = new Color(.15f, .70f, .2f);
+            currentScoreText.fontStyle = FontStyle.Bold;
+            newHighScoreText.color = new Color(.15f, .70f, .2f);
+        }
+        else
+        {
+            currentScoreText.color = new Color(1f, 1f, 1f);
+            currentScoreText.fontStyle = FontStyle.Normal;
+            newHighScoreText.enabled = false;
+        }
     }
     public void OnRestartClicked()
     {
@@ -61,11 +77,18 @@ public class HUD : MonoBehaviour
     #region TimerDisplay
     public void SetTimerValue(float timeLeftInSeconds)
     {
-        if (CurrentTimerText == null)
+        if (currentTimerText == null)
             return;
 
         var timeSpan = TimeSpan.FromSeconds(timeLeftInSeconds); //https://learn.microsoft.com/en-us/dotnet/api/system.timespan.tostring?view=net-9.0&redirectedfrom=MSDN#System_TimeSpan_ToString_System_String_
-        CurrentTimerText.text = timeSpan.ToString(@"mm\:ss");
+        currentTimerText.text = timeSpan.ToString(@"mm\:ss");
+        
+        if (timeLeftInSeconds <= 30f)
+        {
+            currentTimerText.color = new Color(0.7f, 0.1f, 0.2f);
+            currentTimerText.fontStyle = FontStyle.Bold;
+        }
     }
+        
     #endregion TimerDisplay
 }

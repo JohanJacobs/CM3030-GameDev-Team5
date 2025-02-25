@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Game timer is a timer that runs from a value to zero. 
-// when the value reaches zero, then teh gameEndCallbackFN action is executed
+// when the value reaches zero, then the gameEndCallbackFN action is executed
 public class GameTimer
 {
     float _maxTimer;

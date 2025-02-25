@@ -2,9 +2,8 @@
 
 
 /* 
-    Based on implementation from kurtdekker/SingletonSimple.cs
+    Singleton pattern based on implementation from kurtdekker/SingletonSimple.cs
     https://gist.github.com/kurtdekker/775bb97614047072f7004d6fb9ccce30
-
  */
 
 public class HighScoreManager :MonoBehaviour
@@ -24,7 +23,7 @@ public class HighScoreManager :MonoBehaviour
         }
     }
 
-    private int lastHighScore=0;
+    private int lastHighScore=0;    
     public void AddNewScore(int score)
     {
         if (score > lastHighScore)

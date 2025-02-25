@@ -7,16 +7,16 @@ using Random = UnityEngine.Random;
 public class GameController : MonoBehaviour, IMonsterSpawnHandler
 {
     public Tag PlayerStartTag = "PlayerStart";
-
+        
     public float MonsterSpawnDistance = 20f;
     public float MonsterDespawnDistance = 30f;
-
     public MonsterSpawner[] Spawns;
-
     private readonly List<MonsterSpawnerInstance> _monsterSpawnerInstances = new List<MonsterSpawnerInstance>();
 
     private GameObject _player;
+
     private GameTimer _gameTimer;
+    [SerializeField] float gameTimeInMinutes = 1f;
 
     void Awake()
     {
@@ -33,13 +33,8 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
             .Select(monsterSpawner => new MonsterSpawnerInstance(monsterSpawner, this));
 
         _monsterSpawnerInstances.AddRange(monsterSpawnerInstances);
-
-        // Setup the game timer 
-        if (_player.TryGetComponent<PlayerController>(out var pc))
-        {
-            int game_time_in_minutes = 1;
-            _gameTimer = new GameTimer(game_time_in_minutes * 60, pc.GetHud(), () => { pc.RestartPlayer(); });
-        }
+        SetupGameTimer();
+        
     }
 
     void Update()
@@ -53,8 +48,6 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
         {
             monsterSpawnerInstance.Update();
         }
-
-
     }
 
     #region Monster Spawn
@@ -210,4 +203,19 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
 
         _player = player.gameObject;
     }
+
+    #region GameTimerRelated
+    private void SetupGameTimer()
+    {
+        // Setup the game timer to control the rounds in the game         
+        if (_player.TryGetComponent<PlayerController>(out var pc))
+        {
+            
+            _gameTimer = new GameTimer(
+                gameTimeInMinutes * 60, 
+                pc.GetHud(), 
+                () => { pc.RestartPlayer(); });
+        }
+    }
+    #endregion GameTimerRelated
 }

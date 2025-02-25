@@ -226,7 +226,8 @@ public class PlayerController : MonoBehaviour
     {
         audioManager.PlaySFX(audioManager.playerDeadSound);
         PlayDeathAnimation();
-        RestartPlayer();
+        ShowWasted();
+        UpdatePlayerScore();
     }
 
     private void HandlePlayerDamageTaken()
@@ -364,11 +365,13 @@ public class PlayerController : MonoBehaviour
         _asc.RemoveAbility(item.AttackAbility);
     }
 
-    #region GameTimerRElatedFunctions
+    #region GameTimerRelatedFunctions
     public void RestartPlayer()
     {
-        ShowWasted();
-        UpdatePlayerScore();
+        // kill off the player
+        var health = _player.Health;
+        _player.TakeDamage(gameObject,transform.position, health);        
+        
     }
     #endregion
 }
