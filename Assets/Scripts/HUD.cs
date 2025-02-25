@@ -21,7 +21,7 @@ public class HUD : MonoBehaviour
     [SerializeField] private Text currentScoreText;
     [SerializeField] private Text newHighScoreText;
     [SerializeField] private Text currentTimerText;
-    
+           
     public void UpdateHealth(float health, float maxHealth)
     {
         HealthSlider.value = health / maxHealth;
@@ -87,8 +87,21 @@ public class HUD : MonoBehaviour
         {
             currentTimerText.color = new Color(0.7f, 0.1f, 0.2f);
             currentTimerText.fontStyle = FontStyle.Bold;
+            StartCoroutine(PulseGameTimerSize());
+
         }
     }
-        
+    IEnumerator PulseGameTimerSize()
+    {
+        var scale = 0.9f;
+        while(scale < 1f)
+        {
+            currentTimerText.rectTransform.localScale = new Vector3(scale, scale, scale);
+            yield return null;
+            scale += 0.01f;  // decrease by 90%
+        }
+        currentTimerText.rectTransform.localScale = new Vector3(1f, 1f, 1f);
+    }
+
     #endregion TimerDisplay
 }

@@ -9,7 +9,8 @@ public class GameTimer
 {
     float _maxTimer;
     float _currentTimer;
-    bool _pauseTimer;
+    float _cumulator;
+    bool _timerStopped;
 
     HUD _hud;
     Action _timerRanOutCallbackFN;
@@ -18,23 +19,37 @@ public class GameTimer
         _currentTimer = sessionLengthInSeconds;
         _hud = hud;
         _timerRanOutCallbackFN = gameEndCallbackFN;
-        _pauseTimer = false;
+        _timerStopped = false;
+        _cumulator = 0f; 
     }
 
     public void Update(float deltaTime)
     {
-        if (_pauseTimer)        
-            return;        
+        if (_timerStopped)        
+            return;
 
-        // update timer values
-        _currentTimer -= deltaTime;
+        // accumulate 1 second of time then update the timer and display
+        _cumulator += deltaTime;
+
+        if (_cumulator > 1f)
+        {
+            UpdateGameTime();
+            UpdateHudDisplay();
+            _cumulator -= 1f;
+        }
+    }
+
+    private void UpdateGameTime()
+    {
+        _currentTimer -= _cumulator;
         if (_currentTimer <= _maxTimer)
         {
             _timerRanOutCallbackFN();
-            _pauseTimer = true;
+            _timerStopped = true;
         }
-
-        // update the HUD
+    }
+    private void UpdateHudDisplay()
+    {        
         _hud.SetTimerValue(_currentTimer);
     }
 }
