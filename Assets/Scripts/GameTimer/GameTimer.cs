@@ -1,60 +1,39 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 // Game timer is a timer that runs from a value to zero. 
 // when the value reaches zero, then the gameEndCallbackFN action is executed
 public class GameTimer
 {
-    float _sessionEndAt;
-    float _sessionStartAt;
+    // Event that is triggered when the timer reaches zero
+    public static EventHandler OnTimerRanOutEvent;
 
-    float _nextVisualUpdateTime;
-    
-    bool _timerStopped;
+    // Event that is triggered when a second has passed;
+    public static EventHandler<int> OnTimeChangedEvent; 
 
-    HUD _hud;
-    Action _timerRanOutCallbackFN;
-    public GameTimer(float sessionLengthInSeconds, HUD hud, Action gameEndCallbackFN)
+    float _timeLeft;
+
+    public GameTimer(float sessionLengthInSeconds)
     {
-        _sessionStartAt = Time.time;
-        _sessionEndAt = Time.time + sessionLengthInSeconds;
-        _nextVisualUpdateTime = Time.time + 1f;
-
-        _hud = hud;
-        _timerRanOutCallbackFN = gameEndCallbackFN;
-
-        _timerStopped = false;
-
-        UpdateHudDisplay();
+        _timeLeft = sessionLengthInSeconds;       
     }
 
     public void Update()
-    {        
-        if (_timerStopped)        
-            return;
-                
-        if (Time.time >= _nextVisualUpdateTime)
+    {   
+        var oldtimeLeftInt = Mathf.FloorToInt(_timeLeft);
+        _timeLeft -= Time.deltaTime;    
+        var newTimeLeftInt = Mathf.FloorToInt(_timeLeft);
+
+        // Trigger event that a second has passed, up to and including the last 0 and not negative time
+        if (oldtimeLeftInt > newTimeLeftInt && newTimeLeftInt >= 0)
         {
-            UpdateGameTime();
-            UpdateHudDisplay();
-
-            _nextVisualUpdateTime += 1f; // wait for 1 second to udpate visuals
+            OnTimeChangedEvent?.Invoke(this, newTimeLeftInt);
         }
-    }
 
-    private void UpdateGameTime()
-    {        
-        if (Time.time >=_sessionEndAt)
+        // All the time for the timer has run out
+        if (newTimeLeftInt == 0)
         {
-            _timerRanOutCallbackFN();
-            _timerStopped = true;
+            OnTimerRanOutEvent?.Invoke(this, new EventArgs());
         }
-    }
-    private void UpdateHudDisplay()
-    {
-
-        _hud.SetTimerValue(_sessionEndAt - Time.time);
     }
 }

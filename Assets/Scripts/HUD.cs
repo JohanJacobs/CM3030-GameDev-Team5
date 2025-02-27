@@ -20,8 +20,6 @@ public class HUD : MonoBehaviour
     [SerializeField] private Text highestScoreText;
     [SerializeField] private Text currentScoreText;
     [SerializeField] private Text newHighScoreText;
-    [SerializeField] private Text currentTimerText;
-           
     public void UpdateHealth(float health, float maxHealth)
     {
         HealthSlider.value = health / maxHealth;
@@ -73,38 +71,5 @@ public class HUD : MonoBehaviour
     {
         SceneManager.LoadScene("GameScene");
     }
-
-    #region TimerDisplay
-    public void SetTimerValue(float timeLeftInSeconds)
-    {
-        if (currentTimerText == null)
-            return;
-
-        var timeSpan = TimeSpan.FromSeconds(timeLeftInSeconds); //https://learn.microsoft.com/en-us/dotnet/api/system.timespan.tostring?view=net-9.0&redirectedfrom=MSDN#System_TimeSpan_ToString_System_String_
-        currentTimerText.text = timeSpan.ToString(@"mm\:ss");
-
-        if (timeLeftInSeconds < 60)
-        {
-            StartCoroutine(PulseGameTimerSize());
-        }
-
-        if (timeLeftInSeconds <= 30f)
-        {
-            currentTimerText.color = new Color(0.7f, 0.1f, 0.2f);
-            currentTimerText.fontStyle = FontStyle.Bold;
-        }
-    }
-    IEnumerator PulseGameTimerSize()
-    {
-        var scale = 0.9f;
-        while(scale < 1f)
-        {
-            currentTimerText.rectTransform.localScale = new Vector3(scale, scale, scale);
-            yield return null;
-            scale += 0.01f;  // decrease by 90%
-        }
-        currentTimerText.rectTransform.localScale = new Vector3(1f, 1f, 1f);
-    }
-
-    #endregion TimerDisplay
+    
 }

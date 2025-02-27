@@ -19,13 +19,11 @@ public class PlayerController : MonoBehaviour
     public GameObject HUD;
     public GameObject GameMenu;
 
-    public InputMappingContext DefaultInputMappingContext;
-
+    public InputMappingContext DefaultInputMappingContext;    
+    
     private CharacterController _characterController;
     private Player _player;
-    private HUD _hud;
-    public HUD GetHud() => _hud;
-
+    private HUD _hud;    
     private GameMenu _gameMenu;
     
     private AbilitySystemComponent _asc;
@@ -65,6 +63,16 @@ public class PlayerController : MonoBehaviour
         _player.Death += HandlePlayerDeath;
         _player.DamageTaken += HandlePlayerDamageTaken;
         _player.CommittedAttack += HandlePlayerCommittedAttack;
+    }
+
+    private void OnEnable()
+    {
+        GameTimer.OnTimerRanOutEvent += GameTimer_OntimeRanOutEvent;
+    }
+
+    private void OnDisable()
+    {
+        GameTimer.OnTimerRanOutEvent -= GameTimer_OntimeRanOutEvent;
     }
 
     private void OnAbilitySystemReady(AbilitySystemComponent asc)
@@ -366,12 +374,16 @@ public class PlayerController : MonoBehaviour
     }
 
     #region GameTimerRelatedFunctions
-    public void RestartPlayer()
+    private void GameTimer_OntimeRanOutEvent(object sender, EventArgs e)
+    {
+        RestartPlayer();
+    }
+
+    private void RestartPlayer()
     {
         // kill off the player
         var health = _player.Health;
         _player.TakeDamage(gameObject,transform.position, health);        
-        
     }
     #endregion
 }
