@@ -1164,8 +1164,8 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1.1
   m_Text: "Use             to aim weapon,                   click to fire \nMove
-    with                           \n\nShoot skeletons to level up & gain upgrades\nHow
-    long can you survive?"
+    with                           \n\nShoot skeletons, gain upgrades, most Importantly,
+    SURVIVE!"
 --- !u!1 &4582877542644609672
 GameObject:
   m_ObjectHideFlags: 0
