@@ -224,11 +224,8 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
     #region GameTimerRelated
     private void SetupGameTimer()
     {
-        // Setup the game timer to control the rounds in the game         
-        if (_player.TryGetComponent<PlayerController>(out var pc))
-        {   
+        // Setup the game timer to control the rounds in the game                 
             _gameTimer = new GameTimer(gameTimeInMinutes * 60);
-        }
     }
     #endregion GameTimerRelated
 }
