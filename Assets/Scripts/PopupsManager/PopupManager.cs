@@ -40,7 +40,7 @@ public class PopupManager : MonoBehaviour
             return;
         }
         // pickups that impact the players abilities
-        if (sender is ExperienceOrbPickup pickupWithEffect)
+        if (sender is PickupWithEffect pickupWithEffect)
         {
             var asc = target.GetComponent<AbilitySystemComponent>();
 
