@@ -225,7 +225,7 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
     private void SetupGameTimer()
     {
         // Setup the game timer to control the rounds in the game                 
-            _gameTimer = new GameTimer(gameTimeInMinutes * 60);
+        _gameTimer = new GameTimer(gameTimeInMinutes * 60);
     }
     #endregion GameTimerRelated
 }
