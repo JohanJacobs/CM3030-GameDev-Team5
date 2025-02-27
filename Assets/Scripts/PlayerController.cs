@@ -37,13 +37,13 @@ public class PlayerController : MonoBehaviour
     public GameObject HUD;
     public GameObject GameMenu;
 
-    public InputMappingContext DefaultInputMappingContext;    
-    
+    public InputMappingContext DefaultInputMappingContext;
+
     private CharacterController _characterController;
     private Player _player;
-    private HUD _hud;    
+    private HUD _hud;
     private GameMenu _gameMenu;
-    
+
     private AbilitySystemComponent _asc;
     private InputComponent _inputComponent;
     private EquipmentComponent _equipmentComponent;
