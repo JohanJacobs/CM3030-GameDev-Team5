@@ -37,7 +37,7 @@ public class HighScoreManager :MonoBehaviour
         }
     }
 
-    private int lastHighScore=0;    
+    private int lastHighScore=0;
     public void AddNewScore(int score)
     {
         if (score > lastHighScore)

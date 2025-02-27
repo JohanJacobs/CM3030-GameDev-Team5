@@ -24,7 +24,7 @@ using Random = UnityEngine.Random;
 public class GameController : MonoBehaviour, IMonsterSpawnHandler
 {
     public Tag PlayerStartTag = "PlayerStart";
-        
+
     public float MonsterSpawnDistance = 20f;
     public float MonsterDespawnDistance = 30f;
     public MonsterSpawner[] Spawns;
