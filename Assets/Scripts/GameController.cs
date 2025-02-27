@@ -27,12 +27,13 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
 
     public float MonsterSpawnDistance = 20f;
     public float MonsterDespawnDistance = 30f;
-
     public MonsterSpawner[] Spawns;
-
     private readonly List<MonsterSpawnerInstance> _monsterSpawnerInstances = new List<MonsterSpawnerInstance>();
 
     private GameObject _player;
+
+    private GameTimer _gameTimer;
+    [SerializeField] float gameTimeInMinutes = 1f;
 
     void Awake()
     {
@@ -49,12 +50,16 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
             .Select(monsterSpawner => new MonsterSpawnerInstance(monsterSpawner, this));
 
         _monsterSpawnerInstances.AddRange(monsterSpawnerInstances);
+        SetupGameTimer();
+        
     }
 
     void Update()
     {
         if (_player == null)
             return;
+
+        _gameTimer.Update();
 
         foreach (var monsterSpawnerInstance in _monsterSpawnerInstances)
         {
@@ -215,4 +220,12 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
 
         _player = player.gameObject;
     }
+
+    #region GameTimerRelated
+    private void SetupGameTimer()
+    {
+        // Setup the game timer to control the rounds in the game                 
+        _gameTimer = new GameTimer(gameTimeInMinutes * 60);
+    }
+    #endregion GameTimerRelated
 }
