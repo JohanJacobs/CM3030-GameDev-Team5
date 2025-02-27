@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*
+
+University of London
+BsC Computer Science Course
+Games Development
+Final Assignment - Streets of Fire Game
+
+Group 5 
+
+Please refer to the README file for detailled information
+
+Creature.cs
+
+Class Creature manages a number of creature attributes such as health, state and abilities
+
+*/
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;

@@ -2,10 +2,12 @@
 
 University of London
 BsC Computer Science Course
-Games Design
+Games Development
 Final Assignment - Streets of Fire Game
 
 Group 5
+
+Please refer to the README file for detailled information
 
 AudioManager.cs
 
@@ -38,12 +40,12 @@ public class AudioManager : MonoBehaviour
     [SerializeField] AudioSource musicSource;
     [SerializeField] AudioSource SFXSource;
 
+    // clips for multiple events
     public AudioClip background;
     public AudioClip sfxexample;
     public AudioClip shootingSound;
     public AudioClip killedSkeletonSound;
     public AudioClip grabExperienceSound;
-
     public AudioClip playerHitSound;
     public AudioClip playerDeadSound;
 
@@ -52,6 +54,7 @@ public class AudioManager : MonoBehaviour
         // NOTE: keep it as it's used instantiate AudioManager in time
     }
 
+    // This method can be used to play an AudioClip only once
     public void PlaySFX(AudioClip clip)
     {
         if (clip)
