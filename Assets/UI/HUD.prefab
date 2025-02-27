@@ -1753,7 +1753,7 @@ GameObject:
   - component: {fileID: 8414506300174677138}
   - component: {fileID: 6363687679240913111}
   - component: {fileID: 1767758079265204028}
-  - component: {fileID: 3281180943087778990}
+  - component: {fileID: 6360692580882804560}
   m_Layer: 0
   m_Name: GameTimer
   m_TagString: Untagged
@@ -1818,7 +1818,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3281180943087778990
+--- !u!114 &6360692580882804560
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1827,7 +1827,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7681620094560876185}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecd918346dc83f74fa6208fb7d1e54f1, type: 3}
+  m_Script: {fileID: 11500000, guid: 4951dcc9f165d3e48a13dbbc94bcc0e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   currentTimerText: {fileID: 3983788864955588721}
