@@ -98,6 +98,7 @@ GameObject:
   - component: {fileID: 6552311690192007200}
   - component: {fileID: 6552311690192007213}
   - component: {fileID: 6552311690192007212}
+  - component: {fileID: 5933792806026448545}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -247,6 +248,20 @@ MonoBehaviour:
   CameraOffset: {x: 0, y: 0, z: 0}
   CameraAngle: 32.5
   CameraDistance: 18
+--- !u!114 &5933792806026448545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6552311690192007215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e48b52b01731a14f979bc02b9e4e229, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  XPEffect: {fileID: 11400000, guid: 5a710b1700691134e9b2e90265091612, type: 2}
+  PlayerTag: Player
 --- !u!1 &9212160647062214359
 GameObject:
   m_ObjectHideFlags: 0
