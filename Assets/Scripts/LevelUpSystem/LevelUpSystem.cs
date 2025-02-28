@@ -6,12 +6,15 @@ using static UnityEngine.GraphicsBuffer;
 
 public class LevelUpSystem : MonoBehaviour
 {
-    [SerializeField] int xpInterval=50;
-    [SerializeField] Effect xpEffect;
+    public delegate void LevelUpDelegate(int LevelNumber);
+    public static event LevelUpDelegate GlobalLevelUpEvent;
+
+    [SerializeField] int _xpInterval=50;
+    [SerializeField] Effect _xpEffect;
 
     Player _player;
     AbilitySystemComponent _abilitySystem;
-    
+    int _levelnumber = 0;
     private void Awake()
     {
         _player = GetComponent<Player>();
@@ -30,12 +33,11 @@ public class LevelUpSystem : MonoBehaviour
 
     private void Pickup_GlobalPickedUp(Pickup pickup, GameObject pickedUpBy)
     {
-        if (pickup is ExperienceOrbPickup)
+        if (pickup is ExperienceOrbPickup && (_player?.Experience % _xpInterval) == 0)
         {
-            if (_player.Experience % xpInterval == 0)
-            {
-                _abilitySystem.ApplyEffectToSelf(xpEffect);                
-            }
+            _levelnumber++;
+            _abilitySystem?.ApplyEffectToSelf(_xpEffect);                
+            GlobalLevelUpEvent?.Invoke(_levelnumber);
         }
     }
 }
