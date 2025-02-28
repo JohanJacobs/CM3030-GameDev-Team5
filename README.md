@@ -49,8 +49,12 @@ The following assets were incorporated in the game:
   Free, Standard Unity Asset Store EULA
   No attribution required
 
-- High score code based and derived from implementation by Kurt Dekker
+- High score code Singleton based and derived from implementation by Kurt Dekker
   https://gist.github.com/kurtdekker/775bb97614047072f7004d6fb9ccce30
   SingletonSimple.cs
 
+- Level up Sound Effect Created from two assets 
+  kWoosh_Low_Long01.wav by moogy73 -- https://freesound.org/s/425702/ -- License: Creative Commons
+  Boom2 by Jurij - https://pixabay.com/sound-effects/boom-2-208745/ - https://pixabay.com/service/license-summary/
+  Mixed with audacity by Johan Jacobs
   

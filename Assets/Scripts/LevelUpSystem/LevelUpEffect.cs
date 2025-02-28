@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class LevelUpEffect : MonoBehaviour
 {
+    private static AudioManager audioManager => AudioManager.Instance; 
+
     [SerializeField] ParticleSystem particleExplode;
     [SerializeField] ParticleSystem particleSwirl;
     PopupManager _popupManager;
+
 
     private void Awake()
     {
@@ -28,8 +31,13 @@ public class LevelUpEffect : MonoBehaviour
         // Display a message for the level up
         _popupManager?.CreateNewPopup(transform.position, $"Level {LevelNumber++}!",transform,3f);
 
+        // audio 
+        audioManager.PlaySFX(audioManager.playerLevelUpSound);
+
         // Trigger the particle systems
         particleExplode.Play();
         particleSwirl.Play();
+
+
     }
 }
