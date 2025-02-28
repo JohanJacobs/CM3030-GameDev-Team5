@@ -15,16 +15,20 @@ public class LevelUpEffect : MonoBehaviour
     }
     private void OnEnable()
     {
-        LevelUpSystem.GlobalLevelUpEvent += LevelUpSysotem_GlobalLevelUpEvent;
+        LevelUpSystem.GlobalLevelUpEvent += LevelUpSystem_GlobalLevelUpEvent;
     }
     private void OnDisable()
     {
-        LevelUpSystem.GlobalLevelUpEvent -= LevelUpSysotem_GlobalLevelUpEvent;
+        LevelUpSystem.GlobalLevelUpEvent -= LevelUpSystem_GlobalLevelUpEvent;
     }
 
-    private void LevelUpSysotem_GlobalLevelUpEvent(int LevelNumber)
+    // Player Leveled up 
+    private void LevelUpSystem_GlobalLevelUpEvent(int LevelNumber)
     {
+        // Display a message for the level up
         _popupManager?.CreateNewPopup(transform.position, $"Level {LevelNumber++}!",transform,3f);
+
+        // Trigger the particle systems
         particleExplode.Play();
         particleSwirl.Play();
     }
