@@ -174,7 +174,7 @@ public class PlayerController : MonoBehaviour
         aimDirection.y = 0f;
         aimDirection.Normalize();
 
-        _player.UpdateAttackAim(aimOrigin, aimTarget, aimDirection);
+        _player.UpdateAttackAbilityAim(aimOrigin, aimTarget, aimDirection);
     }
 
     public void RandomSpawnBulletTracerFX(Vector3 origin, Vector3 direction, float probability = 0.6f)
@@ -250,11 +250,14 @@ public class PlayerController : MonoBehaviour
         PlayHitAnimation();
     }
 
-    private void HandlePlayerCommittedAttack(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage)
+    private void HandlePlayerCommittedAttack(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage, EquipmentSlot abilityEquipmentSlot)
     {
         audioManager.PlaySFX(audioManager.sfxexample);
 
-        RandomSpawnBulletTracerFX(origin, direction, 1f);
+        TryGetEquipmentItemMuzzleTransform(abilityEquipmentSlot, out var muzzleOrigin);
+
+        // TODO: use muzzle direction as well?
+        RandomSpawnBulletTracerFX(muzzleOrigin, direction, 1f);
 
         // TODO: change IsShooting to trigger?
         StartCoroutine(PlayShootAnimationForSeconds(.2f));
@@ -371,11 +374,53 @@ public class PlayerController : MonoBehaviour
 
         attackAbilityInstanceData.EquipmentItem = equipmentItem;
         attackAbilityInstanceData.EquipmentSlot = equipmentSlot;
-        attackAbilityInstanceData.ProvidedByEquipment = true;
     }
 
     private void OnWeaponUnequipped(WeaponItem item, EquipmentItem equipmentItem, EquipmentSlot equipmentSlot)
     {
         _asc.RemoveAbility(item.AttackAbility);
+    }
+
+    private bool TryGetEquipmentItemMuzzleTransform(EquipmentSlot equipmentSlot, out Vector3 origin)
+    {
+        var equippedItem = _equipmentComponent.GetEquippedItem(equipmentSlot);
+
+        if (equippedItem is WeaponEquipmentItem weapon)
+        {
+            origin = weapon.MuzzleTransform.position;
+            return true;
+        }
+
+        if (_player.TryFindEquipmentAttachmentSlot(equipmentSlot, out var attachmentSlot))
+        {
+            origin = attachmentSlot.Socket.position;
+            return true;
+        }
+
+        origin = Vector3.zero;
+        return false;
+    }
+
+    private bool TryGetEquipmentItemMuzzleTransform(EquipmentSlot equipmentSlot, out Vector3 origin, out Vector3 direction)
+    {
+        var equippedItem = _equipmentComponent.GetEquippedItem(equipmentSlot);
+
+        if (equippedItem is WeaponEquipmentItem weapon)
+        {
+            origin = weapon.MuzzleTransform.position;
+            direction = weapon.MuzzleTransform.forward;
+            return true;
+        }
+
+        if (_player.TryFindEquipmentAttachmentSlot(equipmentSlot, out var attachmentSlot))
+        {
+            origin = attachmentSlot.Socket.position;
+            direction = attachmentSlot.Socket.forward;
+            return true;
+        }
+
+        origin = Vector3.zero;
+        direction = Vector3.forward;
+        return false;
     }
 }

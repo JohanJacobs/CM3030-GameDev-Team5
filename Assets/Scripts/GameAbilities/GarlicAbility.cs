@@ -67,7 +67,16 @@ public class GarlicAbility : Ability
 
         var asc = abilityInstance.AbilitySystemComponent;
 
-        ApplyEffectsToTargetsInRange(abilityInstance, asc, asc.transform.position, range, LayerMask, TargetEffects);
+        var targetQuery = new AbilityTargetQuery()
+        {
+            LayerMask = LayerMask,
+            Origin = asc.transform.position,
+            Range = range,
+        };
+
+        var targets = AbilityTargetSelector.GetAreaTargets(targetQuery);
+
+        AbilityTargetUtility.ApplyAbilityEffectsToTargets(abilityInstance, TargetEffects, targets);
     }
 
     public override void ActivateAbility(AbilityInstance abilityInstance)
@@ -75,23 +84,5 @@ public class GarlicAbility : Ability
         var data = abilityInstance.GetData<GarlicAbilityInstanceData>();
 
         data.TimeToNextTrigger = 0;
-    }
-
-    private static void ApplyEffectsToTargetsInRange(AbilityInstance abilityInstance, AbilitySystemComponent source, Vector3 origin, float range, LayerMask layerMask, Effect[] effects)
-    {
-        // TODO: consider OverlapSphereNonAlloc
-        var colliders = Physics.OverlapSphere(origin, range, layerMask);
-
-        foreach (var collider in colliders)
-        {
-            var monster = collider.GetComponentInParent<Monster>();
-            if (monster == null)
-                continue;
-
-            foreach (var effect in effects)
-            {
-                source.ApplyEffectToTarget(effect, monster.AbilitySystemComponent, abilityInstance);
-            }
-        }
     }
 }

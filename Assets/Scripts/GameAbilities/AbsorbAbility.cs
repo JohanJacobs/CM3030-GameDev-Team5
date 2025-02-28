@@ -80,13 +80,18 @@ public class AbsorbAbility : Ability
 
     private void AbsorbPickupsInRange(AbsorbAbilityInstanceData data, Vector3 origin, float range, LayerMask layerMask, float deltaTime)
     {
-        // TODO: consider OverlapSphereNonAlloc
-        // TODO: could be too expensive to trigger every update
-        var colliders = Physics.OverlapSphere(origin, range, layerMask);
-
-        foreach (var collider in colliders)
+        var targetQuery = new AbilityTargetQuery()
         {
-            var pickup = Pickup.GetPickupGameObject(collider);
+            LayerMask = layerMask,
+            Origin = origin,
+            Range = range,
+        };
+
+        var targets = AbilityTargetSelector.GetAreaTargets(targetQuery);
+
+        foreach (var target in targets)
+        {
+            var pickup = Pickup.GetPickupGameObject(target.Collider);
             if (pickup == null)
                 continue;
 
@@ -104,7 +109,7 @@ public class AbsorbAbility : Ability
             data.OrbSpeeds[pickup] = speed;
 
             //LINEAR ACCELERATION
-            //pickup.transform.position = Vector3.MoveTowards(pickup.transform.position, origin, absorptionSpeed * deltaTime);
+            // pickup.transform.position = Vector3.MoveTowards(pickup.transform.position, origin, absorptionSpeed * deltaTime);
         }
     }
 }

@@ -17,4 +17,7 @@ public enum EquipmentSlot
 {
     MainHand,
     OffHand,
+
+    // NOTE: keep that one last
+    Undefined,
 }

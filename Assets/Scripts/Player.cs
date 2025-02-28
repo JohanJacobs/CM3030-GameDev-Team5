@@ -5,7 +5,7 @@ BsC Computer Science Course
 Games Development
 Final Assignment - Streets of Fire Game
 
-Group 5 
+Group 5
 
 Please refer to the README file for detailled information
 
@@ -14,11 +14,12 @@ Player.cs
 Class Player is used to manage some player attack related abilities
 
 */
+
 using UnityEngine;
 
-public class Player : Creature, IAttackAbilityAimProvider, IAttackAbilityDispatcher
+public class Player : Creature, IAttackAbilityAim, IAttackAbilityDispatcher
 {
-    public delegate void AttackDelegate(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage);
+    public delegate void AttackDelegate(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage, EquipmentSlot abilityEquipmentSlot);
 
     public event AttackDelegate CommittedAttack;
 
@@ -27,9 +28,9 @@ public class Player : Creature, IAttackAbilityAimProvider, IAttackAbilityDispatc
     public float Experience => AbilitySystemComponent.GetAttributeValue(AttributeType.Experience);
     public float Level => AbilitySystemComponent.GetAttributeValue(AttributeType.Level);
 
-    private Vector3 _attackOrigin;
-    private Vector3 _attackTarget;
-    private Vector3 _attackDirection;
+    private Vector3 _attackAbilityAimOrigin;
+    private Vector3 _attackAbilityAimTarget;
+    private Vector3 _attackAbilityAimDirection;
 
     public Player()
     {
@@ -37,30 +38,30 @@ public class Player : Creature, IAttackAbilityAimProvider, IAttackAbilityDispatc
         _autoDestroyOnDeath = false;
     }
 
-    public void UpdateAttackAim(in Vector3 origin, in Vector3 target, in Vector3 direction)
+    public void UpdateAttackAbilityAim(in Vector3 origin, in Vector3 target, in Vector3 direction)
     {
-        _attackOrigin = origin;
-        _attackTarget = target;
-        _attackDirection = direction;
+        _attackAbilityAimOrigin = origin;
+        _attackAbilityAimTarget = target;
+        _attackAbilityAimDirection = direction;
     }
 
-    public Vector3 GetAttackOrigin()
+    public Vector3 GetAttackAbilityAimOrigin()
     {
-        return _attackOrigin;
+        return _attackAbilityAimOrigin;
     }
 
-    public Vector3 GetAttackTarget()
+    public Vector3 GetAttackAbilityAimTarget()
     {
-        return _attackTarget;
+        return _attackAbilityAimTarget;
     }
 
-    public Vector3 GetAttackDirection()
+    public Vector3 GetAttackAbilityAimDirection()
     {
-        return _attackDirection;
+        return _attackAbilityAimDirection;
     }
 
-    public void OnAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage)
+    public void OnAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage, EquipmentSlot abilityEquipmentSlot)
     {
-        CommittedAttack?.Invoke(abilityInstance, origin, direction, damage);
+        CommittedAttack?.Invoke(abilityInstance, origin, direction, damage, abilityEquipmentSlot);
     }
 }

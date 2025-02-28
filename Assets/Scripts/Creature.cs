@@ -109,6 +109,21 @@ public class Creature : MonoBehaviour
         }
     }
 
+    public bool TryFindEquipmentAttachmentSlot(EquipmentSlot equipmentSlot, out EquipmentAttachmentSlot attachmentSlot)
+    {
+        attachmentSlot = EquipmentAttachmentSlots.FirstOrDefault(slot => slot.Slot == equipmentSlot);
+        return attachmentSlot != null;
+    }
+
+    public void Suicide()
+    {
+        var effectContext = AbilitySystemComponent.CreateEffectContext();
+
+        effectContext.SetValue(DamageEffect.SelfDestruct, true);
+
+        AbilitySystemComponent.ApplyEffectWithContext(GameData.Instance.DefaultDamageEffect, effectContext);
+    }
+
     protected virtual GameObject GetDamageCauser()
     {
         return gameObject;

@@ -25,10 +25,9 @@ public class RayAttackAbility : AttackAbility
         var asc = abilityInstance.AbilitySystemComponent;
         var attacker = asc.GetComponent<Creature>();
 
-        GetDefaultAttackOriginAndDirection(abilityInstance, out var origin, out var direction);
+        GetOwnerAim(abilityInstance, out var origin, out var direction);
 
-        // HACK: ray comes from attacker center with slight vertical offset
-        var ray = new Ray(attacker.transform.position + Vector3.up * 0.5f, direction);
+        var ray = new Ray(origin, direction);
 
         var range = Range.Calculate(abilityInstance);
         var damageMin = DamageMin.Calculate(abilityInstance);
@@ -36,25 +35,22 @@ public class RayAttackAbility : AttackAbility
 
         var damage = Random.Range(damageMin, damageMax);
 
-        if (Physics.Raycast(ray, out var hit, range, LayerMask))
+        var targetQuery = new AbilityTargetQuery()
         {
-            // HACK: update direction for visuals
-            // {
-            //     direction = hit.point - origin;
-            //
-            //     direction.y = 0;
-            //     direction.Normalize();
-            // }
+            Direction = direction,
+            LayerMask = LayerMask,
+            Origin = origin,
+            Range = range,
+        };
 
-            var victim = hit.collider.GetComponentInParent<Creature>();
-            if (victim)
+        var targets = AbilityTargetSelector.GetRaycastTargetsSingle(targetQuery);
+
+        foreach (var target in targets)
+        {
+            AbilityTargetUtility.ApplyAbilityEffectToTarget(abilityInstance, DamageEffect, target, effectContext =>
             {
-                var effectContext = asc.CreateEffectContext(victim.AbilitySystemComponent, abilityInstance);
-
                 effectContext.SetValue(DamageEffect.AmountSetByCaller, damage);
-
-                asc.ApplyEffectWithContext(DamageEffect, effectContext);
-            }
+            });
         }
 
         NotifyAttackCommitted(abilityInstance, origin, direction, damage);

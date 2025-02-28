@@ -35,7 +35,7 @@ public sealed class EffectContext
     private readonly WeakReference<AbilitySystemComponent> _weakTarget;
     private readonly WeakReference<AbilityInstance> _weakAbilityInstance;
 
-    private readonly Dictionary<Tag, object> _setByCallerValues = new Dictionary<Tag, object>();
+    private readonly Dictionary<Tag, object> _values = new Dictionary<Tag, object>();
 
     public EffectContext(AbilitySystemComponent source, AbilitySystemComponent target)
     {
@@ -51,12 +51,12 @@ public sealed class EffectContext
 
     public void SetValue<T>(in Tag tag, T value)
     {
-        _setByCallerValues[tag] = value;
+        _values[tag] = value;
     }
 
     public bool GetValue<T>(in Tag tag, out T value)
     {
-        if (_setByCallerValues.TryGetValue(tag, out var obj))
+        if (_values.TryGetValue(tag, out var obj))
         {
             if (obj is T concreteValue)
             {
@@ -67,5 +67,10 @@ public sealed class EffectContext
 
         value = default;
         return false;
+    }
+
+    public bool HasValue(in Tag tag)
+    {
+        return _values.ContainsKey(tag);
     }
 }

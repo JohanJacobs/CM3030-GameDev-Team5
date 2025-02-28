@@ -80,6 +80,7 @@ public class GameData : ScriptableObject, ISerializationCallbackReceiver
     public GameAttributeData[] AttributeData;
     public GameLayersData LayersData;
     public GameTags Tags;
+    public DamageEffect DefaultDamageEffect;
 
     public IReadOnlyDictionary<AttributeType, GameAttributeData> AttributeDataMap => _attributeDataMap;
 
