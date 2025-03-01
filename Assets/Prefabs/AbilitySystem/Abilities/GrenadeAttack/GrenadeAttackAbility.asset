@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61001364c98383a418444f337a1a05a2, type: 3}
+  m_Name: GrenadeAttackAbility
+  m_EditorClassIdentifier: 
+  ActivateOnGranted: 0
+  CostEffect: {fileID: 0}
+  CooldownEffect: {fileID: 11400000, guid: fadb1bccf2fc12b4ba1443e7b33487b5, type: 2}
+  Tags: []
+  BlockTags: []
+  CancelTags: []
+  GrantedTags: []
+  AbilityInstanceDataClass:
+    ClassName: AttackAbilityInstanceData
+  InputPolicy: 2
+  InputTag:
+    _string: Untagged
+  InputMappingContext: {fileID: 0}
+  DisplayName: 
+  Description: 
+  DamageEffect: {fileID: 11400000, guid: 817b68add03e58b45a2da251df55c866, type: 2}
+  DamageMin:
+    Calculation: 0
+    AttributeProvider: 1
+    Attribute: 0
+    Value: 3
+  DamageMax:
+    Calculation: 0
+    AttributeProvider: 1
+    Attribute: 0
+    Value: 6
+  Range:
+    Calculation: 0
+    AttributeProvider: 1
+    Attribute: 0
+    Value: 0
+  Projectile: {fileID: 1167045036002323203, guid: cacc6aec60594724d9ccd2d7cd546ee1,
+    type: 3}
+  Launch: 2
+  ThrowSpeed:
+    Calculation: 0
+    AttributeProvider: 1
+    Attribute: 0
+    Value: 8

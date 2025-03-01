@@ -23,20 +23,35 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour, IMonsterSpawnHandler
 {
+    public static GameController ActiveInstance => _activeInstance;
+
     public Tag PlayerStartTag = "PlayerStart";
 
     public float MonsterSpawnDistance = 20f;
     public float MonsterDespawnDistance = 30f;
     public MonsterSpawner[] Spawns;
+
+    public GameObject Player => _player;
+
+    private static GameController _activeInstance;
+
     private readonly List<MonsterSpawnerInstance> _monsterSpawnerInstances = new List<MonsterSpawnerInstance>();
 
     private GameObject _player;
 
     private GameTimer _gameTimer;
+
     [SerializeField] float gameTimeInMinutes = 1f;
 
     void Awake()
     {
+        // set static instance
+        {
+            Debug.Assert(_activeInstance == null);
+
+            _activeInstance = this;
+        }
+
         _navMeshWalkableAreaMask = (1 << NavMesh.GetAreaFromName("Walkable"));
     }
 
@@ -50,8 +65,8 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
             .Select(monsterSpawner => new MonsterSpawnerInstance(monsterSpawner, this));
 
         _monsterSpawnerInstances.AddRange(monsterSpawnerInstances);
+
         SetupGameTimer();
-        
     }
 
     void Update()
@@ -64,6 +79,16 @@ public class GameController : MonoBehaviour, IMonsterSpawnHandler
         foreach (var monsterSpawnerInstance in _monsterSpawnerInstances)
         {
             monsterSpawnerInstance.Update();
+        }
+    }
+
+    void OnDestroy()
+    {
+        // reset static instance
+        {
+            Debug.Assert(_activeInstance == this);
+
+            _activeInstance = null;
         }
     }
 

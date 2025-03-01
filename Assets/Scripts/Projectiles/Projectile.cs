@@ -22,21 +22,46 @@ public class Projectile : MonoBehaviour
     public LayerMask LayerMask;
     public float Lifespan = 10;
     public bool DestroyOnHit = true;
-    
-    public GameObject Owner
-    {
-        get => _owner;
-        set => SetOwner(value);
-    }
 
-    private GameObject _owner;
+    public AbilityInstance AbilityInstance => _abilityInstance;
+    public Collider ProjectileCollider => _collider;
+    public Rigidbody ProjectileRigidBody => _rb;
 
     private Collider _collider;
     private Rigidbody _rb;
 
+    private AbilityInstance _abilityInstance;
+
+    private float _lifeTime;
+
+    public void Initialize(AbilityInstance abilityInstance)
+    {
+        SetAbilityInstance(abilityInstance);
+    }
+
     protected virtual bool HandleHit(Collider other)
     {
         return true;
+    }
+
+    protected virtual void OnTriggerEnterImpl(Collider other)
+    {
+        TryHit(other);
+    }
+
+    protected virtual void OnCollisionEnterImpl(Collision collision)
+    {
+        foreach (var contact in collision.contacts)
+        {
+            Debug.DrawRay(contact.point, contact.normal, Color.white);
+
+            if (TryHit(contact.otherCollider))
+                break;
+        }
+    }
+
+    protected virtual void OnEndOfLife()
+    {
     }
 
     private void Awake()
@@ -45,24 +70,49 @@ public class Projectile : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
     }
 
-    private void Start()
+    private void Update()
     {
-        if (Lifespan > 0)
-        {
-            Destroy(gameObject, Lifespan);
-        }
+        TickLifeTime();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == Owner)
+        OnTriggerEnterImpl(other);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        OnCollisionEnterImpl(collision);
+    }
+
+    private void SetAbilityInstance(AbilityInstance abilityInstance)
+    {
+        if (_abilityInstance == abilityInstance)
             return;
+
+        if (_abilityInstance != null)
+        {
+            Physics.IgnoreCollision(_abilityInstance.Owner.CreatureCollider, _collider, false);
+        }
+
+        _abilityInstance = abilityInstance;
+
+        if (_abilityInstance != null)
+        {
+            Physics.IgnoreCollision(_abilityInstance.Owner.CreatureCollider, _collider, true);
+        }
+    }
+
+    private bool TryHit(Collider other)
+    {
+        if (other.gameObject == _abilityInstance.Owner)
+            return false;
 
         if (!LayerMask.TestGameObjectLayer(other.gameObject))
-            return;
+            return false;
 
         if (!HandleHit(other))
-            return;
+            return false;
 
         _collider.enabled = false;
 
@@ -70,23 +120,22 @@ public class Projectile : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        return true;
     }
 
-    private void SetOwner(GameObject owner)
+    private void TickLifeTime()
     {
-        if (_owner == owner)
+        if (!(Lifespan > 0))
             return;
 
-        if (_owner)
-        {
-            Physics.IgnoreCollision(_owner.GetComponent<Collider>(), _collider, false);
-        }
+        _lifeTime += Time.deltaTime;
 
-        _owner = owner;
+        if (_lifeTime < Lifespan)
+            return;
 
-        if (_owner)
-        {
-            Physics.IgnoreCollision(_owner.GetComponent<Collider>(), _collider, true);
-        }
+        OnEndOfLife();
+
+        Destroy(gameObject, 0.05f);
     }
 }
