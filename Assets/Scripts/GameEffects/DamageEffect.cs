@@ -81,6 +81,6 @@ public class DamageEffect : Effect
             Critical = false,
         };
 
-        DamageSystem.Instance.PostDamageEvent(damageEvent);
+        DamageSystem.ActiveInstance.PostDamageEvent(damageEvent);
     }
 }

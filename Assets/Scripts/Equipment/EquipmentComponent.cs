@@ -88,6 +88,9 @@ public class EquipmentComponent : MonoBehaviour
 
     public bool EquipItem(Item item)
     {
+        if (!item.CanEquip)
+            return false;
+
         var itemSlot = FindItemSlot(item);
         if (itemSlot == null)
             return false;
@@ -95,7 +98,7 @@ public class EquipmentComponent : MonoBehaviour
         if (itemSlot.Equipped)
             return true;
 
-        if (!TryFindFreeEquipmentSlot(out var equipmentSlot))
+        if (!TryFindFreeEquipmentSlotOf(item.EquipsInSlots, out var equipmentSlot))
             return false;
 
         if (!TryFindEquipmentAttachmentSlot(equipmentSlot, out var attachmentSlot))
@@ -125,6 +128,9 @@ public class EquipmentComponent : MonoBehaviour
 
     public bool UnequipItem(Item item)
     {
+        if (!item.CanEquip)
+            return false;
+
         var itemSlot = FindItemSlot(item);
         if (itemSlot == null)
             return false;
@@ -175,6 +181,23 @@ public class EquipmentComponent : MonoBehaviour
                 slot = equipmentSlot;
                 return true;
             }
+        }
+
+        slot = EquipmentSlot.Undefined;
+        return false;
+    }
+
+    private bool TryFindFreeEquipmentSlotOf(IEnumerable<EquipmentSlot> desiredSlots, out EquipmentSlot slot)
+    {
+        var suitableSlots = UsableEquipmentSlots
+            .Where(equipmentSlot => _equipmentSlots[equipmentSlot] == null)
+            .Intersect(desiredSlots)
+            .ToArray();
+
+        if (suitableSlots.Any())
+        {
+            slot = suitableSlots.First();
+            return true;
         }
 
         slot = EquipmentSlot.Undefined;

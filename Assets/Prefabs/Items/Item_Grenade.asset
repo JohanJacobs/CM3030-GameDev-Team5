@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8d41a45905025d49b51f99fa305dcbd, type: 3}
-  m_Name: Item_TwoHandedCrossbow
+  m_Name: Item_Grenade
   m_EditorClassIdentifier: 
-  DisplayName: Crossbow
-  EquipsInSlots: 00000000
-  EquipmentItem: {fileID: 5165996310063704418, guid: 4157752e9d3d8d74693399a89c7afe19,
-    type: 3}
-  AttackAbility: {fileID: 11400000, guid: 85787a2774f0c6d4aa74d0f5d7986806, type: 2}
+  DisplayName: Frag Grenade
+  EquipsInSlots: 01000000
+  EquipmentItem: {fileID: 0}
+  AttackAbility: {fileID: 11400000, guid: 6f680a7a7a739284abbc4dc361a20a43, type: 2}

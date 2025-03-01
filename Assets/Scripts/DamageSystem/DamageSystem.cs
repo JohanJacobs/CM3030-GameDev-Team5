@@ -22,11 +22,11 @@ public struct DamageEvent
 [RequireComponent(typeof(GameController))]
 public class DamageSystem : MonoBehaviour
 {
-    public static DamageSystem Instance => _instance;
+    public static DamageSystem ActiveInstance => _activeInstance;
 
     private const int MaxDamageEvents = 256;
 
-    private static DamageSystem _instance;
+    private static DamageSystem _activeInstance;
 
     private readonly DamageEvent[] _damageEvents = new DamageEvent[MaxDamageEvents];
 
@@ -43,9 +43,12 @@ public class DamageSystem : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Assert(_instance == null);
+        // set static instance
+        {
+            Debug.Assert(_activeInstance == null);
 
-        _instance = this;
+            _activeInstance = this;
+        }
     }
 
     private void LateUpdate()
@@ -60,6 +63,15 @@ public class DamageSystem : MonoBehaviour
         Array.Clear(_damageEvents, 0, _damageEventCount);
 
         _damageEventCount = 0;
+    }
+
+    private void OnDestroy()
+    {
+        {
+            Debug.Assert(_activeInstance == this);
+
+            _activeInstance = null;
+        }
     }
 
     private void ProcessDamageEvent(ref DamageEvent damageEvent)

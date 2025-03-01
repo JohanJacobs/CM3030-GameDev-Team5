@@ -46,6 +46,7 @@ public class Creature : MonoBehaviour
 
     public AbilitySystemComponent AbilitySystemComponent { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
+    public Collider CreatureCollider { get; private set; }
 
     public event KillDelegate Kill;
     public event DeathDelegate Death;
@@ -60,6 +61,8 @@ public class Creature : MonoBehaviour
 
         HealthComponent = GetComponent<HealthComponent>();
         HealthComponent.OutOfHealth += OnOutOfHealth;
+
+        CreatureCollider = GetCreatureCollider();
     }
 
     public void NotifyDamageTaken(in DamageEvent damageEvent)
@@ -105,6 +108,11 @@ public class Creature : MonoBehaviour
 
     protected virtual void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
     {
+    }
+
+    protected virtual Collider GetCreatureCollider()
+    {
+        return GetComponent<Collider>();
     }
 
     private void Die()
