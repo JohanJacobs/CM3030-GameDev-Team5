@@ -28,6 +28,11 @@ MonoBehaviour:
     Value: 1.025
     Permanent: 1
     Post: 0
+  - Attribute: 14
+    Type: 0
+    Value: 1
+    Permanent: 1
+    Post: 0
   DurationPolicy: 2
   CancellationPolicy: 0
   Duration:
