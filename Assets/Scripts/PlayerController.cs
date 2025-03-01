@@ -85,12 +85,12 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnable()
     {
-        GameTimer.OnTimerRanOutEvent += GameTimer_OntimeRanOutEvent;
+        GameTimer.OnTimerRanOutEvent += GameTimer_OnTimeRanOutEvent;
     }
 
     private void OnDisable()
     {
-        GameTimer.OnTimerRanOutEvent -= GameTimer_OntimeRanOutEvent;
+        GameTimer.OnTimerRanOutEvent -= GameTimer_OnTimeRanOutEvent;
     }
 
     private void OnAbilitySystemReady(AbilitySystemComponent asc)
@@ -393,7 +393,8 @@ public class PlayerController : MonoBehaviour
     }
 
     #region GameTimerRelatedFunctions
-    private void GameTimer_OntimeRanOutEvent(object sender, EventArgs e)
+
+    private void GameTimer_OnTimeRanOutEvent(object sender, EventArgs e)
     {
         RestartPlayer();
     }
@@ -401,9 +402,9 @@ public class PlayerController : MonoBehaviour
     private void RestartPlayer()
     {
         // kill off the player
-        var health = _player.Health;
-        _player.TakeDamage(gameObject,transform.position, health);        
+        _player.Suicide();
     }
+
     #endregion
 
     private bool TryGetEquipmentItemMuzzleTransform(EquipmentSlot equipmentSlot, out Vector3 origin)
