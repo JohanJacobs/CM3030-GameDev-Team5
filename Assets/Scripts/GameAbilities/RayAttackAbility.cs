@@ -53,7 +53,7 @@ public class RayAttackAbility : AttackAbility
             });
         }
 
-        NotifyAttackCommitted(abilityInstance, origin, direction, damage);
+        NotifyAttackCommitted(abilityInstance, origin, direction);
 
         abilityInstance.End();
     }

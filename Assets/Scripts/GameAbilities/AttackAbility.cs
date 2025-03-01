@@ -26,7 +26,7 @@ public interface IAttackAbilityAim
 
 public interface IAttackAbilityDispatcher
 {
-    void OnAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage, EquipmentSlot abilityEquipmentSlot);
+    void OnAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, EquipmentSlot abilityEquipmentSlot);
 }
 
 [AbilityInstanceDataClass]
@@ -157,7 +157,7 @@ public abstract class AttackAbility : Ability
         direction = attackDirection;
     }
 
-    protected void NotifyAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage)
+    protected void NotifyAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction)
     {
         var owner = abilityInstance.Owner;
 
@@ -165,7 +165,7 @@ public abstract class AttackAbility : Ability
 
         if (owner is IAttackAbilityDispatcher dispatcher)
         {
-            dispatcher.OnAttackCommitted(abilityInstance, origin, direction, damage, data.EquipmentSlot);
+            dispatcher.OnAttackCommitted(abilityInstance, origin, direction, data.EquipmentSlot);
         }
     }
 }

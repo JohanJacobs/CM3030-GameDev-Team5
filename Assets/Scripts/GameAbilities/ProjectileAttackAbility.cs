@@ -40,7 +40,7 @@ public class ProjectileAttackAbility : AttackAbility
 
         projectile.Owner = asc.Owner.gameObject;
 
-        NotifyAttackCommitted(abilityInstance, origin, direction, 0);
+        NotifyAttackCommitted(abilityInstance, origin, direction);
 
         abilityInstance.End();
     }

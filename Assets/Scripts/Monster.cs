@@ -145,9 +145,18 @@ public class Monster : Creature
 
         _toNextAttack += 1f / AttackRate;
 
-        var targetCreature = _target.GetComponent<Creature>();
+        // NOTE: stub, monsters should use abilities to perform attacks too
+        var damageEvent = new DamageEvent()
+        {
+            AbilityInstance = null,
+            Source = AbilitySystemComponent,
+            Target = _target.GetComponent<AbilitySystemComponent>(),
+            Causer = gameObject,
+            Amount = Random.Range(DamageMin, DamageMax),
+            Critical = false,
+        };
 
-        DealDamage(targetCreature, transform.position, Random.Range(DamageMin, DamageMax));
+        DamageSystem.Instance.PostDamageEvent(damageEvent);
     }
 
     private bool IsTargetInAttackRange()

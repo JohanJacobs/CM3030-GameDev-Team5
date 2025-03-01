@@ -69,22 +69,18 @@ public class DamageEffect : Effect
             }
         }
 
+        // TODO: check if amount is positive?
+
         var damageEvent = new DamageEvent()
         {
             AbilityInstance = effectContext.AbilityInstance,
-            Instigator = effectContext.Source.Owner.gameObject,
+            Source = effectContext.Source,
+            Target = effectContext.Target,
             Causer = causer,
-            Victim = effectContext.Target.Owner.gameObject,
-            Damage = amount,
+            Amount = amount,
             Critical = false,
-            Origin = origin,
         };
 
-        // TODO: check if amount is positive?
-
-        effectContext.Target.AddDamage(amount);
-
-        effectContext.Source.Owner.NotifyDamageDealt(effectContext.Target.Owner, origin, amount);
-        effectContext.Target.Owner.NotifyDamageTaken(effectContext.Source.Owner, origin, amount);
+        DamageSystem.Instance.PostDamageEvent(damageEvent);
     }
 }

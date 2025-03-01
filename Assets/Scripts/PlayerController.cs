@@ -250,7 +250,7 @@ public class PlayerController : MonoBehaviour
         PlayHitAnimation();
     }
 
-    private void HandlePlayerCommittedAttack(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage, EquipmentSlot abilityEquipmentSlot)
+    private void HandlePlayerCommittedAttack(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, EquipmentSlot abilityEquipmentSlot)
     {
         audioManager.PlaySFX(audioManager.sfxexample);
 

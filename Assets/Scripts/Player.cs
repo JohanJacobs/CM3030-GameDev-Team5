@@ -19,7 +19,7 @@ using UnityEngine;
 
 public class Player : Creature, IAttackAbilityAim, IAttackAbilityDispatcher
 {
-    public delegate void AttackDelegate(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage, EquipmentSlot abilityEquipmentSlot);
+    public delegate void AttackDelegate(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, EquipmentSlot abilityEquipmentSlot);
 
     public event AttackDelegate CommittedAttack;
 
@@ -60,8 +60,8 @@ public class Player : Creature, IAttackAbilityAim, IAttackAbilityDispatcher
         return _attackAbilityAimDirection;
     }
 
-    public void OnAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage, EquipmentSlot abilityEquipmentSlot)
+    public void OnAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, EquipmentSlot abilityEquipmentSlot)
     {
-        CommittedAttack?.Invoke(abilityInstance, origin, direction, damage, abilityEquipmentSlot);
+        CommittedAttack?.Invoke(abilityInstance, origin, direction, abilityEquipmentSlot);
     }
 }

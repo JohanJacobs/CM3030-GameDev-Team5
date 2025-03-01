@@ -62,56 +62,27 @@ public class Creature : MonoBehaviour
         HealthComponent.OutOfHealth += OnOutOfHealth;
     }
 
-    public void TakeDamage(GameObject causer, Vector3 origin, float amount)
+    public void NotifyDamageTaken(in DamageEvent damageEvent)
     {
-        if (IsDead)
-            return;
-
-        AbilitySystemComponent.AddDamage(amount);
-
-        OnDamageTaken(causer, origin, amount);
+        OnDamageTaken(damageEvent.Causer, damageEvent.Causer.transform.position, damageEvent.Amount);
 
         DamageTaken?.Invoke();
     }
 
-    public void DealDamage(Creature victim, Vector3 origin, float amount)
+    public void NotifyDamageDealt(in DamageEvent damageEvent)
     {
-        if (victim == null)
-            return;
-
-        if (victim.IsDead)
-            return;
-
-        victim.TakeDamage(GetDamageCauser(), origin, amount);
-
-        if (victim.IsDead)
+        if (damageEvent.Lethal)
         {
-            OnKill(victim);
+            OnKill(damageEvent.Target.Owner);
 
-            Kill?.Invoke(this, victim);
-        }
-    }
-
-    public void NotifyDamageTaken(Creature causer, Vector3 origin, float amount)
-    {
-        OnDamageTaken(causer.gameObject, origin, amount);
-
-        DamageTaken?.Invoke();
-    }
-
-    public void NotifyDamageDealt(Creature victim, Vector3 origin, float amount)
-    {
-        if (victim.IsDead)
-        {
-            OnKill(victim);
-
-            Kill?.Invoke(this, victim);
+            Kill?.Invoke(this, damageEvent.Target.Owner);
         }
     }
 
     public bool TryFindEquipmentAttachmentSlot(EquipmentSlot equipmentSlot, out EquipmentAttachmentSlot attachmentSlot)
     {
         attachmentSlot = EquipmentAttachmentSlots.FirstOrDefault(slot => slot.Slot == equipmentSlot);
+
         return attachmentSlot != null;
     }
 
@@ -122,11 +93,6 @@ public class Creature : MonoBehaviour
         effectContext.SetValue(DamageEffect.SelfDestruct, true);
 
         AbilitySystemComponent.ApplyEffectWithContext(GameData.Instance.DefaultDamageEffect, effectContext);
-    }
-
-    protected virtual GameObject GetDamageCauser()
-    {
-        return gameObject;
     }
 
     protected virtual void OnKill(Creature victim)
@@ -167,6 +133,11 @@ public class Creature : MonoBehaviour
             if (distinctAttachmentSlotCount < EquipmentAttachmentSlots.Length)
             {
                 Debug.LogWarning("Duplicate attachment slots");
+            }
+
+            if (EquipmentAttachmentSlots.Any(slot => slot.Slot == EquipmentSlot.Undefined))
+            {
+                Debug.LogWarning("Equipment slot Undefined must not be used for attachments");
             }
         }
     }
