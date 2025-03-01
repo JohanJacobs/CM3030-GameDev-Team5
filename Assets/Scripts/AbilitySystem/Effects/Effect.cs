@@ -14,6 +14,7 @@ Effect.cs
 */
 
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -72,6 +73,11 @@ public class Effect : ScriptableObject, IEffectLogic
         Debug.Assert(result, "Effect definition is invalid");
 
         return result;
+    }
+
+    public bool HasTag(in Tag tag)
+    {
+        return Tags?.Contains(tag) ?? false;
     }
 
     public virtual void ApplyEffect(EffectInstance effectInstance)

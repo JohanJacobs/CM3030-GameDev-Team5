@@ -27,6 +27,7 @@ public class EffectInstance
     public bool Inactive => !Active;
     public bool SelfTargeted => Context.Target == Context.Source;
     public float TimeRemaining => _timeLeftToExpiration;
+    public IReadOnlyList<AttributeModifierHandle> AttributeModifiers => _modifiers;
 
     public float TimeRemainingFraction
     {

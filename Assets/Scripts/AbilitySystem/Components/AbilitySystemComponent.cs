@@ -538,6 +538,60 @@ public class AbilitySystemComponent : MonoBehaviour
         return 0f;
     }
 
+    /// <summary>
+    /// Returns aggregate information of currently active effects with given tag (see <see cref="Effect.Tags"/>)
+    /// </summary>
+    /// <remarks>
+    /// Not supposed to be called often
+    /// </remarks>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public IEnumerable<EffectInfo> GetActiveEffectsInfoByTag(Tag tag)
+    {
+        var effectInstanceGroups = _effectInstances
+            .Where(ei => ei.Active)
+            .Where(ei => ei.Effect.HasTag(tag))
+            .GroupBy(ei => ei.Effect);
+
+        foreach (var eig in effectInstanceGroups)
+        {
+            var effect = eig.Key;
+
+            var effectInfo = new EffectInfo()
+            {
+                Effect = effect,
+                Stacks = eig.Count(),
+            };
+
+            if (effect.DurationPolicy == EffectDurationPolicy.Infinite)
+            {
+                effectInfo.TimeLeft = float.PositiveInfinity;
+                effectInfo.TimeLeftFraction = 1f;
+            }
+            else
+            {
+                var effectInstanceWithMaxTimeRemaining = eig.Aggregate((lhs, rhs) => lhs.TimeRemaining > rhs.TimeRemaining ? lhs : rhs);
+
+                effectInfo.TimeLeft = effectInstanceWithMaxTimeRemaining.TimeRemaining;
+                effectInfo.TimeLeftFraction = effectInstanceWithMaxTimeRemaining.TimeRemainingFraction;
+            }
+
+            effectInfo.AttributeModifiers = eig
+                .SelectMany(ei => ei.AttributeModifiers)
+                // TODO: validate handles?
+                .GroupBy(amh => amh.ModifierStack.Attribute)
+                .Select(amg => new EffectAttributeModifierInfo()
+                {
+                    Attribute = amg.Key,
+                    Value = amg.Sum(amh => amh.Instance.GetAbsoluteValueChange()),
+                })
+                .OrderBy(ei => ei.Attribute)
+                .ToArray();
+
+            yield return effectInfo;
+        }
+    }
+
     #endregion
 
     #region Abilities
