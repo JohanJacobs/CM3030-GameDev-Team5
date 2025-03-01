@@ -14,31 +14,34 @@ AttackAbilityInstanceData.cs
 */
 
 using System;
-using System.Linq;
 using UnityEngine;
+using static UnityEngine.UI.GridLayoutGroup;
 
-public interface IAttackAbilityAimProvider
+public interface IAttackAbilityAim
 {
-    Vector3 GetAttackOrigin();
-    Vector3 GetAttackTarget();
-    Vector3 GetAttackDirection();
+    Vector3 GetAttackAbilityAimOrigin();
+    Vector3 GetAttackAbilityAimTarget();
+    Vector3 GetAttackAbilityAimDirection();
 }
 
 public interface IAttackAbilityDispatcher
 {
-    void OnAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage);
+    void OnAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, EquipmentSlot abilityEquipmentSlot);
 }
 
 [AbilityInstanceDataClass]
 public class AttackAbilityInstanceData : AbilityInstanceData
 {
     public EquipmentItem EquipmentItem;
-    public EquipmentSlot EquipmentSlot;
-    public bool ProvidedByEquipment;
+    public EquipmentSlot EquipmentSlot = EquipmentSlot.Undefined;
+
+    public bool ProvidedByEquipment => EquipmentSlot != EquipmentSlot.Undefined;
 }
 
 public abstract class AttackAbility : Ability
 {
+    public DamageEffect DamageEffect;
+
     public Magnitude DamageMin;
     public Magnitude DamageMax;
     public Magnitude Range;
@@ -48,9 +51,10 @@ public abstract class AttackAbility : Ability
         AbilityInstanceDataClass = new AbilityInstanceDataClass(typeof(AttackAbilityInstanceData));
     }
 
-    protected bool GetEquipmentAttackOrigin(AbilityInstance abilityInstance, out Vector3 origin)
+    protected bool GetEquipmentAim(AbilityInstance abilityInstance, out Vector3 origin)
     {
         var owner = abilityInstance.Owner;
+
         var data = abilityInstance.GetData<AttackAbilityInstanceData>();
 
         if (data.ProvidedByEquipment)
@@ -61,8 +65,7 @@ public abstract class AttackAbility : Ability
                 return true;
             }
 
-            var attachmentSlot = FindEquipmentAttachmentSlot(owner, data.EquipmentSlot);
-            if (attachmentSlot != null)
+            if (owner.TryFindEquipmentAttachmentSlot(data.EquipmentSlot, out var attachmentSlot))
             {
                 origin = attachmentSlot.Socket.position;
                 return true;
@@ -73,26 +76,78 @@ public abstract class AttackAbility : Ability
         return false;
     }
 
-    protected void GetDefaultAttackOriginAndDirection(AbilityInstance abilityInstance, out Vector3 origin, out Vector3 direction)
+    protected bool GetEquipmentAim(AbilityInstance abilityInstance, out Vector3 origin, out Vector3 direction)
+    {
+        var owner = abilityInstance.Owner;
+
+        var data = abilityInstance.GetData<AttackAbilityInstanceData>();
+
+        if (data.ProvidedByEquipment)
+        {
+            if (data.EquipmentItem is WeaponEquipmentItem weaponEquipmentItem)
+            {
+                origin = weaponEquipmentItem.MuzzleTransform.position;
+                direction = weaponEquipmentItem.MuzzleTransform.forward;
+                return true;
+            }
+
+            if (owner.TryFindEquipmentAttachmentSlot(data.EquipmentSlot, out var attachmentSlot))
+            {
+                origin = attachmentSlot.Socket.position;
+                direction = attachmentSlot.Socket.forward;
+                return true;
+            }
+        }
+
+        origin = Vector3.zero;
+        direction = Vector3.forward;
+        return false;
+    }
+
+    protected bool GetEquipmentAimWithOwnerDirection(AbilityInstance abilityInstance, out Vector3 origin, out Vector3 direction)
+    {
+        GetOwnerAim(abilityInstance, out var ownerOrigin, out direction);
+
+        var owner = abilityInstance.Owner;
+
+        var data = abilityInstance.GetData<AttackAbilityInstanceData>();
+
+        if (data.ProvidedByEquipment)
+        {
+            if (data.EquipmentItem is WeaponEquipmentItem weaponEquipmentItem)
+            {
+                origin = weaponEquipmentItem.MuzzleTransform.position;
+                return true;
+            }
+
+            if (owner.TryFindEquipmentAttachmentSlot(data.EquipmentSlot, out var attachmentSlot))
+            {
+                origin = attachmentSlot.Socket.position;
+                return true;
+            }
+        }
+
+        origin = ownerOrigin;
+        return false;
+    }
+
+    protected void GetOwnerAim(AbilityInstance abilityInstance, out Vector3 origin, out Vector3 direction)
     {
         Vector3 attackOrigin;
         Vector3 attackDirection;
 
-        bool wantsAttackOrigin = !GetEquipmentAttackOrigin(abilityInstance, out attackOrigin);
-
         var owner = abilityInstance.Owner;
 
-        if (owner is IAttackAbilityAimProvider aimProvider)
+        switch (owner)
         {
-            if (wantsAttackOrigin)
-                attackOrigin = aimProvider.GetAttackOrigin();
-            attackDirection = aimProvider.GetAttackDirection();
-        }
-        else
-        {
-            if (wantsAttackOrigin)
+            case IAttackAbilityAim aim:
+                attackOrigin = aim.GetAttackAbilityAimOrigin();
+                attackDirection = aim.GetAttackAbilityAimDirection();
+                break;
+            default:
                 attackOrigin = owner.transform.position;
-            attackDirection = owner.transform.forward;
+                attackDirection = owner.transform.forward;
+                break;
         }
 
         attackDirection.y = 0;
@@ -102,18 +157,15 @@ public abstract class AttackAbility : Ability
         direction = attackDirection;
     }
 
-    protected void NotifyAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction, float damage)
+    protected void NotifyAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction)
     {
         var owner = abilityInstance.Owner;
 
+        var data = abilityInstance.GetData<AttackAbilityInstanceData>();
+
         if (owner is IAttackAbilityDispatcher dispatcher)
         {
-            dispatcher.OnAttackCommitted(abilityInstance, origin, direction, damage);
+            dispatcher.OnAttackCommitted(abilityInstance, origin, direction, data.EquipmentSlot);
         }
-    }
-
-    private EquipmentAttachmentSlot FindEquipmentAttachmentSlot(Creature creature, EquipmentSlot equipmentSlot)
-    {
-        return creature.EquipmentAttachmentSlots.FirstOrDefault(s => s.Slot == equipmentSlot);
     }
 }

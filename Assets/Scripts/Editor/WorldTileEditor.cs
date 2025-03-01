@@ -14,6 +14,7 @@ WorldTileEditor.cs
 */
 
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
@@ -27,12 +28,13 @@ public class WorldTileEditor : Editor
 
     private SerializedProperty _propSize;
     private SerializedProperty _propNavMeshData;
-    
+
+    private NavMeshData _overrideNavMeshData;
 
     public void OnEnable()
     {
         _propSize = serializedObject.FindProperty("Size");
-        _propNavMeshData = serializedObject.FindProperty("NavMeshData");    
+        _propNavMeshData = serializedObject.FindProperty("NavMeshData");
     }
 
     public override void OnInspectorGUI()
@@ -42,7 +44,7 @@ public class WorldTileEditor : Editor
         GUI.enabled = false;
         EditorGUILayout.PropertyField(_propNavMeshData);
         GUI.enabled = true;
-        EditorGUILayout.PropertyField(_propSize);        
+        EditorGUILayout.PropertyField(_propSize);
 
         EditorGUILayout.Space();
 
@@ -90,6 +92,16 @@ public class WorldTileEditor : Editor
         }
 
         GUILayout.EndHorizontal();
+
+        _overrideNavMeshData = EditorGUILayout.ObjectField("Baked Nav Mesh", _overrideNavMeshData, typeof(NavMeshData), false) as NavMeshData;
+
+        if (_overrideNavMeshData)
+        {
+            if (GUILayout.Button("Borrow Nav Mesh"))
+            {
+                OnBorrow(prefabInstanceRoot, prefab, prefabPath);
+            }
+        }
     }
 
     private void OnClear(GameObject instance, GameObject prefab, string prefabPath)
@@ -112,6 +124,26 @@ public class WorldTileEditor : Editor
         prefabWorldTile.NavMeshData = navMeshData;
 
         AssetDatabase.SaveAssets();
+
+        _overrideNavMeshData = navMeshData;
+    }
+
+    private void OnBorrow(GameObject instance, GameObject prefab, string prefabPath)
+    {
+        var prefabWorldTile = prefab.GetComponent<WorldTile>();
+
+        if (prefabWorldTile.NavMeshData == _overrideNavMeshData)
+            return;
+
+        DestroyPrefabNavMeshData(prefabPath);
+
+        var navMeshData = Instantiate(_overrideNavMeshData);
+
+        AssetDatabase.AddObjectToAsset(navMeshData, prefab);
+
+        prefabWorldTile.NavMeshData = navMeshData;
+
+        AssetDatabase.SaveAssets();
     }
 
     private NavMeshData BuildNavMeshData(GameObject instance, Vector2 tileSize)
@@ -127,6 +159,24 @@ public class WorldTileEditor : Editor
         UnityEditor.AI.NavMeshBuilder.CollectSourcesInStage(instance.transform, layerMask, NavMeshCollectGeometry.RenderMeshes, defaultArea, markups, instance.scene, sources);
 
         var settings = NavMesh.GetSettingsByID(0);
+
+        {
+            // var t = typeof(NavMeshBuildSettings);
+            // var fields = t.GetFields(BindingFlags.NonPublic);
+            // foreach (var field in fields)
+            // {
+            //     Debug.Log(field.Name);
+            // }
+
+            var field = typeof(NavMeshBuildSettings).GetField("m_AccuratePlacement", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            object boxed = settings;
+
+            field?.SetValue(boxed, -1);
+
+            settings = (NavMeshBuildSettings)boxed;
+        }
+
         // var bounds = new Bounds(Vector3.zero, new Vector3(tileSize.x, 100f, tileSize.y));
         var bounds = new Bounds(Vector3.zero, 1000.0f * Vector3.one);
 

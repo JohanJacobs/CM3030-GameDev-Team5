@@ -25,20 +25,23 @@ MonoBehaviour:
   InputTag:
     _string: Untagged
   InputMappingContext: {fileID: 0}
+  DisplayName: 
+  Description: 
+  DamageEffect: {fileID: 11400000, guid: 817b68add03e58b45a2da251df55c866, type: 2}
   DamageMin:
-    Calculation: 1
+    Calculation: 5
     AttributeProvider: 1
-    Attribute: 8
+    Attribute: 21
     Value: 4
   DamageMax:
-    Calculation: 1
+    Calculation: 5
     AttributeProvider: 1
-    Attribute: 9
+    Attribute: 21
     Value: 12
   Range:
-    Calculation: 1
+    Calculation: 5
     AttributeProvider: 1
-    Attribute: 10
+    Attribute: 20
     Value: 24
   LayerMask:
     serializedVersion: 2

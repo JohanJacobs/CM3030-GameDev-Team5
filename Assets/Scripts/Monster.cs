@@ -31,7 +31,6 @@ public class Monster : Creature
     public float DamageMax => AbilitySystemComponent.GetAttributeValue(AttributeType.MaxDamage);
     public float AttackRate => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRate);
     public float AttackRange => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRange);
-    
 
     private NavMeshAgent _navMeshAgent;
 
@@ -41,9 +40,18 @@ public class Monster : Creature
 
     private Vector3 _knockBackForce = Vector3.zero;
 
-
     private bool _isSpawning = true; // Required to stop the navmesh movement when spawning.    
     private Collider _collider; 
+
+    public void KnockBack(Vector3 origin, float amount)
+    {
+        if (!(KnockBackResistance < 1))
+            return;
+
+        var direction = transform.position - origin;
+
+        _knockBackForce += direction.normalized * amount * (1f - KnockBackResistance);
+    }
 
     void Start()
     {
@@ -90,11 +98,7 @@ public class Monster : Creature
         _navMeshAgent.isStopped = true;
         _navMeshAgent.enabled = false;
 
-        var myCollider = GetComponentInChildren<Collider>();
-        if (myCollider)
-        {
-            myCollider.enabled = false;
-        }
+        _collider.enabled = false;
     }
 
     protected override void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
@@ -108,19 +112,9 @@ public class Monster : Creature
         }
 
         // TODO: shouldn't be here
-        var knockBackMagnitude = AbilitySystemUtility.GetAttributeValueOrDefault(causer, AttributeType.KnockBack, 1);
-
-        KnockBack(origin, knockBackMagnitude * amount / MaxHealth);
-    }
-
-    private void KnockBack(Vector3 origin, float amount)
-    {
-        if (!(KnockBackResistance < 1))
-            return;
-
-        var direction = transform.position - origin;
-
-        _knockBackForce += direction.normalized * amount * (1f - KnockBackResistance);
+        // var knockBackMagnitude = AbilitySystemUtility.GetAttributeValueOrDefault(causer, AttributeType.KnockBack, 1);
+        //
+        // KnockBack(origin, knockBackMagnitude * amount / MaxHealth);
     }
 
     private void UpdateMovementAnimation()
@@ -151,9 +145,18 @@ public class Monster : Creature
 
         _toNextAttack += 1f / AttackRate;
 
-        var targetCreature = _target.GetComponent<Creature>();
+        // NOTE: stub, monsters should use abilities to perform attacks too
+        var damageEvent = new DamageEvent()
+        {
+            AbilityInstance = null,
+            Source = AbilitySystemComponent,
+            Target = _target.GetComponent<AbilitySystemComponent>(),
+            Causer = gameObject,
+            Amount = Random.Range(DamageMin, DamageMax),
+            Critical = false,
+        };
 
-        DealDamage(targetCreature, transform.position, Random.Range(DamageMin, DamageMax));
+        DamageSystem.Instance.PostDamageEvent(damageEvent);
     }
 
     private bool IsTargetInAttackRange()

@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb973b78fd4f7ef4fa8c59b0f55e8ba2, type: 3}
+  m_Name: TestStunEffect
+  m_EditorClassIdentifier: 
+  Modifiers:
+  - Attribute: 6
+    Type: 3
+    Value: 0
+    Permanent: 0
+    Post: 1
+  - Attribute: 7
+    Type: 3
+    Value: 0
+    Permanent: 0
+    Post: 1
+  DurationPolicy: 1
+  CancellationPolicy: 1
+  Duration:
+    Calculation: 0
+    AttributeProvider: 0
+    Attribute: 0
+    Value: 0.5
+  Period:
+    Calculation: 0
+    AttributeProvider: 1
+    Attribute: 0
+    Value: 0
+  Tags: []
+  BlockTags: []
+  CancelTags: []
+  GrantedTags:
+  - _string: Condition.Stunned
+  Cue: {fileID: 6413521036590870303, guid: ecf2535daeb37b345b92d7e3ea5cf6cf, type: 3}

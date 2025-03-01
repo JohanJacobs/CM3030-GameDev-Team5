@@ -21,6 +21,8 @@ using UnityEngine;
 public class AbilitySystemComponent : MonoBehaviour
 {
     public delegate void SelfDelegate(AbilitySystemComponent asc);
+    public delegate void AttributeValueMutatorDelegate(AbilitySystemComponent asc, AttributeType attribute, ref float value);
+    public delegate void EffectContextDelegate(AbilitySystemComponent asc, Effect effect, EffectContext effectContext);
 
     private struct ReadyCallback
     {
@@ -31,6 +33,9 @@ public class AbilitySystemComponent : MonoBehaviour
     private static readonly AttributeType[] AllAttributes = Enum.GetValues(typeof(AttributeType)).Cast<AttributeType>().ToArray();
 
     public IReadOnlyCollection<Tag> Tags => _tags;
+    public bool Ready => _ready;
+
+    public Creature Owner { get; private set; }
 
     [SerializeField]
     private AttributeSet[] _grantedAttributeSets;
@@ -49,7 +54,15 @@ public class AbilitySystemComponent : MonoBehaviour
 
     private readonly TagContainer _tags = new TagContainer();
 
+    // these two store number of delegates subscribed to respective event
+    // should generally reduce runtime processing cost in case attribute changes frequently but nothing wants to know of these changes
+    private readonly EnumArray<int, AttributeType> _preAttributeModificationDelegateCount = new EnumArray<int, AttributeType>();
+    private readonly EnumArray<int, AttributeType> _postAttributeModificationDelegateCount = new EnumArray<int, AttributeType>();
+
     private bool _ready;
+
+    private event AttributeValueMutatorDelegate PreAttributeModification;
+    private event AttributeValueMutatorDelegate PostAttributeModification;
 
     public void OnReady(SelfDelegate @delegate, int priority = 0)
     {
@@ -66,6 +79,72 @@ public class AbilitySystemComponent : MonoBehaviour
             };
 
             _readyDelegates.Add(callback);
+        }
+    }
+
+    /// <summary>
+    /// Registers delegate to be called before attribute modifier stack is applied. Passed value is attribute's base value.
+    /// Doesn't trigger on direct value changes.
+    /// </summary>
+    /// <remarks>
+    /// Only related to modifier stack so it doesn't trigger on direct value changes. Careful with add/remove pairs.
+    /// Note also that it's possible to have several callbacks for same attribute.
+    /// </remarks>
+    /// <param name="attribute"></param>
+    /// <param name="delegate"></param>
+    public void RegisterPreAttributeModificationCallback(AttributeType attribute, AttributeValueMutatorDelegate @delegate)
+    {
+        PreAttributeModification += @delegate;
+
+        ref var count = ref _preAttributeModificationDelegateCount[attribute];
+
+        {
+            ++count;
+        }
+    }
+
+    public void UnregisterPreAttributeModificationCallback(AttributeType attribute, AttributeValueMutatorDelegate @delegate)
+    {
+        PreAttributeModification -= @delegate;
+
+        ref var count = ref _preAttributeModificationDelegateCount[attribute];
+
+        if (count > 0)
+        {
+            --count;
+        }
+    }
+
+    /// <summary>
+    /// Registers delegate to be called after attribute modifier stack is applied but before storing actual attribute value.
+    /// Passed value is attribute's base value with applied modifier stack.
+    /// </summary>
+    /// <remarks>
+    /// Only related to modifier stack so it doesn't trigger on direct value changes. Careful with add/remove pairs.
+    /// Note also that it's possible to have several callbacks for same attribute.
+    /// </remarks>
+    /// <param name="attribute"></param>
+    /// <param name="delegate"></param>
+    public void RegisterPostAttributeModificationCallback(AttributeType attribute, AttributeValueMutatorDelegate @delegate)
+    {
+        PostAttributeModification += @delegate;
+
+        ref var count = ref _postAttributeModificationDelegateCount[attribute];
+
+        {
+            ++count;
+        }
+    }
+
+    public void UnregisterPostAttributeModificationCallback(AttributeType attribute, AttributeValueMutatorDelegate @delegate)
+    {
+        PostAttributeModification -= @delegate;
+
+        ref var count = ref _postAttributeModificationDelegateCount[attribute];
+
+        if (count > 0)
+        {
+            --count;
         }
     }
 
@@ -129,10 +208,8 @@ public class AbilitySystemComponent : MonoBehaviour
     public void SetAttributeBaseValue(AttributeType attribute, float value)
     {
         var attributeValue = _attributeValues[attribute];
-        if (attributeValue == null)
-            return;
 
-        attributeValue.BaseValue = value;
+        attributeValue?.HACK_SetBaseValue(value);
     }
 
     public float GetAttributeBaseValue(AttributeType attribute)
@@ -140,6 +217,13 @@ public class AbilitySystemComponent : MonoBehaviour
         var attributeValue = _attributeValues[attribute];
 
         return attributeValue?.BaseValue ?? 0f;
+    }
+
+    public void SetAttributeValue(AttributeType attribute, float value)
+    {
+        var attributeValue = _attributeValues[attribute];
+
+        attributeValue?.HACK_SetCurrentValue(value);
     }
 
     public float GetAttributeValue(AttributeType attribute)
@@ -258,10 +342,8 @@ public class AbilitySystemComponent : MonoBehaviour
     public void ApplyPermanentAttributeModifier(AttributeType attribute, ScalarModifier scalarModifier)
     {
         var attributeValue = _attributeValues[attribute];
-        if (attributeValue == null)
-            return;
 
-        attributeValue.BaseValue = scalarModifier.Calculate(attributeValue.BaseValue);
+        attributeValue?.HACK_SetBaseValue(scalarModifier.Calculate(attributeValue.BaseValue));
     }
 
     /// <summary>
@@ -273,10 +355,8 @@ public class AbilitySystemComponent : MonoBehaviour
     public void ApplyPermanentAttributeOverride(AttributeType attribute, float scalarOverride)
     {
         var attributeValue = _attributeValues[attribute];
-        if (attributeValue == null)
-            return;
 
-        attributeValue.BaseValue = scalarOverride;
+        attributeValue?.HACK_SetBaseValue(scalarOverride);
     }
 
     /// <summary>
@@ -323,6 +403,41 @@ public class AbilitySystemComponent : MonoBehaviour
 
     #endregion
 
+    #region Effect Context
+
+    public EffectContext CreateEffectContext()
+    {
+        return new EffectContext(this, this);
+    }
+
+    public EffectContext CreateEffectContext(AbilityInstance abilityInstance)
+    {
+        if (abilityInstance == null)
+            throw new ArgumentNullException(nameof(abilityInstance));
+
+        return new EffectContext(this, this, abilityInstance);
+    }
+
+    public EffectContext CreateEffectContext(AbilitySystemComponent target)
+    {
+        if (target == null)
+            throw new ArgumentNullException(nameof(target));
+
+        return new EffectContext(this, target);
+    }
+
+    public EffectContext CreateEffectContext(AbilitySystemComponent target, AbilityInstance abilityInstance)
+    {
+        if (target == null)
+            throw new ArgumentNullException(nameof(target));
+        if (abilityInstance == null)
+            throw new ArgumentNullException(nameof(abilityInstance));
+
+        return new EffectContext(this, target, abilityInstance);
+    }
+
+    #endregion
+
     #region Effects
 
     public bool CanApplyEffect(Effect effect)
@@ -339,7 +454,16 @@ public class AbilitySystemComponent : MonoBehaviour
     {
         effect.Validate();
 
-        var context = new EffectContext(this, this);
+        var context = CreateEffectContext();
+
+        return context.Target.ApplyEffect(effect, context);
+    }
+
+    public EffectHandle ApplyEffectToSelf(Effect effect, AbilityInstance abilityInstance)
+    {
+        effect.Validate();
+
+        var context = CreateEffectContext(abilityInstance);
 
         return context.Target.ApplyEffect(effect, context);
     }
@@ -348,7 +472,29 @@ public class AbilitySystemComponent : MonoBehaviour
     {
         effect.Validate();
 
-        var context = new EffectContext(this, target);
+        var context = CreateEffectContext(target);
+
+        return context.Target.ApplyEffect(effect, context);
+    }
+
+    public EffectHandle ApplyEffectToTarget(Effect effect, AbilitySystemComponent target, AbilityInstance abilityInstance)
+    {
+        effect.Validate();
+
+        var context = CreateEffectContext(target, abilityInstance);
+
+        return context.Target.ApplyEffect(effect, context);
+    }
+
+    public EffectHandle ApplyEffectWithContext(Effect effect, EffectContext context)
+    {
+        if (context == null)
+            throw new ArgumentNullException(nameof(context));
+
+        effect.Validate();
+
+        if (context.Source != this)
+            throw new InvalidOperationException("Invalid effect context source");
 
         return context.Target.ApplyEffect(effect, context);
     }
@@ -365,7 +511,7 @@ public class AbilitySystemComponent : MonoBehaviour
         // TODO: get rid of Contains call
         if (_effectInstances.Contains(effectInstance))
         {
-            RemoveEffectInstance(effectInstance);
+            RemoveEffectInstanceImpl(effectInstance);
         }
 
         handle.Clear();
@@ -391,6 +537,60 @@ public class AbilitySystemComponent : MonoBehaviour
             return effectInstance.TimeRemainingFraction;
 
         return 0f;
+    }
+
+    /// <summary>
+    /// Returns aggregate information of currently active effects with given tag (see <see cref="Effect.Tags"/>)
+    /// </summary>
+    /// <remarks>
+    /// Not supposed to be called often
+    /// </remarks>
+    /// <param name="tag"></param>
+    /// <returns></returns>
+    public IEnumerable<EffectInfo> GetActiveEffectsInfoByTag(Tag tag)
+    {
+        var effectInstanceGroups = _effectInstances
+            .Where(ei => ei.Active)
+            .Where(ei => ei.Effect.HasTag(tag))
+            .GroupBy(ei => ei.Effect);
+
+        foreach (var eig in effectInstanceGroups)
+        {
+            var effect = eig.Key;
+
+            var effectInfo = new EffectInfo()
+            {
+                Effect = effect,
+                Stacks = eig.Count(),
+            };
+
+            if (effect.DurationPolicy == EffectDurationPolicy.Infinite)
+            {
+                effectInfo.TimeLeft = float.PositiveInfinity;
+                effectInfo.TimeLeftFraction = 1f;
+            }
+            else
+            {
+                var effectInstanceWithMaxTimeRemaining = eig.Aggregate((lhs, rhs) => lhs.TimeRemaining > rhs.TimeRemaining ? lhs : rhs);
+
+                effectInfo.TimeLeft = effectInstanceWithMaxTimeRemaining.TimeRemaining;
+                effectInfo.TimeLeftFraction = effectInstanceWithMaxTimeRemaining.TimeRemainingFraction;
+            }
+
+            effectInfo.AttributeModifiers = eig
+                .SelectMany(ei => ei.AttributeModifiers)
+                // TODO: validate handles?
+                .GroupBy(amh => amh.ModifierStack.Attribute)
+                .Select(amg => new EffectAttributeModifierInfo()
+                {
+                    Attribute = amg.Key,
+                    Value = amg.Sum(amh => amh.Instance.GetAbsoluteValueChange()),
+                })
+                .OrderBy(ei => ei.Attribute)
+                .ToArray();
+
+            yield return effectInfo;
+        }
     }
 
     #endregion
@@ -494,6 +694,12 @@ public class AbilitySystemComponent : MonoBehaviour
 
     #region Unity Messages
 
+    private void Awake()
+    {
+        Owner = GetComponent<Creature>();
+        Owner.Death += OnOwnerDeath;
+    }
+
     private void Start()
     {
         foreach (var attribute in AllAttributes)
@@ -551,6 +757,8 @@ public class AbilitySystemComponent : MonoBehaviour
         _effectInstances.Clear();
         _abilityInstances.Clear();
         _tags.Clear();
+
+        Owner = null;
     }
 
     #endregion
@@ -580,12 +788,30 @@ public class AbilitySystemComponent : MonoBehaviour
 
     private void UpdateAttributeValue(AttributeValue attributeValue, AttributeModifierStack attributeModifierStack)
     {
-        attributeValue.Value = attributeModifierStack.Calculate(attributeValue.BaseValue);
+        var attribute = attributeValue.Attribute;
+
+        float value = attributeValue.BaseValue;
+
+        if (!attribute.IsMetaAttribute() && _preAttributeModificationDelegateCount[attribute] > 0)
+        {
+            PreAttributeModification?.Invoke(this, attribute, ref value);
+        }
+
+        value = attributeModifierStack.Calculate(attributeValue.BaseValue);
+
+        if (!attribute.IsMetaAttribute() && _postAttributeModificationDelegateCount[attribute] > 0)
+        {
+            PostAttributeModification?.Invoke(this, attribute, ref value);
+        }
+
+        attributeValue.HACK_SetCurrentValue(value);
     }
 
     private EffectHandle ApplyEffect(Effect effect, EffectContext context)
     {
         bool canApplyEffect = CanApplyEffect(effect);
+        bool hasDuration;
+        bool hasPeriod;
 
         switch (effect.DurationPolicy)
         {
@@ -594,8 +820,16 @@ public class AbilitySystemComponent : MonoBehaviour
                     return null;
                 break;
             case EffectDurationPolicy.Duration:
+                hasDuration = effect.Duration.Calculate(context) > 0;
+                if (!hasDuration)
+                    return null;
+                hasPeriod = effect.Period.Calculate(context) > 0;
+                if (!canApplyEffect && !hasPeriod)
+                    return null;
+                break;
             case EffectDurationPolicy.Infinite:
-                if (!canApplyEffect && !(effect.Period.Calculate(context) > 0))
+                hasPeriod = effect.Period.Calculate(context) > 0;
+                if (!canApplyEffect && !hasPeriod)
                     return null;
                 break;
             default:
@@ -608,7 +842,7 @@ public class AbilitySystemComponent : MonoBehaviour
             HandleTagsAdded(effect.GrantedTags);
         }
 
-        var effectInstance = new EffectInstance(effect, context);
+        var effectInstance = effect.CreateEffectInstance(effect, context);
 
         if (effect.Instant)
         {
@@ -635,10 +869,9 @@ public class AbilitySystemComponent : MonoBehaviour
         return handle;
     }
 
-    private void RemoveEffectInstance(EffectInstance effectInstance)
+    private void RemoveEffectInstanceImpl(EffectInstance effectInstance)
     {
         effectInstance.Cancel();
-        effectInstance.Destroy();
 
         _effectInstances.Remove(effectInstance);
 
@@ -646,14 +879,15 @@ public class AbilitySystemComponent : MonoBehaviour
         {
             RemoveTags(effectInstance.Effect.GrantedTags);
         }
+
+        effectInstance.Destroy();
     }
 
-    private void RemoveEffectInstance(EffectInstance effectInstance, int index)
+    private void RemoveEffectInstanceImpl(EffectInstance effectInstance, int index)
     {
         Debug.Assert(_effectInstances[index] == effectInstance);
 
         effectInstance.Cancel();
-        effectInstance.Destroy();
 
         _effectInstances.RemoveAt(index);
 
@@ -661,6 +895,8 @@ public class AbilitySystemComponent : MonoBehaviour
         {
             RemoveTags(effectInstance.Effect.GrantedTags);
         }
+
+        effectInstance.Destroy();
     }
 
     private void HandleTagsAdded(IEnumerable<Tag> tags)
@@ -681,7 +917,7 @@ public class AbilitySystemComponent : MonoBehaviour
 
         foreach (var effectInstance in effectsToCancel)
         {
-            RemoveEffectInstance(effectInstance);
+            RemoveEffectInstanceImpl(effectInstance);
         }
     }
 
@@ -719,7 +955,7 @@ public class AbilitySystemComponent : MonoBehaviour
 
             if (effectInstance.Inactive)
             {
-                RemoveEffectInstance(effectInstance, i);
+                RemoveEffectInstanceImpl(effectInstance, i);
             }
             else
             {
@@ -750,7 +986,6 @@ public class AbilitySystemComponent : MonoBehaviour
     private void RemoveAbilityImpl(AbilityInstance abilityInstance)
     {
         abilityInstance.Abort();
-        abilityInstance.Destroy();
 
         _abilityInstances.Remove(abilityInstance);
 
@@ -760,6 +995,24 @@ public class AbilitySystemComponent : MonoBehaviour
         }
 
         abilityInstance.NotifyRemoved();
+        abilityInstance.Destroy();
+    }
+
+    private void RemoveAbilityImpl(AbilityInstance abilityInstance, int index)
+    {
+        Debug.Assert(_abilityInstances[index] == abilityInstance);
+
+        abilityInstance.Abort();
+
+        _abilityInstances.RemoveAt(index);
+
+        if (abilityInstance.Ability.HasGrantedTags)
+        {
+            RemoveTags(abilityInstance.Ability.GrantedTags);
+        }
+
+        abilityInstance.NotifyRemoved();
+        abilityInstance.Destroy();
     }
 
     private void DispatchReady()
@@ -773,41 +1026,20 @@ public class AbilitySystemComponent : MonoBehaviour
         _readyDelegates.Clear();
     }
 
+    private void OnOwnerDeath(Creature creature)
+    {
+        AddTags(new []{ GameData.Instance.Tags.ConditionDead });
+
+        foreach (var effectInstance in _effectInstances.ToArray())
+        {
+            RemoveEffectInstanceImpl(effectInstance);
+        }
+
+        foreach (var abilityInstance in _abilityInstances.ToArray())
+        {
+            RemoveAbilityImpl(abilityInstance);
+        }
+    }
+
     #endregion
-}
-
-public static class AbilitySystemHelper
-{
-    private static void AddAttributeValue(this AbilitySystemComponent self, AttributeType attribute, float amount)
-    {
-        var attributeValue = self.GetAttributeValueObject(attribute);
-        if (attributeValue == null)
-            return;
-
-        attributeValue.Value += amount;
-    }
-
-    public static void AddExperience(this AbilitySystemComponent self, float amount)
-    {
-        Debug.Assert(!(amount < 0), "Experience amount must be non-negative");
-
-        if (amount > 0)
-            self.AddAttributeValue(AttributeType.Experience, amount);
-    }
-
-    public static void AddDamage(this AbilitySystemComponent self, float amount)
-    {
-        Debug.Assert(!(amount < 0), "Damage amount must be non-negative");
-
-        if (amount > 0)
-            self.AddAttributeValue(AttributeType.Damage, amount);
-    }
-
-    public static void AddHealing(this AbilitySystemComponent self, float amount)
-    {
-        Debug.Assert(!(amount < 0), "Healing amount must be non-negative");
-
-        if (amount > 0)
-            self.AddAttributeValue(AttributeType.Healing, amount);
-    }
 }

@@ -1,6 +1,6 @@
 University of London
 BsC Computer Science Course
-Games Design
+Games Development
 Final Assignment - Streets of Fire Game
 
 Group 5 
@@ -9,15 +9,18 @@ Game Description: An intuitive, easy to learn shooting, survival game inspired b
 a 3D city scenario with streets, cars, buildings and other assets, where the player controls a mage using a 
 crossbow to eliminate skeletons infestating the city. 
 
-This work has been created with Unity 2019.4.4011 and using Github to manage the main repository at 
+This work has been created with Unity 2019.4.40f1 and using Github to manage the main repository at 
 https://github.com/JohanJacobs/CM3030-GameDev-Team5 for collaborative development. 
 
 During implementation of this project, we have used the following material to support the development, 
 which can include code suggestions and code inspiration for our work: 
 
--   Uol Game Design module videos and reading material
--   You tube series of tutorial videos on Unity by user Rehope Games 
-    https://www.youtube.com/playlist?list=PLf6aEENFZ4Fvu4wgRHej1f7hflhCLv5iK 
+- UoL Games Development module videos and reading material
+- YouTube series of tutorial videos on Unity by user Rehope Games
+  https://www.youtube.com/playlist?list=PLf6aEENFZ4Fvu4wgRHej1f7hflhCLv5iK 
+- Singleton implementation examples by Kurt Dekker
+  https://gist.github.com/kurtdekker/775bb97614047072f7004d6fb9ccce30
+  https://gist.github.com/kurtdekker/2f07be6f6a844cf82110fc42a774a625
 
 The following assets were incorporated in the game: 
 
@@ -49,12 +52,11 @@ The following assets were incorporated in the game:
   Free, Standard Unity Asset Store EULA
   No attribution required
 
-- High score code Singleton based and derived from implementation by Kurt Dekker
-  https://gist.github.com/kurtdekker/775bb97614047072f7004d6fb9ccce30
-  SingletonSimple.cs
-
 - Level up Sound Effect Created from two assets 
   kWoosh_Low_Long01.wav by moogy73 -- https://freesound.org/s/425702/ -- License: Creative Commons
   Boom2 by Jurij - https://pixabay.com/sound-effects/boom-2-208745/ - https://pixabay.com/service/license-summary/
   Mixed with audacity by Johan Jacobs
   
+- Video game star
+  https://www.freepik.com/free-vector/video-game-star_136470646.htm
+  Free, attribution required

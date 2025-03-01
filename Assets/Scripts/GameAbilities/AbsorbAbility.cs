@@ -21,13 +21,24 @@ public class AbsorbAbilityInstanceData : AbilityInstanceData
 {
     //Dictionary of orbs and their individual speeds
     public Dictionary<GameObject, float> OrbSpeeds = new Dictionary<GameObject, float>();
+
+    public void Reset()
+    {
+        OrbSpeeds.Clear();
+    }
 }
 
 [CreateAssetMenu(menuName = "Abilities/Absorb")]
 public class AbsorbAbility : Ability
 {
-    public AttributeSet AbilityAttributeSet;
     public LayerMask LayerMask;
+
+    public Magnitude Range = new Magnitude()
+    {
+        Calculation = MagnitudeCalculation.AttributeAdd,
+        Attribute = AttributeType.AttackRange,
+        Value = 4,
+    };
 
     [SerializeField] private float absorptionSpeed = 0.5f;
     [SerializeField] private float maxAbsorptionSpeed = 14f;
@@ -39,75 +50,66 @@ public class AbsorbAbility : Ability
         AbilityInstanceDataClass = new AbilityInstanceDataClass(typeof(AbsorbAbilityInstanceData));
     }
 
-    public override void HandleAbilityAdded(AbilityInstance abilityInstance)
-    {
-        abilityInstance.AbilitySystemComponent.AddAttributeSet(AbilityAttributeSet);
-    }
-
-    public override void HandleAbilityRemoved(AbilityInstance abilityInstance)
-    {
-        abilityInstance.AbilitySystemComponent.RemoveAttributeSet(AbilityAttributeSet);
-    }
-
     public override void UpdateAbility(AbilityInstance abilityInstance, float deltaTime)
     {
-        var asc = abilityInstance.AbilitySystemComponent;
+        var data = abilityInstance.GetData<AbsorbAbilityInstanceData>();
 
-        // TODO: cache attribute value objects
+        // NOTE: this could be a clone with different properties so we're using the one AbilityInstance was created for
+        var ability = abilityInstance.GetAbility<AbsorbAbility>();
 
-        var aoeRangeModifier = ScalarModifier.MakeIdentity();
+        var range = abilityInstance.CalculateMagnitude(ability.Range);
 
-        aoeRangeModifier.Combine(ScalarModifier.MakeBonus(asc.GetAttributeValue(AttributeType.AreaOfEffectBonus)));
-        aoeRangeModifier.Combine(ScalarModifier.MakeBonusFraction(asc.GetAttributeValue(AttributeType.AreaOfEffectBonusFraction)));
-        aoeRangeModifier.Combine(ScalarModifier.MakeMultiplier(asc.GetAttributeValue(AttributeType.AreaOfEffectMultiplier)));
+        Debug.Assert(range > 0);
 
-        var absorbRadius = asc.GetAttributeValue(AttributeType.AbsorptionRadius);
-
-        Absorb(abilityInstance, aoeRangeModifier.Calculate(absorbRadius));
+        AbsorbPickupsInRange(data, abilityInstance.Owner.transform.position, range, ability.LayerMask, deltaTime);
     }
 
     public override void ActivateAbility(AbilityInstance abilityInstance)
     {
         var data = abilityInstance.GetData<AbsorbAbilityInstanceData>();
 
-        data.OrbSpeeds.Clear();
+        data.Reset();
     }
 
     public override void EndAbility(AbilityInstance abilityInstance)
     {
         var data = abilityInstance.GetData<AbsorbAbilityInstanceData>();
 
-        data.OrbSpeeds.Clear();
+        data.Reset();
     }
 
-    private void Absorb(AbilityInstance abilityInstance, float range)
+    private void AbsorbPickupsInRange(AbsorbAbilityInstanceData data, Vector3 origin, float range, LayerMask layerMask, float deltaTime)
     {
-        var asc = abilityInstance.AbilitySystemComponent;
-        var ascAvatar = asc.GetComponent<Creature>(); //Player instance
-        var data = abilityInstance.GetData<AbsorbAbilityInstanceData>(); //For orb tracking
-
-        var colliders = Physics.OverlapSphere(asc.transform.position, range, LayerMask);
-
-        foreach (var collider in colliders)
+        var targetQuery = new AbilityTargetQuery()
         {
-            var pickup = Pickup.GetPickupGameObject(collider);
+            LayerMask = layerMask,
+            Origin = origin,
+            Range = range,
+        };
+
+        var targets = AbilityTargetSelector.GetAreaTargets(targetQuery);
+
+        foreach (var target in targets)
+        {
+            var pickup = Pickup.GetPickupGameObject(target.Collider);
             if (pickup == null)
                 continue;
 
-            if (!data.OrbSpeeds.ContainsKey(pickup))
+            if (!data.OrbSpeeds.TryGetValue(pickup, out var speed))
             {
-                data.OrbSpeeds[pickup] = absorptionSpeed;
+                speed = absorptionSpeed;
             }
 
-            //Update speed for this particular orb
-            data.OrbSpeeds[pickup] += absorptionAcceleration * Time.deltaTime;
-            data.OrbSpeeds[pickup] = Mathf.Min(data.OrbSpeeds[pickup], maxAbsorptionSpeed);
             //Move orb towards player
-            pickup.transform.position = Vector3.MoveTowards(pickup.transform.position, ascAvatar.transform.position, data.OrbSpeeds[pickup] * Time.deltaTime);
+            pickup.transform.position = Vector3.MoveTowards(pickup.transform.position, origin, speed * deltaTime);
 
+            //Update speed for this particular orb
+            speed = Mathf.Min(speed + absorptionAcceleration * deltaTime, maxAbsorptionSpeed);
+
+            data.OrbSpeeds[pickup] = speed;
 
             //LINEAR ACCELERATION
-            //pickup.transform.position = Vector3.MoveTowards(pickup.transform.position, ascAvatar.transform.position, absorptionSpeed * Time.deltaTime);
+            // pickup.transform.position = Vector3.MoveTowards(pickup.transform.position, origin, absorptionSpeed * deltaTime);
         }
     }
 }

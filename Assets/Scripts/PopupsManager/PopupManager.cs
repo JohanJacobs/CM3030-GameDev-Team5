@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text;
 using UnityEngine;
 
 public class PopupManager : MonoBehaviour
@@ -21,54 +23,68 @@ public class PopupManager : MonoBehaviour
         Pickup.GlobalPickedUp -= Pickup_PickedUp;
     }
 
-    public void CreateNewPopup(Vector3 position, string popupText,Transform playerTransform, float timeToLive)
+    public void CreateNewPopup(Vector3 position, string popupText, Transform playerTransform, float timeToLive)
     {
-        var go = Instantiate(popupTemplate,position, Quaternion.identity);
-        go.transform.SetParent(transform);
+        var go = Instantiate(popupTemplate, position, Quaternion.identity, transform);
 
-        var text_component = go.GetComponent<TextPopup>();
-        text_component.Setup(popupText, playerTransform, timeToLive);
+        var textPopup = go.GetComponent<TextPopup>();
+        textPopup.Setup(popupText, playerTransform, timeToLive);
     }
 
     #region Pickup Callbacks
+
     private void Pickup_PickedUp(Pickup sender, GameObject target)
     {
-        // handle XP messages   
+        var attributeDataMap = GameData.Instance.AttributeDataMap;
+
+        // handle XP messages
         if (sender is ExperienceOrbPickup experienceOrbPickup)
         {
-            CreateNewPopup(target.transform.position, "+1 XP", target.transform, _popupTimeToLive);
+            CreateNewPopup(target.transform.position, $"+{experienceOrbPickup.Experience} XP", target.transform, _popupTimeToLive);
             return;
         }
+
         // pickups that impact the players abilities
         if (sender is PickupWithEffect pickupWithEffect)
         {
-            var asc = target.GetComponent<AbilitySystemComponent>();
+            Vector3 popupOffset = new Vector3(0f, -0.5f, 0f);
+            Vector3 popupSpawnPosition = target.transform.position + new Vector3(0f, 2.5f, 0f);
 
-            // create a message for each attribute that is changed
-            var pwe = sender as PickupWithEffect;
-            int attribute_counter = 0;
-            var message_offset = new Vector3(0f, -0.5f, 0f);
-            foreach (var e in pwe.Effect.Modifiers)
+            var sb = new StringBuilder(48);
+
+            foreach (var item in pickupWithEffect.AbsoluteAttributeValueChanges)
             {
-                var modifierValue = asc.GetAttributeValueWithExtraModifier(e.Attribute, ScalarModifier.MakeFromAttributeModifier(e), e.Post);
+                var attribute = item.Key;
+                var delta = item.Value;
+
+                // dynamically create popup string value (target = player)
+                sb.Clear();
+
                 
-                // Find the text value, depending on if multiplier or increment
-                string popupText;
-                if (e.Type == NewAttributeModifierType.Multiply)
+                if (delta < 0f)
+                    sb.Append("-");
+                else if (delta > 0f)
+                    sb.Append("+");
+
+                if (attribute.IsScaleAttribute())
                 {
-                    popupText = $"x{modifierValue} {e.Attribute}";
+                    sb.Append(Mathf.Abs(delta * 100f).ToString("0.##", CultureInfo.InvariantCulture));
+                    sb.Append("%");
                 }
                 else
                 {
-                    popupText = $"+{modifierValue} {e.Attribute}";
+                    sb.Append(Mathf.Abs(delta).ToString("0.##", CultureInfo.InvariantCulture));
                 }
-        
-                // dynamically create popup string value (target = player)
-                CreateNewPopup(target.transform.position - (message_offset * attribute_counter ), popupText, target.transform, _popupTimeToLive);
-                
-                attribute_counter += 1;
-            }
 
+                var attributeDisplayName = attributeDataMap.TryGetValue(attribute, out var attributeData) ? attributeData.DisplayName : attribute.GetName();
+
+                sb.Append(" ");
+                sb.Append(attributeDisplayName);
+
+                CreateNewPopup(popupSpawnPosition, sb.ToString(), target.transform, _popupTimeToLive);
+
+                popupSpawnPosition += popupOffset;
+            }
         }
     }
 

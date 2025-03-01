@@ -5,7 +5,7 @@ BsC Computer Science Course
 Games Development
 Final Assignment - Streets of Fire Game
 
-Group 5 
+Group 5
 
 Please refer to the README file for detailled information
 
@@ -30,11 +30,18 @@ public class EquipmentComponent : MonoBehaviour
     {
         public Item Item;
         public EquipmentItem EquipmentItem;
-        public bool Equipped;
-        public EquipmentSlot EquippedSlot;
+        public EquipmentSlot EquippedSlot = EquipmentSlot.Undefined;
+
+        public bool Equipped => EquippedSlot != EquipmentSlot.Undefined;
     }
 
     private static readonly EquipmentSlot[] AllEquipmentSlots = Enum.GetValues(typeof(EquipmentSlot)).Cast<EquipmentSlot>().ToArray();
+    // NOTE: need to keep this up-to-date with equipment slots
+    private static readonly EquipmentSlot[] UsableEquipmentSlots =
+    {
+        EquipmentSlot.MainHand,
+        EquipmentSlot.OffHand,
+    };
 
     private readonly List<InventorySlot> _slots = new List<InventorySlot>();
     private readonly EnumArray<InventorySlot, EquipmentSlot> _equipmentSlots = new EnumArray<InventorySlot, EquipmentSlot>();
@@ -43,8 +50,8 @@ public class EquipmentComponent : MonoBehaviour
 
     public bool HasItem(Item item)
     {
-        var slot = _slots.Find(s => s.Item == item);
-        if (slot == null)
+        var itemSlot = FindItemSlot(item);
+        if (itemSlot == null)
             return false;
 
         return true;
@@ -52,14 +59,13 @@ public class EquipmentComponent : MonoBehaviour
 
     public bool AddItem(Item item)
     {
-        var slot = _slots.Find(s => s.Item == item);
-        if (slot != null)
+        var itemSlot = FindItemSlot(item);
+        if (itemSlot != null)
             return false;
 
         var newSlot = new InventorySlot()
         {
             Item = item,
-            Equipped = false,
         };
 
         _slots.Add(newSlot);
@@ -69,79 +75,85 @@ public class EquipmentComponent : MonoBehaviour
 
     public bool RemoveItem(Item item)
     {
-        var slot = _slots.Find(s => s.Item == item);
-        if (slot == null)
+        var itemSlot = FindItemSlot(item);
+        if (itemSlot == null)
             return false;
 
         UnequipItem(item);
 
-        _slots.Remove(slot);
+        _slots.Remove(itemSlot);
 
         return true;
     }
 
     public bool EquipItem(Item item)
     {
-        var slot = _slots.Find(s => s.Item == item);
-        if (slot == null)
+        var itemSlot = FindItemSlot(item);
+        if (itemSlot == null)
             return false;
 
-        if (slot.Equipped)
+        if (itemSlot.Equipped)
             return true;
 
-        var equipmentSlot = FindFreeEquipmentSlot();
-        if (equipmentSlot == null)
+        if (!TryFindFreeEquipmentSlot(out var equipmentSlot))
             return false;
 
-        var attachmentSlot = FindEquipmentAttachmentSlot(equipmentSlot.Value);
-        if (attachmentSlot == null)
+        if (!TryFindEquipmentAttachmentSlot(equipmentSlot, out var attachmentSlot))
             return false;
 
-        switch (slot.Item)
+        switch (itemSlot.Item)
         {
             case WeaponItem weaponItem:
                 if (weaponItem.EquipmentItem)
                 {
-                    slot.EquipmentItem = Instantiate(weaponItem.EquipmentItem, attachmentSlot.Socket);
+                    itemSlot.EquipmentItem = Instantiate(weaponItem.EquipmentItem, attachmentSlot.Socket);
                 }
+
                 break;
             default:
                 return false;
         }
 
-        slot.Equipped = true;
-        slot.EquippedSlot = equipmentSlot.Value;
+        itemSlot.EquippedSlot = equipmentSlot;
 
-        _equipmentSlots[equipmentSlot.Value] = slot;
+        _equipmentSlots[equipmentSlot] = itemSlot;
 
-        ItemEquipped?.Invoke(item, slot.EquipmentItem, slot.EquippedSlot);
+        ItemEquipped?.Invoke(item, itemSlot.EquipmentItem, itemSlot.EquippedSlot);
 
         return true;
     }
 
     public bool UnequipItem(Item item)
     {
-        var slot = _slots.Find(s => s.Item == item);
-        if (slot == null)
+        var itemSlot = FindItemSlot(item);
+        if (itemSlot == null)
             return false;
 
-        if (!slot.Equipped)
+        if (!itemSlot.Equipped)
             return true;
 
-        ItemUnequipped?.Invoke(item, slot.EquipmentItem, slot.EquippedSlot);
+        ItemUnequipped?.Invoke(item, itemSlot.EquipmentItem, itemSlot.EquippedSlot);
 
-        _equipmentSlots[slot.EquippedSlot] = null;
+        _equipmentSlots[itemSlot.EquippedSlot] = null;
 
-        if (slot.EquipmentItem)
+        if (itemSlot.EquipmentItem)
         {
-            Destroy(slot.EquipmentItem);
+            Destroy(itemSlot.EquipmentItem);
         }
 
-        slot.EquipmentItem = null;
-        slot.Equipped = false;
-        slot.EquippedSlot = default;
+        itemSlot.EquipmentItem = null;
+        itemSlot.EquippedSlot = EquipmentSlot.Undefined;
 
         return true;
+    }
+
+    public EquipmentItem GetEquippedItem(EquipmentSlot equipmentSlot)
+    {
+        var itemSlot = _equipmentSlots[equipmentSlot];
+        if (itemSlot == null)
+            return null;
+
+        return itemSlot.EquipmentItem;
     }
 
     private void Awake()
@@ -149,19 +161,28 @@ public class EquipmentComponent : MonoBehaviour
         _creature = GetComponent<Creature>();
     }
 
-    private EquipmentSlot? FindFreeEquipmentSlot()
+    private InventorySlot FindItemSlot(Item item)
     {
-        foreach (var equipmentSlot in AllEquipmentSlots)
-        {
-            if (_equipmentSlots[equipmentSlot] == null)
-                return equipmentSlot;
-        }
-
-        return null;
+        return _slots.Find(slot => slot.Item == item);
     }
 
-    private EquipmentAttachmentSlot FindEquipmentAttachmentSlot(EquipmentSlot equipmentSlot)
+    private bool TryFindFreeEquipmentSlot(out EquipmentSlot slot)
     {
-        return _creature.EquipmentAttachmentSlots.FirstOrDefault(s => s.Slot == equipmentSlot);
+        foreach (var equipmentSlot in UsableEquipmentSlots)
+        {
+            if (_equipmentSlots[equipmentSlot] == null)
+            {
+                slot = equipmentSlot;
+                return true;
+            }
+        }
+
+        slot = EquipmentSlot.Undefined;
+        return false;
+    }
+
+    public bool TryFindEquipmentAttachmentSlot(EquipmentSlot equipmentSlot, out EquipmentAttachmentSlot attachmentSlot)
+    {
+        return _creature.TryFindEquipmentAttachmentSlot(equipmentSlot, out attachmentSlot);
     }
 }

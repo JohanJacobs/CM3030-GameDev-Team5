@@ -14,6 +14,7 @@ RayAttackAbility.cs
 */
 
 using UnityEngine;
+
 [CreateAssetMenu(menuName = "Abilities/Ray Attack")]
 public class RayAttackAbility : AttackAbility
 {
@@ -24,7 +25,7 @@ public class RayAttackAbility : AttackAbility
         var asc = abilityInstance.AbilitySystemComponent;
         var attacker = asc.GetComponent<Creature>();
 
-        GetDefaultAttackOriginAndDirection(abilityInstance, out var origin, out var direction);
+        GetOwnerAim(abilityInstance, out var origin, out var direction);
 
         var ray = new Ray(origin, direction);
 
@@ -34,16 +35,25 @@ public class RayAttackAbility : AttackAbility
 
         var damage = Random.Range(damageMin, damageMax);
 
-        if (Physics.Raycast(ray, out var hit, range, LayerMask))
+        var targetQuery = new AbilityTargetQuery()
         {
-            var victim = hit.collider.GetComponentInParent<Creature>();
-            if (victim)
+            Direction = direction,
+            LayerMask = LayerMask,
+            Origin = origin,
+            Range = range,
+        };
+
+        var targets = AbilityTargetSelector.GetRaycastTargetsSingle(targetQuery);
+
+        foreach (var target in targets)
+        {
+            AbilityTargetUtility.ApplyAbilityEffectToTarget(abilityInstance, DamageEffect, target, effectContext =>
             {
-                attacker.DealDamage(victim, origin, damage);
-            }
+                effectContext.SetValue(DamageEffect.AmountSetByCaller, damage);
+            });
         }
 
-        NotifyAttackCommitted(abilityInstance, origin, direction, damage);
+        NotifyAttackCommitted(abilityInstance, origin, direction);
 
         abilityInstance.End();
     }

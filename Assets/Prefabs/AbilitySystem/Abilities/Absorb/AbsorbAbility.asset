@@ -23,15 +23,18 @@ MonoBehaviour:
     ClassName: AbsorbAbilityInstanceData
   InputPolicy: 0
   InputTag:
-    _string: 
+    _string: Untagged
   InputMappingContext: {fileID: 0}
   DisplayName: Absorb
   Description: Attracts nearby pickups
-  AbilityAttributeSet: {fileID: 11400000, guid: 7874c5e152a9bbc448c95e4ef5dc4f28,
-    type: 2}
   LayerMask:
     serializedVersion: 2
     m_Bits: 1024
+  Range:
+    Calculation: 5
+    AttributeProvider: 1
+    Attribute: 20
+    Value: 4
   absorptionSpeed: 0.5
   maxAbsorptionSpeed: 14
   absorptionAcceleration: 3

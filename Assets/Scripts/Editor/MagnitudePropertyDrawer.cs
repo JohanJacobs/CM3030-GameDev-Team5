@@ -65,7 +65,14 @@ public class MagnitudePropertyDrawer : PropertyDrawer
                     var attributeProviderRect = new Rect(position.x, position.y + lineHeightWithSpacing, position.width * 0.25f, lineHeight);
                     var attributeRect = new Rect(attributeProviderRect.xMax + spacing, attributeProviderRect.y, position.width * 0.75f - spacing, lineHeight);
 
-                    EditorGUI.PropertyField(attributeProviderRect, propAttributeProvider, GUIContent.none);
+                    var attributeProviderDisplay =
+                        property.serializedObject.targetObject is Effect;
+
+                    if (attributeProviderDisplay)
+                    {
+                        EditorGUI.PropertyField(attributeProviderRect, propAttributeProvider, GUIContent.none);
+                    }
+
                     EditorGUI.PropertyField(attributeRect, propAttribute, GUIContent.none);
                 }
             }

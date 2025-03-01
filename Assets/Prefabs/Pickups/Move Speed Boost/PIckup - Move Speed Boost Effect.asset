@@ -18,7 +18,7 @@ MonoBehaviour:
     Value: 1.2
     Permanent: 0
     Post: 0
-  DurationPolicy: 0
+  DurationPolicy: 1
   CancellationPolicy: 1
   Duration:
     Calculation: 0

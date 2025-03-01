@@ -13,6 +13,7 @@ AttributeModifierInstance.cs
 
 */
 
+using System;
 using UnityEngine;
 
 public abstract class AttributeModifierInstance
@@ -33,10 +34,17 @@ public abstract class AttributeModifierInstance
     }
 
     public abstract void Apply(ref float value);
+
+    public virtual void SetAbsoluteValueChange(float change)
+    {
+
+    }
 }
 
 public sealed class AttributeModifierInstanceWithModifier : AttributeModifierInstance
 {
+    public float AbsoluteValueChange { get; private set; }
+
     private ScalarModifier _scalarModifier;
 
     public AttributeModifierInstanceWithModifier(AttributeModifier attributeModifier)
@@ -56,6 +64,11 @@ public sealed class AttributeModifierInstanceWithModifier : AttributeModifierIns
     public override void Apply(ref float value)
     {
         value = _scalarModifier.Calculate(value);
+    }
+
+    public override void SetAbsoluteValueChange(float change)
+    {
+        AbsoluteValueChange = change;
     }
 }
 
@@ -80,5 +93,22 @@ public sealed class AttributeModifierInstanceWithOverride : AttributeModifierIns
     public override void Apply(ref float value)
     {
         value = _scalarOverride;
+    }
+}
+
+public static class AttributeModifierInstanceHelper
+{
+    public static float GetAbsoluteValueChange(this AttributeModifierInstance self)
+    {
+        switch (self)
+        {
+            case AttributeModifierInstanceWithModifier withModifier:
+                return withModifier.AbsoluteValueChange;
+            case AttributeModifierInstanceWithOverride withOverride:
+                // NOTE: intended for attribute modifiers info collection, might not work for other usages
+                return 0;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(self));
+        }
     }
 }

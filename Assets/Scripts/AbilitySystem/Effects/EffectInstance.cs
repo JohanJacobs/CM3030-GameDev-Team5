@@ -25,7 +25,9 @@ public class EffectInstance
     public bool Canceled => _canceled;
     public bool Active => !Expired && !Canceled;
     public bool Inactive => !Active;
+    public bool SelfTargeted => Context.Target == Context.Source;
     public float TimeRemaining => _timeLeftToExpiration;
+    public IReadOnlyList<AttributeModifierHandle> AttributeModifiers => _modifiers;
 
     public float TimeRemainingFraction
     {
@@ -81,7 +83,7 @@ public class EffectInstance
 
         if (wantsDuration)
         {
-            UpdateDuration();
+            UpdateDuration(false);
         }
 
         if (wantsPeriod)
@@ -90,7 +92,7 @@ public class EffectInstance
         }
     }
 
-    public void Destroy()
+    public virtual void Destroy()
     {
         Debug.Assert(!Active, "Destroying active effect instance probably points to logic error");
 
@@ -162,6 +164,19 @@ public class EffectInstance
         }
     }
 
+    public T GetEffect<T>() where T : Effect
+    {
+        if (Effect is T concreteEffect)
+            return concreteEffect;
+
+        throw new InvalidOperationException($"Requested invalid effect type {typeof(T)}");
+    }
+
+    public float CalculateMagnitude(Magnitude magnitude)
+    {
+        return magnitude.Calculate(Context);
+    }
+
     private void CancelAllModifiers()
     {
         foreach (var handle in _modifiers)
@@ -210,7 +225,8 @@ public class EffectInstance
 
         if (duration > 0)
         {
-            _duration = duration;
+            // NOTE: some small duration is required to let the system do its job
+            _duration = Mathf.Max(duration, 0.05f);
             _timeLeftToExpiration = _duration;
         }
         else

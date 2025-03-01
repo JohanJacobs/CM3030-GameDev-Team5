@@ -20,3 +20,53 @@ MonoBehaviour:
     type: 3}
   PlayerPrefab: {fileID: 6552311690192007200, guid: ee7beeb9b0c49c2449e5a3a7cda00fb9,
     type: 3}
+  InputData:
+    MainHandAbilityInputTag:
+      _string: Input.PrimaryAbility
+    OffHandAbilityInputTag:
+      _string: Input.SecondaryAbility
+  AttributeData:
+  - Attribute: 20
+    DisplayName: Range
+    Description: Affects attacks and abilities effective range
+  - Attribute: 21
+    DisplayName: Damage
+    Description: Affects dealt damage
+  - Attribute: 22
+    DisplayName: Healing
+    Description: Affects healing efficiency
+  - Attribute: 23
+    DisplayName: Cooldown
+    Description: Affects attacks and abilities cooldown
+  - Attribute: 24
+    DisplayName: Duration
+    Description: Affects effects duration
+  - Attribute: 6
+    DisplayName: Speed
+    Description: Overall movement speed
+  LayersData:
+    TerrainMask:
+      serializedVersion: 2
+      m_Bits: 1
+    EnvironmentMask:
+      serializedVersion: 2
+      m_Bits: 1
+    PlayerMask:
+      serializedVersion: 2
+      m_Bits: 256
+    MonsterMask:
+      serializedVersion: 2
+      m_Bits: 512
+    PickupMask:
+      serializedVersion: 2
+      m_Bits: 1024
+    ProjectileMask:
+      serializedVersion: 2
+      m_Bits: 2048
+  Tags:
+    ConditionDead:
+      _string: Condition.Dead
+    ConditionStunned:
+      _string: Condition.Stunned
+  DefaultDamageEffect: {fileID: 11400000, guid: 817b68add03e58b45a2da251df55c866,
+    type: 2}

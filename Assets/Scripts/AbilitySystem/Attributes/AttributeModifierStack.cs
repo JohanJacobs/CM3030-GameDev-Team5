@@ -101,7 +101,10 @@ public class AttributeModifierStack
 
         foreach (var modifierInstance in _modifiers)
         {
+            var valueBeforeModification = value;
+
             modifierInstance.Apply(ref value);
+            modifierInstance.SetAbsoluteValueChange(value - valueBeforeModification);
         }
 
         return value;

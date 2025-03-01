@@ -42,11 +42,7 @@ public class EnumArray<T, TEnum> : IEnumerable<T> where TEnum : Enum
         }
     }
 
-    public T this[TEnum key]
-    {
-        get => _array[Convert.ToInt32(key) - _lower];
-        set => _array[Convert.ToInt32(key) - _lower] = value;
-    }
+    public ref T this[TEnum key] => ref _array[Convert.ToInt32(key) - _lower];
 
     public int Count => _array.Length;
 

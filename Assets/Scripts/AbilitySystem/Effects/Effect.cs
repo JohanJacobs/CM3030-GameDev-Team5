@@ -14,6 +14,7 @@ Effect.cs
 */
 
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -74,6 +75,11 @@ public class Effect : ScriptableObject, IEffectLogic
         return result;
     }
 
+    public bool HasTag(in Tag tag)
+    {
+        return Tags?.Contains(tag) ?? false;
+    }
+
     public virtual void ApplyEffect(EffectInstance effectInstance)
     {
     }
@@ -84,6 +90,11 @@ public class Effect : ScriptableObject, IEffectLogic
 
     public virtual void UpdateEffect(EffectInstance effectInstance, float deltaTime)
     {
+    }
+
+    public virtual EffectInstance CreateEffectInstance(Effect effect, EffectContext context)
+    {
+        return new EffectInstance(effect, context);
     }
 
     protected virtual bool IsValid()

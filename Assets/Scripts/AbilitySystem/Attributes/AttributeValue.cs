@@ -22,17 +22,8 @@ public class AttributeValue
 
     public AttributeType Attribute { get; }
 
-    public float BaseValue
-    {
-        get => _baseValue;
-        set => SetBaseValue(value);
-    }
-
-    public float Value
-    {
-        get => _currentValue;
-        set => SetCurrentValue(value);
-    }
+    public float BaseValue => _baseValue;
+    public float Value => _currentValue;
 
     public event ValueDelegate BaseValueChanged;
     public event ValueDelegate ValueChanged;
@@ -56,6 +47,18 @@ public class AttributeValue
     {
         _baseValue = value;
         _currentValue = value;
+    }
+
+    // TEMP for further design changes
+    public void HACK_SetBaseValue(float value)
+    {
+        SetBaseValue(value);
+    }
+
+    // TEMP for further design changes
+    public void HACK_SetCurrentValue(float value)
+    {
+        SetCurrentValue(value);
     }
 
     private void SetBaseValue(float value)
