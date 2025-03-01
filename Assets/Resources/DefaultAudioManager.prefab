@@ -55,6 +55,7 @@ MonoBehaviour:
   grabExperienceSound: {fileID: 8300000, guid: fd0a6a64cbdc1aa29b770dac392a17e9, type: 3}
   playerHitSound: {fileID: 8300000, guid: cd7b921ee0a7cb5429a978abb26cb750, type: 3}
   playerDeadSound: {fileID: 8300000, guid: 96831e25c38f24a43bbce642deadd5bc, type: 3}
+  playerLevelUpSound: {fileID: 8300000, guid: 5ad407dfbd4d9084fa52f8c35de8b710, type: 3}
 --- !u!82 &4549719715804380124
 AudioSource:
   m_ObjectHideFlags: 0
