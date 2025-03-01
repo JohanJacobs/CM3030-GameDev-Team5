@@ -33,6 +33,7 @@ public class AbilitySystemComponent : MonoBehaviour
     private static readonly AttributeType[] AllAttributes = Enum.GetValues(typeof(AttributeType)).Cast<AttributeType>().ToArray();
 
     public IReadOnlyCollection<Tag> Tags => _tags;
+    public bool Ready => _ready;
 
     public Creature Owner { get; private set; }
 

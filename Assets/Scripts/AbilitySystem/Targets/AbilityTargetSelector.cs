@@ -79,10 +79,14 @@ public static class AbilityTargetSelector
             if (Vector3.Dot(queryDirection, direction) < dotThreshold)
                 continue;
 
+            var asc = collider.GetComponentInParent<AbilitySystemComponent>();
+            if (asc != null && !asc.Ready)
+                continue;
+
             ref var target = ref data.Targets[targetIndex];
 
             target.Collider = collider;
-            target.AbilitySystemComponent = collider.GetComponentInParent<AbilitySystemComponent>();
+            target.AbilitySystemComponent = asc;
             target.Distance = delta.magnitude;
 
             ++targetIndex;
@@ -105,10 +109,14 @@ public static class AbilityTargetSelector
 
         foreach (var raycastHit in data.RaycastHits.Take(Mathf.Clamp(maxTargets, 1, hitCount)))
         {
+            var asc = raycastHit.collider.GetComponentInParent<AbilitySystemComponent>();
+            if (asc != null && !asc.Ready)
+                continue;
+
             ref var target = ref data.Targets[targetIndex];
 
             target.Collider = raycastHit.collider;
-            target.AbilitySystemComponent = raycastHit.collider.GetComponentInParent<AbilitySystemComponent>();
+            target.AbilitySystemComponent = asc;
             target.RaycastHit = raycastHit;
             target.Distance = raycastHit.distance;
 
@@ -133,10 +141,14 @@ public static class AbilityTargetSelector
 
         foreach (var collider in data.Colliders.Take(colliderCount))
         {
+            var asc = collider.GetComponentInParent<AbilitySystemComponent>();
+            if (asc != null && !asc.Ready)
+                continue;
+
             ref var target = ref data.Targets[targetIndex];
 
             target.Collider = collider;
-            target.AbilitySystemComponent = collider.GetComponentInParent<AbilitySystemComponent>();
+            target.AbilitySystemComponent = asc;
             target.Distance = Vector3.Distance(query.Origin, collider.transform.position);
 
             ++targetIndex;
