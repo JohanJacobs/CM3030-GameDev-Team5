@@ -48,6 +48,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip grabExperienceSound;
     public AudioClip playerHitSound;
     public AudioClip playerDeadSound;
+    public AudioClip playerLevelUpSound;
 
     public void Initialize()
     {
