@@ -19,6 +19,7 @@ Class PlayerController is used to manage attributes and player actions such as m
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -80,6 +81,16 @@ public class PlayerController : MonoBehaviour
         _player.Death += HandlePlayerDeath;
         _player.DamageTaken += HandlePlayerDamageTaken;
         _player.CommittedAttack += HandlePlayerCommittedAttack;
+    }
+
+    private void OnEnable()
+    {
+        GameTimer.OnTimerRanOutEvent += GameTimer_OntimeRanOutEvent;
+    }
+
+    private void OnDisable()
+    {
+        GameTimer.OnTimerRanOutEvent -= GameTimer_OntimeRanOutEvent;
     }
 
     private void OnAbilitySystemReady(AbilitySystemComponent asc)
@@ -379,4 +390,18 @@ public class PlayerController : MonoBehaviour
     {
         _asc.RemoveAbility(item.AttackAbility);
     }
+
+    #region GameTimerRelatedFunctions
+    private void GameTimer_OntimeRanOutEvent(object sender, EventArgs e)
+    {
+        RestartPlayer();
+    }
+
+    private void RestartPlayer()
+    {
+        // kill off the player
+        var health = _player.Health;
+        _player.TakeDamage(gameObject,transform.position, health);        
+    }
+    #endregion
 }
