@@ -22,8 +22,7 @@ using UnityEngine.AI;
 public class Monster : Creature
 {
     public float ApproachDistance = 0.3f;
-
-    public Animator _animator;
+    public bool StartsWithSpawnAnimation = true;
 
     public float Speed => AbilitySystemComponent.GetAttributeValue(AttributeType.MoveSpeed);
     public float TurnSpeed => AbilitySystemComponent.GetAttributeValue(AttributeType.TurnSpeed);
@@ -34,6 +33,7 @@ public class Monster : Creature
     public float AttackRange => AbilitySystemComponent.GetAttributeValue(AttributeType.AttackRange);
 
     private NavMeshAgent _navMeshAgent;
+    private Animator _animator;
 
     private GameObject _target;
 
@@ -41,7 +41,7 @@ public class Monster : Creature
 
     private Vector3 _knockBackForce = Vector3.zero;
 
-    private bool _isSpawning = true; // Required to stop the navmesh movement when spawning.    
+    private bool _isSpawning; // Required to stop the navmesh movement when spawning.    
 
     public void KnockBack(Vector3 origin, float amount)
     {
@@ -53,6 +53,23 @@ public class Monster : Creature
         _knockBackForce += direction.normalized * amount * (1f - KnockBackResistance);
     }
 
+    public void SpawnAnimationStarted()
+    {
+        _isSpawning = true;
+
+        // disable collider to ensure we cant shoot a spawning monster.
+        CreatureCollider.enabled = false;
+    }
+
+    // Callback function for when the SpawnComplete Animation event is triggered
+    public void SpawnAnimationCompleted()
+    {
+        _isSpawning = false;
+
+        // enable movement and the colliders for the monster.
+        CreatureCollider.enabled = true;
+    }
+
     void Start()
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
@@ -60,8 +77,10 @@ public class Monster : Creature
 
         _target = GameController.ActiveInstance.Player;
 
-        // disable collider to ensure we cant shoot a spawning monster.
-        CreatureCollider.enabled = false;
+        if (StartsWithSpawnAnimation)
+        {
+            SpawnAnimationStarted();
+        }
     }
 
     void Update()
@@ -241,17 +260,5 @@ public class Monster : Creature
     private void PlayAttackAnimation()
     {
         _animator.SetTrigger("IsAttacking");
-    }
-
-    // Callback function for when the SpawnComplete Animation event is triggered
-    public void SpawnAimationCompleted()
-    {
-        _isSpawning = false;
-
-        // enable movement and the colliders for the monster.        
-        if (CreatureCollider)
-        {
-            CreatureCollider.enabled = true;
-        }
     }
 }

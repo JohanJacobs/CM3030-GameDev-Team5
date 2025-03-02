@@ -16,7 +16,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 3794237158255692187}
-        m_MethodName: SpawnAimationCompleted
+        m_MethodName: SpawnAnimationCompleted
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
