@@ -58,8 +58,9 @@ public class GarlicAbility : Ability
         //instantiate the prefab 
         if (particlesPrefab != null && abilityInstance.Owner != null)
         {
-            var garlicParticleInstance = Instantiate(particlesPrefab, abilityInstance.Owner.transform);
-
+            GameObject garlicParticleInstance = Instantiate(particlesPrefab, abilityInstance.Owner.transform);
+            // var data = abilityInstance.GetData<GarlicAbilityInstanceData>();
+            // data.ParticleInstance = particleInstance;
             abilityInstance.Data.GarlicParticleInstance = garlicParticleInstance;
         }
     }
