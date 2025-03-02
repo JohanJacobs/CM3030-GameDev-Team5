@@ -5,7 +5,7 @@ BsC Computer Science Course
 Games Development
 Final Assignment - Streets of Fire Game
 
-Group 5 
+Group 5
 
 Please refer to the README file for detailled information
 
@@ -15,6 +15,7 @@ Class Monster used to manage Monster properties and methods.
 
 */
 
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -41,7 +42,6 @@ public class Monster : Creature
     private Vector3 _knockBackForce = Vector3.zero;
 
     private bool _isSpawning = true; // Required to stop the navmesh movement when spawning.    
-    private Collider _collider; 
 
     public void KnockBack(Vector3 origin, float amount)
     {
@@ -56,17 +56,17 @@ public class Monster : Creature
     void Start()
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
-        _target = GameObject.FindGameObjectWithTag("Player");
         _animator = GetComponentInChildren<Animator>();
 
+        _target = GameController.ActiveInstance.Player;
+
         // disable collider to ensure we cant shoot a spawning monster.
-        _collider = GetComponentInChildren<Collider>();
-        _collider.enabled = false;
+        CreatureCollider.enabled = false;
     }
 
     void Update()
     {
-        if (_isSpawning) 
+        if (_isSpawning)
             return;
 
         var deltaTime = Time.deltaTime;
@@ -84,7 +84,17 @@ public class Monster : Creature
 
             UpdateNavMeshMovement();
             UpdateMovementAnimation();
-            UpdateAttack();
+
+            var isStunned = AbilitySystemComponent.Tags.Contains(GameData.Instance.Tags.ConditionStunned);
+            if (isStunned)
+            {
+                // TODO: ?
+            }
+            else
+            {
+                UpdateAttack();
+            }
+
             UpdateAttackCooldown(deltaTime);
         }
     }
@@ -98,23 +108,23 @@ public class Monster : Creature
         _navMeshAgent.isStopped = true;
         _navMeshAgent.enabled = false;
 
-        _collider.enabled = false;
+        CreatureCollider.enabled = false;
     }
 
     protected override void OnDamageTaken(GameObject causer, Vector3 origin, float amount)
     {
         PlayHitAnimation();
 
-        if(GameData.Instance.hitParticleEffect != null)
+        if (GameData.Instance.hitParticleEffect != null)
         {
             GameObject particleEffectInstance = Instantiate(GameData.Instance.hitParticleEffect, transform.position, Quaternion.identity);
             Destroy(particleEffectInstance, 2f);
         }
+    }
 
-        // TODO: shouldn't be here
-        // var knockBackMagnitude = AbilitySystemUtility.GetAttributeValueOrDefault(causer, AttributeType.KnockBack, 1);
-        //
-        // KnockBack(origin, knockBackMagnitude * amount / MaxHealth);
+    protected override Collider GetCreatureCollider()
+    {
+        return GetComponentInChildren<Collider>();
     }
 
     private void UpdateMovementAnimation()
@@ -156,7 +166,7 @@ public class Monster : Creature
             Critical = false,
         };
 
-        DamageSystem.Instance.PostDamageEvent(damageEvent);
+        DamageSystem.ActiveInstance.PostDamageEvent(damageEvent);
     }
 
     private bool IsTargetInAttackRange()
@@ -223,7 +233,7 @@ public class Monster : Creature
         // select one of the random 3 death animations
         var max_death_animmation = 3;
         var death_animation = Random.Range(0, max_death_animmation);
-        
+
         // set the animation
         _animator.SetInteger("IsDead", death_animation);
     }
@@ -239,9 +249,9 @@ public class Monster : Creature
         _isSpawning = false;
 
         // enable movement and the colliders for the monster.        
-        if (_collider)
+        if (CreatureCollider)
         {
-            _collider.enabled = true;
+            CreatureCollider.enabled = true;
         }
     }
 }

@@ -14,8 +14,10 @@ AttackAbilityInstanceData.cs
 */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.UI.GridLayoutGroup;
+using Random = UnityEngine.Random;
 
 public interface IAttackAbilityAim
 {
@@ -49,6 +51,23 @@ public abstract class AttackAbility : Ability
     protected AttackAbility()
     {
         AbilityInstanceDataClass = new AbilityInstanceDataClass(typeof(AttackAbilityInstanceData));
+    }
+
+    public void ApplyProjectileDamageEffect(AbilityInstance abilityInstance, Projectile projectile, IEnumerable<AbilityTarget> targets)
+    {
+        var damageMin = DamageMin.Calculate(abilityInstance);
+        var damageMax = DamageMax.Calculate(abilityInstance);
+
+        var damage = Random.Range(damageMin, damageMax);
+
+        foreach (var target in targets)
+        {
+            AbilityTargetUtility.ApplyAbilityEffectToTarget(abilityInstance, DamageEffect, target, effectContext =>
+            {
+                effectContext.SetValue(DamageEffect.AmountSetByCaller, damage);
+                effectContext.SetValue(DamageEffect.CauserSetByCaller, projectile.gameObject);
+            });
+        }
     }
 
     protected bool GetEquipmentAim(AbilityInstance abilityInstance, out Vector3 origin)
@@ -155,6 +174,20 @@ public abstract class AttackAbility : Ability
 
         origin = attackOrigin;
         direction = attackDirection;
+    }
+
+    protected void GetOwnerAimTarget(AbilityInstance abilityInstance, out Vector3 target)
+    {
+        var owner = abilityInstance.Owner;
+
+        switch (owner)
+        {
+            case IAttackAbilityAim aim:
+                target = aim.GetAttackAbilityAimTarget();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(owner), owner, null);
+        }
     }
 
     protected void NotifyAttackCommitted(AbilityInstance abilityInstance, Vector3 origin, Vector3 direction)
