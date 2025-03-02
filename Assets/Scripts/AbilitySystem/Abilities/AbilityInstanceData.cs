@@ -12,7 +12,7 @@ Please refer to the README file for detailled information
 AbilityInstanceDatas.cs
 
 */
-
+using UnityEngine;
 public abstract class AbilityInstanceData
 {
 
