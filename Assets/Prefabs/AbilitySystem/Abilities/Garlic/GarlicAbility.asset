@@ -40,7 +40,8 @@ MonoBehaviour:
     AttributeProvider: 1
     Attribute: 22
     Value: 1.5
-  TargetEffect: {fileID: 11400000, guid: 92f98b1da81f8a14ea7ef155be329e3b, type: 2}
   TargetEffects:
   - {fileID: 11400000, guid: 92f98b1da81f8a14ea7ef155be329e3b, type: 2}
   - {fileID: 11400000, guid: 6095c62a8e36dea4ba96443b4e7a98f2, type: 2}
+  particlesPrefab: {fileID: 2230414966002175049, guid: 5d521121b40a32c4fa85e763a71f4f77,
+    type: 3}

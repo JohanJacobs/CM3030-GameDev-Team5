@@ -14,6 +14,7 @@ GarlicAbility.cs
 */
 
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 [AbilityInstanceDataClass]
@@ -42,10 +43,35 @@ public class GarlicAbility : Ability
 
     public Effect[] TargetEffects;
 
+    public GameObject particlesPrefab;
+
     public GarlicAbility()
     {
         ActivateOnGranted = true;
         AbilityInstanceDataClass = new AbilityInstanceDataClass(typeof(GarlicAbilityInstanceData));
+    }
+
+    public override void HandleAbilityAdded(AbilityInstance abilityInstance)
+    {
+        base.HandleAbilityAdded(abilityInstance);
+
+        //instantiate the prefab 
+        if (particlesPrefab != null && abilityInstance.Owner != null)
+        {
+            var garlicParticleInstance = Instantiate(particlesPrefab, abilityInstance.Owner.transform);
+
+            abilityInstance.Data.GarlicParticleInstance = garlicParticleInstance;
+        }
+    }
+
+    public override void HandleAbilityRemoved(AbilityInstance abilityInstance)
+    {
+        base.HandleAbilityRemoved(abilityInstance);
+
+        if (abilityInstance.Data.GarlicParticleInstance != null)
+        {
+            Destroy(abilityInstance.Data.GarlicParticleInstance);
+        }
     }
 
     public override void UpdateAbility(AbilityInstance abilityInstance, float deltaTime)
