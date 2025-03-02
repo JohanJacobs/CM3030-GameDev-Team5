@@ -76,7 +76,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EquipmentAttachmentSlots: []
-  WalkAnimationMoveSpeed: 2
+  WalkAnimationMoveSpeed: 3
   _autoDestroyOnDeath: 1
   ApproachDistance: 1.25
   StartsWithSpawnAnimation: 0
