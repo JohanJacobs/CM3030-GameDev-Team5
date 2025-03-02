@@ -21,6 +21,7 @@ using UnityEngine;
 public class GarlicAbilityInstanceData : AbilityInstanceData
 {
     public float TimeToNextTrigger;
+    public GameObject GarlicParticleInstance;
 }
 
 [CreateAssetMenu(menuName = "Abilities/Garlic")]
@@ -59,9 +60,9 @@ public class GarlicAbility : Ability
         if (particlesPrefab != null && abilityInstance.Owner != null)
         {
             GameObject garlicParticleInstance = Instantiate(particlesPrefab, abilityInstance.Owner.transform);
-            // var data = abilityInstance.GetData<GarlicAbilityInstanceData>();
-            // data.ParticleInstance = particleInstance;
-            abilityInstance.Data.GarlicParticleInstance = garlicParticleInstance;
+
+            var go = abilityInstance.GetData<GarlicAbilityInstanceData>();
+            go.GarlicParticleInstance = garlicParticleInstance;
         }
     }
 
@@ -69,9 +70,11 @@ public class GarlicAbility : Ability
     {
         base.HandleAbilityRemoved(abilityInstance);
 
-        if (abilityInstance.Data.GarlicParticleInstance != null)
+        var data = abilityInstance.GetData<GarlicAbilityInstanceData>();
+
+        if (data.GarlicParticleInstance != null)
         {
-            Destroy(abilityInstance.Data.GarlicParticleInstance);
+            Destroy(data.GarlicParticleInstance);
         }
     }
 

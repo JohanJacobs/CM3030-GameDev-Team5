@@ -15,7 +15,7 @@ AbilityInstanceDatas.cs
 using UnityEngine;
 public abstract class AbilityInstanceData
 {
-    public GameObject GarlicParticleInstance;
+
 }
 
 [AbilityInstanceDataClass]
