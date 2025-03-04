@@ -701,7 +701,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1888bf49ef907524dba05c17496b2dd6, type: 2}
   - {fileID: 11400000, guid: 555f33c7a68936b4eb64b2c8177b7df3, type: 2}
   - {fileID: 11400000, guid: bf82de43a02d7c048878dc7d4273d3a7, type: 2}
-  gameTimeInMinutes: 1
+  gameTimeInMinutes: 5
   _pickupSpawnRadius: 1.2
 --- !u!4 &1571807413
 Transform:
