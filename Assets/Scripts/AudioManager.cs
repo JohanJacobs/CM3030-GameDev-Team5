@@ -70,5 +70,14 @@ public class AudioManager : MonoBehaviour
         musicSource.Play();
     }
 
+    public void SetMusicVolume(float volume)
+    {
+        musicSource.volume = volume;        
+    }
+    public void SetSFXVolume(float volume)
+    {
+        SFXSource.volume = volume;
+    }
+
     private static AudioManager _instance;
 }
