@@ -23,6 +23,8 @@ using static VolumeSettings;
 
 public class VolumeSettings : MonoBehaviour
 {
+    private static AudioManager audioManager => AudioManager.Instance;
+
     [SerializeField] private AudioMixer myMixer;
     [SerializeField] private Slider MusicSlider;
     [SerializeField] private Slider FXSlider;
@@ -39,19 +41,21 @@ public class VolumeSettings : MonoBehaviour
     public event VolumeSettingsChanged OnVolumeSettingsChanged;
 
     public bool IsAudioMuted { get { return isMuted; } }
-    
+
+    #region UI Callbacks
     public void FXSliderChanged()
     {
         currentFX = FXSlider.value;
         SetMixerVolume(currentFX, currentMusic);        
     }
 
-
     public void MusicSliderChanged()
     {
         currentMusic = MusicSlider.value;
         SetMixerVolume(currentFX, currentMusic);        
     }
+    #endregion UI Callbacks
+
 
     public void ToggleMute()
     {
@@ -88,25 +92,15 @@ public class VolumeSettings : MonoBehaviour
         {
             FXSlider.value = currentFX;
             MusicSlider.value = currentMusic;
-            //OnVolumeSettingsChanged?.Invoke(this);
+            OnVolumeSettingsChanged?.Invoke(this);
         }
-
-        //SetMixerVolume(currentFX,currentMusic);
-
-        
     }
 
     private void SetMixerVolume(float fxVolume, float musicVolume)
     {
-        myMixer.SetFloat("Music", CalculateVolume(musicVolume));
-        myMixer.SetFloat("SFX", CalculateVolume(fxVolume));
+        audioManager.SetMusicVolume((musicVolume));
+        audioManager.SetSFXVolume((fxVolume));
         OnVolumeSettingsChanged?.Invoke(this);
     }
-
-    private float CalculateVolume(float sliderValue)
-    {
-        return Mathf.Log10(sliderValue) * 20f;
-    }         
-   
 }
 
