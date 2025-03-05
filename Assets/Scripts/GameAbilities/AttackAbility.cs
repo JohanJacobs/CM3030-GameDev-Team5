@@ -43,6 +43,7 @@ public class AttackAbilityInstanceData : AbilityInstanceData
 public abstract class AttackAbility : Ability
 {
     public DamageEffect DamageEffect;
+    public Effect[] TargetEffects;
 
     public Magnitude DamageMin;
     public Magnitude DamageMax;
@@ -68,6 +69,11 @@ public abstract class AttackAbility : Ability
                 effectContext.SetValue(DamageEffect.CauserSetByCaller, projectile.gameObject);
             });
         }
+    }
+
+    public void ApplyProjectileTargetEffects(AbilityInstance abilityInstance, Projectile projectile, IEnumerable<AbilityTarget> targets)
+    {
+        AbilityTargetUtility.ApplyAbilityEffectsToTargets(abilityInstance, TargetEffects, targets);
     }
 
     protected bool GetEquipmentAim(AbilityInstance abilityInstance, out Vector3 origin)

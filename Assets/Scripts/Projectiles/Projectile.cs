@@ -53,8 +53,6 @@ public class Projectile : MonoBehaviour
     {
         foreach (var contact in collision.contacts)
         {
-            Debug.DrawRay(contact.point, contact.normal, Color.white);
-
             if (TryHit(contact.otherCollider))
                 break;
         }

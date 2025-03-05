@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class GrenadeProjectile : Projectile
@@ -77,11 +78,12 @@ public class GrenadeProjectile : Projectile
             Range = range,
         };
 
-        var targets = AbilityTargetSelector.GetAreaTargets(targetQuery);
+        var targets = AbilityTargetSelector.GetAreaTargets(targetQuery).ToArray();
 
         if (AbilityInstance.Ability is AttackAbility attackAbility)
         {
             attackAbility.ApplyProjectileDamageEffect(AbilityInstance, this, targets);
+            attackAbility.ApplyProjectileTargetEffects(AbilityInstance, this, targets);
         }
 
         SpawnExplosionVisuals();

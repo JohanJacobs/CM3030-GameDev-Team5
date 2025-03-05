@@ -28,6 +28,8 @@ MonoBehaviour:
   DisplayName: 
   Description: 
   DamageEffect: {fileID: 11400000, guid: 817b68add03e58b45a2da251df55c866, type: 2}
+  TargetEffects:
+  - {fileID: 11400000, guid: e60f08773ef67e2478a44aacd75f7d32, type: 2}
   DamageMin:
     Calculation: 5
     AttributeProvider: 1

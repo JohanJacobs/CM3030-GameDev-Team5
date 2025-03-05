@@ -13,6 +13,7 @@ RayAttackAbility.cs
 
 */
 
+using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Abilities/Ray Attack")]
@@ -43,7 +44,7 @@ public class RayAttackAbility : AttackAbility
             Range = range,
         };
 
-        var targets = AbilityTargetSelector.GetRaycastTargetsSingle(targetQuery);
+        var targets = AbilityTargetSelector.GetRaycastTargetsSingle(targetQuery).ToArray();
 
         foreach (var target in targets)
         {
@@ -52,6 +53,8 @@ public class RayAttackAbility : AttackAbility
                 effectContext.SetValue(DamageEffect.AmountSetByCaller, damage);
             });
         }
+
+        AbilityTargetUtility.ApplyAbilityEffectsToTargets(abilityInstance, TargetEffects, targets);
 
         NotifyAttackCommitted(abilityInstance, origin, direction);
 
