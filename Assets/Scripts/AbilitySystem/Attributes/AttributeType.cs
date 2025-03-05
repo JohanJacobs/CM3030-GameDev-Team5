@@ -49,6 +49,7 @@ public enum AttributeType
     HealingScale,
     CooldownScale,
     DurationScale,
+    MinCooldownScale
 }
 
 public static class AttributeTypeHelper

@@ -64,4 +64,34 @@ public class Player : Creature, IAttackAbilityAim, IAttackAbilityDispatcher
     {
         CommittedAttack?.Invoke(abilityInstance, origin, direction, abilityEquipmentSlot);
     }
+
+    
+    private AttributeValue _minCooldownScaleAttribute;
+    protected override void Awake()
+    {
+        base.Awake();
+        AbilitySystemComponent.OnReady(OnAbilitySystemReady, 10);
+    }
+    private void OnAbilitySystemReady(AbilitySystemComponent asc)
+    {
+        Debug.Assert(AbilitySystemComponent == asc);
+        
+        AbilitySystemComponent.RegisterPostAttributeModificationCallback(AttributeType.CooldownScale, HandlePostAttributeModification);
+
+        _minCooldownScaleAttribute = asc.GetAttributeValueObject(AttributeType.MinCooldownScale);
+
+    }
+
+    private void HandlePostAttributeModification(AbilitySystemComponent asc, AttributeType attribute, ref float value)
+    {
+        switch (attribute) {
+            case AttributeType.CooldownScale:
+                if (value < _minCooldownScaleAttribute.Value)
+                {
+                    value = _minCooldownScaleAttribute.Value;
+                }
+                break;
+        }
+        
+    }
 }

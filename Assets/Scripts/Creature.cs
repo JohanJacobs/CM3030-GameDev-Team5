@@ -55,7 +55,7 @@ public class Creature : MonoBehaviour
     [SerializeField]
     protected bool _autoDestroyOnDeath = true;
 
-    void Awake()
+    protected virtual void Awake()
     {
         AbilitySystemComponent = GetComponent<AbilitySystemComponent>();
 
