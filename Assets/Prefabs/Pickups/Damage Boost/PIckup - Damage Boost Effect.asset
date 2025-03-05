@@ -30,7 +30,9 @@ MonoBehaviour:
     AttributeProvider: 1
     Attribute: 0
     Value: 0
-  Tags: []
+  Tags:
+  - _string: Effect.ShowOnScreen
   BlockTags: []
   CancelTags: []
   GrantedTags: []
+  DisplayName: <color=FF4100>Quarter Damage</color>

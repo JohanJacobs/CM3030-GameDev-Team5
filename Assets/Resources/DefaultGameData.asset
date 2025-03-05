@@ -68,5 +68,7 @@ MonoBehaviour:
       _string: Condition.Dead
     ConditionStunned:
       _string: Condition.Stunned
+    EffectShowOnScreen:
+      _string: Effect.ShowOnScreen
   DefaultDamageEffect: {fileID: 11400000, guid: 817b68add03e58b45a2da251df55c866,
     type: 2}

@@ -10,11 +10,10 @@ public class AbilityPickupText : PickupText
             if (pickupWithEffect.Effect is GrantAbilityEffect grantAbilityEffect)
             {
                 SetText(tmp, grantAbilityEffect.GrantedAbility.DisplayName, grantAbilityEffect.GrantedAbility.Description);
+                return;
             }
-            else
-            {
-                Debug.LogWarning($"Expected GrantAbilityEffect, got {pickupWithEffect.Effect.GetType()}");
-            }
+
+            // TODO: add more effect types?
         }
         else
         {

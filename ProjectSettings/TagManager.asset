@@ -10,6 +10,7 @@ TagManager:
   - PlayerStart
   - Condition.Dead
   - Condition.Stunned
+  - Effect.ShowOnScreen
   layers:
   - Default
   - TransparentFX

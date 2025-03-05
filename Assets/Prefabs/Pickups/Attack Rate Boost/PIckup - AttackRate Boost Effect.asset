@@ -35,7 +35,9 @@ MonoBehaviour:
     AttributeProvider: 1
     Attribute: 0
     Value: 0
-  Tags: []
+  Tags:
+  - _string: Effect.ShowOnScreen
   BlockTags: []
   CancelTags: []
   GrantedTags: []
+  DisplayName: Qwikshot

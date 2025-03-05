@@ -10,8 +10,6 @@ public class PopupManager : MonoBehaviour
     [SerializeField] private float _popupTimeToLive = 1f;
     [SerializeField] private Transform popupTemplate;
 
-    private AbilitySystemComponent asc;
-
     public void OnEnable()
     {
         //AttributeModifier
@@ -60,7 +58,6 @@ public class PopupManager : MonoBehaviour
                 // dynamically create popup string value (target = player)
                 sb.Clear();
 
-                
                 if (delta < 0f)
                     sb.Append("-");
                 else if (delta > 0f)

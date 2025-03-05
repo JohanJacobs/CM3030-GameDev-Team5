@@ -50,6 +50,8 @@ public class GameTags
 {
     public Tag ConditionDead;
     public Tag ConditionStunned;
+
+    public Tag EffectShowOnScreen;
 }
 
 [CreateAssetMenu]

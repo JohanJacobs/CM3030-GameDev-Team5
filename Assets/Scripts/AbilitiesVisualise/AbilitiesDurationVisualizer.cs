@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
 using TMPro;
 using UnityEngine;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 /*
     Visual feedback for the boost that a player has picked up
@@ -10,100 +13,101 @@ using UnityEngine;
 
 public class AbilitiesDurationVisualizer : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI _textMesh;
-    AbilitySystemComponent _abilitySystem;
+    private const float UpdateInterval = 0.1f;
 
-    List<Effect> _currentEffects;
+    [SerializeField]
+    private TextMeshProUGUI _textMesh;
 
-    string _playerTag = "Player";
+    [SerializeField]
+    private Tag _effectTag;
+
+    private AbilitySystemComponent _asc;
+
+    private float _toNextUpdate;
 
     #region Unity Messages
+
     private void Awake()
     {
-        var go = GameObject.FindGameObjectWithTag(_playerTag);
-        _abilitySystem = go.GetComponent<AbilitySystemComponent>();
-        _currentEffects = new List<Effect>();
     }
 
-    private void OnEnable()
+    private void Start()
     {
-        Pickup.GlobalPickedUp += Pickup_GlobalPickedUp;
+        var player = GameController.ActiveInstance.Player;
+
+        _asc = player.GetComponent<AbilitySystemComponent>();
     }
 
-    private void OnDisable()
-    {
-        Pickup.GlobalPickedUp -= Pickup_GlobalPickedUp;
-    }
     private void LateUpdate()
     {
-        var attribute_times = GetEffectAttributeTimes();
-        _textMesh.text = GenerateDisplayText(attribute_times);       
+        _toNextUpdate -= Time.deltaTime;
+
+        if (_toNextUpdate > 0)
+            return;
+
+        _toNextUpdate += UpdateInterval;
+
+        var effectInfos = _asc.GetActiveEffectsInfoByTag(_effectTag);
+
+        _textMesh.text = GenerateDisplayText(effectInfos);
     }
 
     #endregion Unity Messages
 
-    // Iterate over active effects and identify the modifiers active with their
-    // longest active durations.
-    private Dictionary<AttributeType, float> GetEffectAttributeTimes()
+    private static string GenerateDisplayText(IEnumerable<EffectInfo> effectInfos)
     {
-        // keep track of effects that are still active
-        List<Effect> remaining_effects = new List<Effect>();
+        var attributeDataMap = GameData.Instance.AttributeDataMap;
+        var effectInfoArray = effectInfos.ToArray();
 
-        // determine the longest active time 
-        Dictionary<AttributeType, float> attribute_duration= new Dictionary<AttributeType, float>();
+        var sb = new StringBuilder(256);
 
-        foreach (var e in _currentEffects)
+        foreach (var effectInfo in effectInfoArray)
         {
-            var d = _abilitySystem.GetActiveEffectTimeRemainingFraction(e);
-            if (d <= 0)
-                continue;
-            
-            foreach (var m in e.Modifiers)
+            var effectName = string.IsNullOrWhiteSpace(effectInfo.Effect.DisplayName)
+                ? effectInfo.Effect.name
+                : effectInfo.Effect.DisplayName;
+
+            sb.Append("<b>");
+            sb.Append(effectName);
+            sb.Append(" - ");
+            sb.Append(effectInfo.TimeLeft.ToString("F2", CultureInfo.InvariantCulture));
+            sb.Append(" ");
+            sb.Append("[");
+            sb.Append(effectInfo.Stacks);
+            sb.Append("]");
+            sb.Append("</b>");
+            sb.AppendLine();
+
+            foreach (var attributeModifierInfo in effectInfo.AttributeModifiers)
             {
-                UpdateDataDictionary(attribute_duration, m.Attribute, d * e.Duration.Value);
+                var attribute = attributeModifierInfo.Attribute;
+                var delta = attributeModifierInfo.Value;
+
+                sb.Append("\t");
+
+                if (delta < 0f)
+                    sb.Append("-");
+                else if (delta > 0f)
+                    sb.Append("+");
+
+                if (attribute.IsScaleAttribute())
+                {
+                    sb.Append(Mathf.Abs(delta * 100f).ToString("0.##", CultureInfo.InvariantCulture));
+                    sb.Append("%");
+                }
+                else
+                {
+                    sb.Append(Mathf.Abs(delta).ToString("0.##", CultureInfo.InvariantCulture));
+                }
+
+                var attributeDisplayName = attributeDataMap.TryGetValue(attribute, out var attributeData) ? attributeData.DisplayName : attribute.GetName();
+
+                sb.Append(" ");
+                sb.Append(attributeDisplayName);
+                sb.AppendLine();
             }
-
-            remaining_effects.Add(e);            
         }
 
-        // update the active list of effects
-        _currentEffects.Clear();
-        _currentEffects = remaining_effects;
-
-        return attribute_duration;
-    }
-
-    void UpdateDataDictionary(Dictionary<AttributeType, float> attribute_durations, AttributeType Attribute, float value)
-    {
-        // Value not in the dictionary
-        if (!attribute_durations.ContainsKey(Attribute))
-            attribute_durations.Add(Attribute, value);
-
-        // Update the value if its bigger
-        else if (attribute_durations[Attribute] < value)
-            attribute_durations[Attribute] = value;        
-    }
-
-    // Generate the display string
-    string GenerateDisplayText(Dictionary<AttributeType, float> attribute_durations)
-    {
-        string text = "";
-        foreach (var a in attribute_durations)
-        {
-            text += $" {a.Key} {Math.Round(a.Value,1)}s\n";
-        }
-
-        return text;
-    }
-
-    // Add new pickups to the effect list that is tracked.
-    private void Pickup_GlobalPickedUp(Pickup sender, GameObject pickedUpBy)
-    {
-
-        if (sender is PickupWithEffect pwe)
-        {
-            _currentEffects.Add(pwe.Effect);
-        }
+        return sb.ToString();
     }
 }
-

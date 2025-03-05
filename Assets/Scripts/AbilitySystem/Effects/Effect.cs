@@ -61,6 +61,8 @@ public class Effect : ScriptableObject, IEffectLogic
     /// </remarks>
     public Tag[] GrantedTags;
 
+    public string DisplayName;
+
     public bool HasBlockTags => BlockTags != null && BlockTags.Length > 0;
     public bool HasCancelTags => CancelTags != null && CancelTags.Length > 0;
     public bool HasGrantedTags => GrantedTags != null && GrantedTags.Length > 0;
