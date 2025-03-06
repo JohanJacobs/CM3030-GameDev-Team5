@@ -25,6 +25,7 @@ MonoBehaviour:
     Attribute: 0
     Value: 2.5
   ExplodeOnHit: 0
+  ExplosionFx: {fileID: 100004, guid: b46890100828db6429ff69c322b45893, type: 3}
 --- !u!1 &9205836505423852477
 GameObject:
   m_ObjectHideFlags: 0

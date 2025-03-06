@@ -9,6 +9,8 @@ public class GrenadeProjectile : Projectile
 
     public bool ExplodeOnHit = false;
 
+    public GameObject ExplosionFx;
+
     private bool _exploded = false;
     private bool _landed = false;
 
@@ -86,11 +88,11 @@ public class GrenadeProjectile : Projectile
             attackAbility.ApplyProjectileTargetEffects(AbilityInstance, this, targets);
         }
 
-        SpawnExplosionVisuals();
+        SpawnExplosionFx();
     }
 
-    private void SpawnExplosionVisuals()
+    private void SpawnExplosionFx()
     {
-
+        Instantiate(ExplosionFx, transform.position, Quaternion.identity, transform.parent);
     }
 }

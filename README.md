@@ -60,3 +60,7 @@ The following assets were incorporated in the game:
 - Video game star
   https://www.freepik.com/free-vector/video-game-star_136470646.htm
   Free, attribution required
+
+- War FX by Jean Moreno
+  https://assetstore.unity.com/packages/vfx/particles/war-fx-5669
+  Extension Asset license, https://unity.com/legal/as-terms
