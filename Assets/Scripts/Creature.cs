@@ -55,14 +55,17 @@ public class Creature : MonoBehaviour
     [SerializeField]
     protected bool _autoDestroyOnDeath = true;
 
+    AttributeValue _CooldownScaleAttribute;
     void Awake()
     {
         AbilitySystemComponent = GetComponent<AbilitySystemComponent>();
+        AbilitySystemComponent.OnReady(OnAbilitySystemReady, 10);
 
         HealthComponent = GetComponent<HealthComponent>();
         HealthComponent.OutOfHealth += OnOutOfHealth;
 
         CreatureCollider = GetCreatureCollider();
+
     }
 
     public void NotifyDamageTaken(in DamageEvent damageEvent)
@@ -150,4 +153,25 @@ public class Creature : MonoBehaviour
         }
     }
 #endif
+
+    private void OnAbilitySystemReady(AbilitySystemComponent asc)
+    {
+        Debug.Assert(AbilitySystemComponent == asc);
+
+        asc.RegisterPostAttributeModificationCallback(AttributeType.CooldownScale, HandlePostAttributeModification);
+    }
+
+    private void HandlePostAttributeModification(AbilitySystemComponent asc, AttributeType attribute, ref float value)
+    {
+        switch (attribute)
+        {
+            case AttributeType.CooldownScale:
+                if (value < 0.05f)
+                {
+                    value = 0.05f;                    
+                }
+                break;
+        }
+
+    }
 }
