@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Modifiers:
   - Attribute: 6
-    Type: 2
-    Value: 1.2
+    Type: 0
+    Value: 0.5
     Permanent: 0
     Post: 0
   DurationPolicy: 1
