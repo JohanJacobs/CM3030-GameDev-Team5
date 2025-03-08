@@ -6,7 +6,7 @@ Final Assignment - Streets of Fire Game
 Group 5 
 
 Game Description: An intuitive, easy to learn shooting, survival game inspired by Vampire Survivors, but using
-a 3D city scenario with streets, cars, buildings and other assets, where the player controls a mage using a 
+a 3D city scenario with streets, cars, buildings and other assets, where the player controls a rogue using a 
 crossbow to eliminate skeletons infestating the city. 
 
 This work has been created with Unity 2019.4.40f1 and using Github to manage the main repository at 
