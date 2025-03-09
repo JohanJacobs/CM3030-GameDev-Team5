@@ -20,7 +20,7 @@ MonoBehaviour:
     Post: 0
   - Attribute: 23
     Type: 0
-    Value: -0.25
+    Value: -0.1
     Permanent: 0
     Post: 0
   DurationPolicy: 1

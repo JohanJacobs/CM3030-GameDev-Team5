@@ -44,10 +44,11 @@ MonoBehaviour:
   BlockTags: []
   CancelTags: []
   GrantedTags: []
+  DisplayName: 
   AmountCalculation: 0
   OriginCalculation: 0
   Amount:
     Calculation: 5
     AttributeProvider: 0
     Attribute: 18
-    Value: 1.5
+    Value: 1.2

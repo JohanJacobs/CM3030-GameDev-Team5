@@ -18,14 +18,14 @@ MonoBehaviour:
     Value: 1.05
     Permanent: 1
     Post: 0
-  - Attribute: 11
-    Type: 2
-    Value: 1.1
+  - Attribute: 23
+    Type: 0
+    Value: -0.05
     Permanent: 1
     Post: 0
   - Attribute: 18
     Type: 2
-    Value: 1.025
+    Value: 1.05
     Permanent: 1
     Post: 0
   - Attribute: 14
@@ -33,7 +33,7 @@ MonoBehaviour:
     Value: 1
     Permanent: 1
     Post: 0
-  DurationPolicy: 2
+  DurationPolicy: 0
   CancellationPolicy: 0
   Duration:
     Calculation: 0
@@ -49,3 +49,4 @@ MonoBehaviour:
   BlockTags: []
   CancelTags: []
   GrantedTags: []
+  DisplayName: 
